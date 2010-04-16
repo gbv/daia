@@ -1,0 +1,18 @@
+0.26 2010-01-19
+     - Extended the 'serve' method and added FastCGI example
+     - Added fetching data via HTTP in DAIA::parse
+     - improved error messages
+     - some UTF8 and XML fiddling
+0.25 2009-10-22
+     - refactored DAIA::parse_xml, added DAIA::parse_json and DAIA::parse
+     - fixed 'label' serializing in DAIA/XML, added parameters xslt and header
+     - fixed adding multiple child elements at once
+     - moved Response->serve to Object->serve and added UTF-8 encoding
+     - added Item->services
+     - added example client 'daiaformat.pl'
+0.21 2009-10-15
+     - remove XML::Writer dependency, rewrote ->xml and started parse_xml
+0.20 2009-10-14
+     - first public release
+0.10 2009-10-14
+     - first public snapshot
