@@ -18,5 +18,6 @@ More tests and documentation
 * does it work on Windows ?
 
 Misc
-* rewrite daia.xsl
+* rewrite daia.xsl client (icons missing?)
 * minimize package dependencies
+
