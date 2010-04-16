@@ -1,0 +1,64 @@
+/**
+ * CSS for daia.xsl.
+ */
+
+/* general layout */
+body { font-family: sans-serif; font-size: small }
+div { padding: 5px;}
+h1 { border-bottom: 1px solid #aaa; margin: 0; }
+#meta { font-size: smaller; text-align: right; }
+h1, h2 { font-weight: bold; }
+#about { border-top: 1px solid #fabd23; margin-top: 1em; }
+
+/* copy table */
+table { border-collapse:collapse; }
+th { background: #ccf; }
+td { border: 1px solid #666; padding: 3px; }
+
+/* messages and errors */
+.messsage { border: 1px solid #c0c090; background: #f8eaba; }
+.error    { border: 1px solid #BB7070; background: #FFDBDB; }
+.errno { color: red; font-weight: bold; }
+
+/* ids */
+.id { font-family: monospace; font-size: medium; }
+
+/* delay or expected time */
+.time {
+  padding-left: 22px; line-height: 18px; display: inline-block; 
+  background:transparent url(icons/clock_16.png) center left no-repeat
+}
+
+/* fragmented item and limited access */
+/* tr.fragment td, td.limited { background: #ccc; } */
+.limitation {  border: 1px solid #BB7070; background: #FFDBDB; }
+.limited { background: #FFDBDB; }
+.limited { background: #FFDBDB; }
+
+/* status icons (0=unknown, 1=available, 2=not available, 3=currently not available) */
+.status0, .available, .status2, .status3 { padding-left: 25px; line-height: 20px;
+    display: inline-block; }
+.status0 { background:transparent url(icons/questionmark_16.png) center left no-repeat; }
+
+/*
+.available { background:transparent url(18px-Bullet-green.png) center left no-repeat; }
+.status2 { background:transparent url(18px-Bullet-red.png) center left no-repeat; }
+.status3 { background:transparent url(questionmark_16.png) center left no-repeat; }
+*/
+.loan .available { background:transparent url(icons/daia_loan_16.png) center left no-repeat; }
+.presentation .available { background:transparent url(icons/daia_presentation_16.png) center left no-repeat; }
+
+
+/* xmlverbatim */
+.xmlverb-default          { color: #333; font-family: monospace; font-size: medium;
+    background-color: #fff; border: 1px solid #666 }
+.xmlverb-element-name     { color: #900 }
+.xmlverb-element-nsprefix { color: #660 }
+.xmlverb-attr-name        { color: #600 }
+.xmlverb-attr-content     { color: #009; font-weight: bold }
+.xmlverb-ns-name          { color: #660 }
+.xmlverb-ns-uri           { color: #309 }
+.xmlverb-text             { color: #000; font-weight: bold }
+.xmlverb-comment          { color: #060; font-style: italic }
+.xmlverb-pi-name          { color: #060; font-style: italic }
+.xmlverb-pi-content       { color: #066; font-style: italic }

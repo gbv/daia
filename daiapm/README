@@ -1,0 +1,27 @@
+DAIA Perl package
+=================
+
+This module provides classes and functions for the Document Availability
+Information API (DAIA) as specified at L<http://purl.org/NET/DAIA>.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+See Makefile.PL for a list of dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Verbundzentrale des GBV (VZG) and by Jakob
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

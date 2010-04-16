@@ -1,0 +1,22 @@
+The following feature requests and bug reports are known:
+
+Additional functionality
+* add inferencing (same id = same object policy)
+* support DAIA/RDF 
+
+Additional methods
+* validating as method (move code from daia.pl)
+* add 'error' and 'addError' methods
+* add 'remove_messages([lang])' and 'get_messages()'
+* user-defined XML-namespace-prefix in XML serialization
+
+More tests and documentation
+* how to add properties (add/append/provide)
+* document and test setting via unblessed struct
+* test UTF-8 (when reading from streams), append*, ...
+* more serialization and unserialization
+* does it work on Windows ?
+
+Misc
+* rewrite daia.xsl
+* minimize package dependencies

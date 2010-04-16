@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+daia - Simple DAIA parser and converter as command line client or CGI script
+
+=cut
+
+use strict;
+use utf8;
+use Encode;
+use CGI qw(:standard);
+use LWP::Simple qw(get);
+use Data::Dumper;
+use CGI::Carp qw(fatalsToBrowser);
+use DAIA;
+
+our $VERSION = '0.6';
+
+=head1 DESCRIPTION
+
+You can pass either an URL which will be queried, or a string of serialized DAIA.
+The serialization format (JSON or XML) can be specified or it will get guessed.
+You can use this as a proxy to convert serialization format or just show the result
+in HTML - in this case you can also validate DAIA/XML against the XML Schema.
+
+=head1 COMMAND LINE USAGE
+
+To get usage information call this script with C<-?>, C<-h> or C<--help> as only
+parameter. Options can be passed as C<key=value> pairs and the first parameter
+is treated as filename or URL to read from (use '-' for STDIN as set by default).
+
+  daia input.xml  out=json  # convert to DAIA/JSON (default)
+  daia input.json out=xml   # convert to DAIA/XML
+
+=head1 CGI USAGE
+
+Put this script in a directory of your webserver where it is executed as CGI script.
+You may have to change its filename to C<daia.pl> and add the following line to the 
+file C<.htaccess>:
+
+  AddHandler cgi-script .pl
+
+=cut
+
+# called as CGI script or from command line?
+my $cgimode = (not @ARGV and CGI->http);
+
+# set parameters
+my $url = param('url');
+$url = shift @ARGV unless defined $url or $cgimode;
+
+my $data = param('data'); # icoming raw data is UTF-8
+eval{ $data = Encode::decode_utf8( $data ); };
+
+my $informat  = lc(param('in'));
+my $outformat = lc(param('out'));
+
+my $callback  = param('callback'); 
+$callback = "" unless $callback =~ /^[a-z][a-z0-9._\[\]]*$/i;
+
+my ($error, $daia);
+
+my $xsd = "daia.xsd"; # TODO: search somewhere else
+
+if( not $url =~  /^\s*http[s]?:\/\// and not $cgimode and not $data ) {
+    $url = '-' unless defined $url;
+    $url =~ s#^file://##;
+    $url = \*STDIN if $url eq '-';
+    if ($url =~ /^-(\?|h|-help)$/) {
+        print join("",<DATA>)."\n";
+        exit;
+    }
+}
+
+# parse DAIA
+if ( $data ) {
+    $daia = eval { DAIA->parse( data => $data, format => $informat ) };
+} elsif( $url ) {
+    $daia = eval { DAIA->parse( file => $url, format => $informat ) };
+}
+if ($@) {
+    $error = $@;
+    $error =~ s/ at .* line.*//;
+}
+
+# called from command line
+if( not $cgimode ) { 
+    if ( $error ) {
+        print STDERR "$error\n";
+    } else {
+        binmode STDOUT, "utf8";
+        if ($outformat eq 'xml') {
+            print $daia->xml(xmlns => 1);
+        } elsif($outformat eq 'dump') {
+            print Dumper($daia);
+        } else {
+            print $daia->json;
+        }
+        print "\n";
+    }
+    exit;
+}
+
+# called as CGI
+if ( $outformat =~ /^(json|xml)$/ ) {
+    my $xslt = "daia.xsl";
+    $xslt = undef unless -f $xslt;
+    $daia->serve( format => $outformat, callback => $callback, xslt => $xslt );
+} elsif ( $outformat and $outformat ne 'html' ) {
+    $error = "Unknown output format - using HTML instead";
+}
+
+# HTML output
+$error = "<div class='error'>".escapeHTML($error)."!</div>" if $error;
+my $msg;
+if ( $url and not $data ) {
+    $msg = "Data was fetched from URL " . a({href=>$url},escapeHTML($url));
+    $msg .= " (" . a({href=>'#result'}, "result...") . ")";
+    $msg = div({class=>'msg'},$msg);
+}
+
+print header(-charset => 'UTF-8');
+print <<HTML;
+<html>
+<head>
+  <title>DAIA Converter</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <style>
+    body { font-family: arial, sans-serif;}
+    h1, p { margin: 0; text-align: center; }
+    h2 { margin-top: 2px; border-bottom: 1px dotted #666;}
+    form { margin: 1em; border: 1px solid #333; }
+    fieldset { border: 1px solid #fff; }
+    label, .error, .msg { font-weight: bold; }
+    .submit, .error { font-size: 120%; }
+    .error { color: #A00; margin: 1em; }
+    .msg { color: #0A0; margin: 1em; }
+    .footer { font-size: small; margin: 1em; }
+    #result { border: 1px dotted #666; margin: 1em; padding: 0.5em; }
+  </style>
+</head>
+<body>
+<h1>DAIA Converter</h1>
+<p>Convert and Validate <a href="http://purl.org/NET/DAIA">DAIA response format</a></p>
+<form method="get" accept-charset="utf-8" action="">
+HTML
+print $msg, $error,
+  fieldset(label('Input: ',
+        popup_menu('in',['','json','xml'],'',
+                   {''=>'Guess','json'=>'DAIA/JSON','xml'=>'DAIA/XML'})
+  )),
+  fieldset('either', label('URL: ', textfield(-name=>'url', -size=>70)),
+    'or', label('Data:'),
+    textarea( -name=>'data', -rows=>20, -cols=>80 ),
+  ),
+  fieldset(
+    label('Output: ',
+        popup_menu('out',['html','json','xml'],'html',
+                   {'html'=>'HTML','json'=>'DAIA/JSON','xml'=>'DAIA/XML'})
+    ), '&#xA0;', 
+    label('JSONP Callback: ', textfield('callback'))
+  ),
+  fieldset('<input type="submit" value="Convert" class="submit" />'),
+  "</form>"
+;
+if ($daia) {
+  if ( $informat eq 'xml' or DAIA::guess($data) eq 'xml' ) {
+    my ($schema, $parser); # TODO: move this into a DAIA library method
+    eval { require XML::LibXML; };
+    if ( $@ ) {
+        $error = "XML::LibXML::Schema required to validate DAIA/XML";
+    } else {
+        $parser = XML::LibXML->new;
+        $schema = eval { XML::LibXML::Schema->new( location => $xsd ); };
+        if ($schema) {
+            my $doc = $parser->parse_string( $data );
+            eval { $schema->validate($doc) };
+            $error = "DAIA/XML not valid but parseable: " . $@ if $@;
+        } else {
+            $error = "Could not load XML Schema - validating was skipped";
+        }
+    }
+    if ( $error ) {
+      print "<p class='error'>".escapeHTML($error)."</p>";
+    } else {
+      print p("DAIA/XML valid according to ".a({href=>$xsd},"this XML Schema"));
+    }
+  } else {
+     print p("validation is rather lax so the input may be invalid - but it was parseable");
+  }
+  print "<div id='result'>";
+  print "<h2>Result in DAIA/JSON</h2>";
+  binmode(STDOUT, ":utf8");
+  print pre(escapeHTML( $daia->json( $callback ) ));
+  print "<h2>Result in DAIA/XML</h2>";
+  print pre(escapeHTML( $daia->xml( xmlns => 1 ) ) );
+  print "</div>";
+}
+
+print <<HTML;
+<div class='footer'>
+The source of this script is
+<a href='http://search.cpan.org/perldoc?daia'>available at CPAN</a>.
+The current version is $VERSION.
+</div></body>
+HTML
+
+__DATA__
+usage: daia [<URL-or-FILE>] [<OPTIONS>]
+
+Options are passed as key=value pairs. If no 'url' option is set, the
+first parameter is used instead. By default reads from STDIN (url=-).
+
+  url=...           input URL or local file
+  data=...          use given string instead of URL or file
+  out=...           set output format 
+      json            DAIA/JSON (default for command line)
+      xml             DAIA/XML
+      html            HTML view (only for CGI)
+      dump            Perl Dump format (only for command line)
+  in=...            set input format (json or xml)
+  callback=...      use callback method (if out=json)
+  -?|-h|--help      show this help

@@ -1,0 +1,10 @@
+{
+  "version" : "0.5",
+  "schema" : "http://ws.gbv.de/daia/",
+  "timestamp" : "2009-06-09T15:39:52.831+02:00",
+  "institution" : { "content" : "贛語" },
+  "document" : [ {
+    "href" : "http://example.com/document/42",
+    "id" : "my:id:1"
+  } ]
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="daia.xsl"?>
+<daia xmlns="http://ws.gbv.de/daia/" version="0.5"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd"
+      timestamp="2009-06-09T15:39:52.831+02:00">
+   <institution>贛語</institution>
+   <document href="http://example.com/document/42" id="my:id:1">
+   </document>
+</daia>
