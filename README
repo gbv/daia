@@ -1,0 +1,9 @@
+
+The DAIA project is grouped into modules that can be used independently:
+
+phpdaia - PHP implementation
+daiapm  - DAIA perl module
+
+Some common resources such as images, XSLT script, and schema files will
+be moved to a common module that other modules reuse.
+
