@@ -1,0 +1,24 @@
+phpDaia is a PHP library to build DAIA information.
+
+It's pretty simple to install phpDAIA.
+
+Just copy the files to a directory on your webserver. To communicate with your ILS you need to 
+edit daia.ini with the data of your library.
+If you are using the DAIA server in addition to a PICA server, you have to modify the Catalog-Urls
+according to your needs.
+
+Currently only PICA systems are supported. 
+Since you may have diffenrences in your local PICA systems, there is no warranty that your PICA system 
+works together with the DAIA server without problems.
+
+You can check your DAIA server by calling 
+http://<your-webserver>/<your-directory>/daia_ws.php?ppn=<one ppn from you catalog>
+Your PHP must support XSLT-transformation to view the DAIA page in HTML.
+If you do not see a result here, just try to view the pure XML result:
+http://<your-webserver>/<your-directory>/daia_ws.php?output=xml&ppn=<one ppn from you catalog>
+
+The XSL-Stylesheet, the icons and the CSS are taken from Jakob Voss' DAIA library in Perl.
+
+Questions? Suggestions? Critics? Please email me! 
+
+Oliver Marahrens <o.marahrens@tu-harburg.de>
