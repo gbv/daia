@@ -1,9 +1,13 @@
 
 The DAIA project is grouped into modules that can be used independently:
 
-phpdaia - PHP implementation
+phpDaia - PHP implementation
 daiapm  - DAIA perl module
 
-Some common resources such as images, XSLT script, and schema files will
-be moved to a common module that other modules reuse.
+In addition some common modules group resources used by other modules:
+
+schemas - DAIA XSD and OWL schemas for validating
+
+Please make sure that all packaged distributions can be used independently!
+This can be done by copying content from the common modules.
 
