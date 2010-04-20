@@ -22,6 +22,6 @@ test:
 	@php test.php
 
 dist:   ${SOURCES}
-	@tar -czf ${DISTFILE} -T MANIFEST
+	@tar -czfh ${DISTFILE} -T MANIFEST
 
 .PHONY: clean test
