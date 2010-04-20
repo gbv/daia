@@ -7,7 +7,7 @@ DAIA - Document Availability Information API in Perl
 =cut
 
 use strict;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =head1 DESCRIPTION
 
@@ -465,13 +465,20 @@ Please report bugs and feature requests via L<https://rt.cpan.org/Public/Dist/Di
 The classes of this package are implemented using L<DAIA::Object> which is just another
 Perl meta-class framework.
 
+The current developer version of this package together with more DAIA
+implementations in other programming languages is availabe in a project
+at Sourceforge: L<http://sourceforge.net/projects/daia/>. Feel free to
+contribute!
+
+A specification of DAIA can be found at L<http://purl.org/NET/DAIA>.
+
 =head1 AUTHOR
 
 Jakob Voss C<< <jakob.voss@gbv.de> >>
 
 =head1 LICENSE
 
-Copyright (C) 2009 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at
