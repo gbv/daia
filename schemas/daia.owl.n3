@@ -15,6 +15,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cld: <http://purl.org/cld/terms/> .
 
 @base <http://purl.org/ontology/daia/> .
 
@@ -25,7 +26,7 @@
 <http://purl.org/ontology/daia/> a owl:Ontology ;
     dct:title "Document Availability Information Ontology (DAIA)" ;
     dct:description """The Document Availability Information Ontology (DAIA) describes the current availability of documents in libraries and similar institutions. Availability can be expressed in terms of specific services."""@en ;
-    owl:versionInfo "Beta version 2010-01-14" .
+    owl:versionInfo "Beta version 2010-04-20" .
 
 #################################################################
 # DAIA Classes
@@ -291,7 +292,8 @@ service:Openaccess a owl:Class ;
     rdfs:comment "Relates a Document to an Institution which has a record about the Document."@en ;
     rdfs:domain :Document ;
     rdfs:range :Institution ;
-    owl:inverseOf :hasInCatalog .
+    owl:inverseOf :hasInCatalog ;
+    rdfs:seeAlso cld:catalogueOrIndex .
 
 ###  http://purl.org/ontology/daia/hasInCatalog
 :hasInCatalog a owl:ObjectProperty ;
@@ -299,19 +301,20 @@ service:Openaccess a owl:Class ;
     rdfs:comment "Relates an Institution to a Document which the Institution has in catalog record about."@en ;
     rdfs:domain :Institution ;
     rdfs:range :Document ; 
-    owl:inverseOf :inCatalogOf .
+    owl:inverseOf :inCatalogOf ;
+    rdfs:seeAlso cld:catalogueOrIndex .
 
 ###  http://purl.org/ontology/daia/holds
 :holds a owl:ObjectProperty ;
     rdfs:label "holds"@en ;
-    rdfs:comment "Relates an Institution to an Item which the Institution holds."@en ;
+    rdfs:comment "Relates an Institution to an Item which the Institution holds. Holding does not imply owning but beeing able to provide a service."@en ;
     rdfs:domain :Institution ;
     rdfs:range :Item ;
-    owl:inverseOf :holdBy .
+    owl:inverseOf :heldBy .
 
-###  http://purl.org/ontology/daia/holdBy
-:holdBy a owl:ObjectProperty ;
-    rdfs:label "hold by"@en ;
+###  http://purl.org/ontology/daia/heldBy
+:heldBy a owl:ObjectProperty ;
+    rdfs:label "held by"@en ;
     rdfs:comment "Relates an Item to an Institution that holds the Item."@en ;
     rdfs:domain :Item ;
     rdfs:range :Institution ; 
