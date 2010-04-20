@@ -22,7 +22,7 @@ class DAIA_XML {
         $this->xml = $xml;
 
         $daiaRoot = $xml->createElement('daia');
-        #$daiaRoot->createAttributeNS('http://ws.gbv.de/daia/');
+        $daiaRoot->createAttributeNS('http://ws.gbv.de/daia/');
         $daiaRoot->setAttribute('version', $this->daia->getVersion());
         $daiaRoot->setAttribute('timestamp', $this->daia->getTimestamp());
         /*$daiaRoot->appendChild($this->getMessage(array()));*/
