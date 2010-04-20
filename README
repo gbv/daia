@@ -3,6 +3,7 @@ The DAIA project is grouped into modules that can be used independently:
 
 phpDaia - PHP implementation
 daiapm  - DAIA perl module
+xslt    - XSLT client
 
 In addition some common modules group resources used by other modules:
 

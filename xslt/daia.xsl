@@ -16,14 +16,14 @@
 
     TODO:
       - i18n of messages
-      - check whether Gesamtstatus is only limited/fragmented
+      - check whether "Gesamtstatus" is only limited/fragmented
 
   -->
   <xsl:import href="xmlverbatim.xsl"/>
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
 
   <!-- URL of CSS file -->
-  <xsl:param name="stylesheet">http://ws.gbv.de/daia/daia.css</xsl:param>
+  <xsl:param name="stylesheet">daia.css</xsl:param>
 
   <!-- prefered language to show messages in -->
   <xsl:param name="language">de</xsl:param>
@@ -31,10 +31,10 @@
 
   <!-- root -->
   <xsl:template match="/">
-    <xsl:apply-templates select="daia"/>
+    <xsl:apply-templates select="d:daia"/>
   </xsl:template>
 
-  <xsl:template match="daia">
+  <xsl:template match="d:daia">
     <html>
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -49,9 +49,9 @@
           Timestamp: <xsl:value-of select="@timestamp"/><br/>
           DAIA version: <xsl:value-of select="@version"/>
         </div>
-        <xsl:apply-templates select="message"/>
-        <xsl:apply-templates select="institution"/>
-        <xsl:variable name="items" select="document/item"/>
+        <xsl:apply-templates select="d:message"/>
+        <xsl:apply-templates select="d:institution"/>
+        <xsl:variable name="items" select="d:document/d:item"/>
         <xsl:if test="$items">
           <h2>Exemplare</h2>
           <p>
@@ -104,13 +104,13 @@
               </div>
           </p>
         </xsl:if>
-        <xsl:if test="not(item) and document"> <!-- no items -->
+        <xsl:if test="not(d:item) and d:document"> <!-- no items -->
           <h2>Dokumente</h2>
           <table>
-            <xsl:for-each select="document">
+            <xsl:for-each select="d:document">
               <tr><td>
                 <xsl:apply-templates select="."/>
-                <xsl:apply-templates select="message"/>
+                <xsl:apply-templates select="d:message"/>
               </td></tr>
           </xsl:for-each>
           </table>
@@ -118,9 +118,8 @@
         <h2>Raw XML response (this document)</h2>
         <xsl:apply-templates select="/" mode="xmlverb" />
         <div id="about">
-          DAIA is still early beta! See 
-          <a href="http://www.gbv.de/wikis/cls/DAIA">http://www.gbv.de/wikis/cls/DAIA</a>
-          for more information.
+          See <a href="http://purl.org/NET/DAIA">http://purl.org/NET/DAIA</a>
+          for more information about DAIA.
         </div>
       </body>
     </html>
@@ -133,7 +132,7 @@
     <span>
       <xsl:choose>
         <xsl:when test="$value = 1">
-          <xsl:attribute name="class">status1</xsl:attribute>
+          <xsl:attribute name="class">available</xsl:attribute>
           <xsl:text>&#xA0;</xsl:text>
           <xsl:if test="$legend">verfügbar</xsl:if>
         </xsl:when>
@@ -154,19 +153,22 @@
         </xsl:otherwise>
       </xsl:choose>
     </span>
+    <xsl:if test="@href">
+      <a href="{@href}">LINK</a>
+    </xsl:if>
   </xsl:template>
 
 
-  <xsl:template match="item">
-    <xsl:variable name="status" select="available|unavailable"/>
+  <xsl:template match="d:item">
+    <xsl:variable name="status" select="d:available|d:unavailable"/>
     <tr>
       <xsl:if test="@fragment='true' or @fragment='1'">
         <xsl:attribute name="class">fragment</xsl:attribute>
       </xsl:if>
       <td>
         <xsl:if test="position() = 1">
-          <xsl:apply-templates select="parent::document"/>
-          <xsl:apply-templates select="parent::document/message"/>
+          <xsl:apply-templates select="parent::d:document"/>
+          <xsl:apply-templates select="parent::d:document/d:message"/>
         </xsl:if>
         <xsl:if test="@fragment='true' or @fragment='1'">(teilweise)</xsl:if>
       </td>
@@ -176,9 +178,9 @@
         </xsl:call-template>
       </td>
       <td>
-        <xsl:apply-templates select="department"/>
-        <xsl:if test="department and storage"><br/></xsl:if>
-        <xsl:apply-templates select="storage"/>
+        <xsl:apply-templates select="d:department"/>
+        <xsl:if test="d:department and d:storage"><br/></xsl:if>
+        <xsl:apply-templates select="d:storage"/>
       </td>
       <td class="status">
         <xsl:if test="not($status[@service='presentation'])">
@@ -213,21 +215,21 @@
         <xsl:apply-templates select="$status[@service='openaccess']"/>
       </td>
       <td>
-        <xsl:apply-templates select="message"/>
+        <xsl:apply-templates select="d:message"/>
       </td>
     </tr>
   </xsl:template>
 
 
   <xsl:template name="summary">
-    <xsl:variable name="items" select="document/item"/>
-    <xsl:variable name="avail" select="$items/available"/>
-    <xsl:variable name="unavail" select="$items/unavailable"/>
+    <xsl:variable name="items" select="d:document/d:item"/>
+    <xsl:variable name="avail" select="$items/d:available"/>
+    <xsl:variable name="unavail" select="$items/d:unavailable"/>
     <xsl:variable name="status" select="$avail|$unavail"/>
     <tr>
       <th colspan="2">
         <xsl:value-of select="count($items)"/>&#xA0;Exemplare,
-        <xsl:value-of select="count(document)"/>&#xA0;Dokumente
+        <xsl:value-of select="count(d:document)"/>&#xA0;Dokumente
       </th>
       <th align="right">Gesamtstatus</th>
       <td class="status">
@@ -251,8 +253,8 @@
   </xsl:template>
 
 
-  <xsl:template match="unavailable">
-    <xsl:if test="limitation">
+  <xsl:template match="d:unavailable">
+    <xsl:if test="d:limitation">
       <xsl:attribute name="class">limited</xsl:attribute>
     </xsl:if>
     <!--div-->
@@ -268,40 +270,37 @@
             </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
-      <xsl:if test="limitation">(eingeschränkt)</xsl:if>
+
+      <xsl:if test="d:limitation">(eingeschränkt)</xsl:if>
       <xsl:if test="@queue">[<xsl:value-of select="@queue"/>]</xsl:if>
-      <xsl:if test="@href">
-        <a href="{@href}">LINK</a>
-      </xsl:if>
       <xsl:if test="@expected">
         <div class="time">
           <xsl:value-of select="@expected"/>
         </div>
       </xsl:if>
-      <xsl:apply-templates select="limitation"/>
-      <xsl:apply-templates select="message"/>
+      <xsl:apply-templates select="d:limitation"/>
+      <xsl:apply-templates select="d:message"/>
     <!--/div-->
   </xsl:template>
 
-  <xsl:template match="available">
+  <xsl:template match="d:available">
     <!--div-->
-      <xsl:if test="limitation">
+      <xsl:if test="d:limitation">
         <xsl:attribute name="class">limited</xsl:attribute>
       </xsl:if>
+      <!-- TODO: only for known services -->
+      <xsl:attribute name="class"><xsl:value-of select="@service"/></xsl:attribute>
       <xsl:call-template name="status">
         <xsl:with-param name="value" select="1"/>
       </xsl:call-template>
-      <xsl:if test="limitation">(eingeschränkt)</xsl:if>
-      <xsl:if test="@href">
-        <a href="{@href}">LINK</a>
-      </xsl:if>
+      <xsl:if test="d:limitation">(eingeschränkt)</xsl:if>
       <xsl:if test="@delay">
         <div class="time">
           <xsl:value-of select="@delay"/>
         </div>
       </xsl:if>
-      <xsl:apply-templates select="limitation"/>
-      <xsl:apply-templates select="message"/>
+      <xsl:apply-templates select="d:limitation"/>
+      <xsl:apply-templates select="d:message"/>
     <!--/div-->
   </xsl:template>
 
@@ -311,9 +310,9 @@
     <xsl:call-template name="status">
       <xsl:with-param name="value">
         <xsl:choose>
-          <xsl:when test="$availability[name()='available']">1</xsl:when>
-          <xsl:when test="$availability[name()='unavailable'][@expected]">3</xsl:when>
-          <xsl:when test="$availability[name()='unavailable']">2</xsl:when>
+          <xsl:when test="$availability[name()='d:available']">1</xsl:when>
+          <xsl:when test="$availability[name()='d:unavailable'][@expected]">3</xsl:when>
+          <xsl:when test="$availability[name()='d:unavailable']">2</xsl:when>
           <xsl:otherwise>0</xsl:otherwise>
         </xsl:choose>
       </xsl:with-param>
@@ -321,8 +320,8 @@
   </xsl:template>
 
   <!-- print a message or an error. -->
-  <xsl:template match="message">
-    <xsl:if test="not($language) or @lang=$language or not(../message[@lang=$language])">
+  <xsl:template match="d:message">
+    <xsl:if test="not($language) or @lang=$language or not(../d:message[@lang=$language])">
     <div>
       <xsl:attribute name="class">
         <xsl:choose>
@@ -338,7 +337,7 @@
   </xsl:template>
 
   <!-- show a limitation -->
-  <xsl:template match="limitation">
+  <xsl:template match="d:limitation">
     <div class="limitation">
       <xsl:call-template name="content-with-optional-href"/>
     </div>
@@ -346,14 +345,14 @@
 
 
   <!-- print information about an institution -->
-  <xsl:template match="institution">
+  <xsl:template match="d:institution">
     <h2>Institution</h2>
     <p><xsl:call-template name="content-with-optional-href"/></p>
   </xsl:template>
 
 
   <!-- print information about a document -->
-  <xsl:template match="document">
+  <xsl:template match="d:document">
     <xsl:call-template name="content-with-optional-href">
       <xsl:with-param name="content"/>
     </xsl:call-template>
@@ -361,14 +360,14 @@
 
 
   <!-- print information about a department -->
-  <xsl:template match="department">
+  <xsl:template match="d:department">
     <b>Abt: </b>
     <xsl:call-template name="content-with-optional-href"/>
   </xsl:template>
 
 
   <!-- print information about a storage -->
-  <xsl:template match="storage">
+  <xsl:template match="d:storage">
     <b>Ort: </b>
     <xsl:call-template name="content-with-optional-href"/>
   </xsl:template>
