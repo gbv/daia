@@ -31,6 +31,11 @@ class DAIA_PICA extends DAIA {
     protected $reservationUrl;
 
     /**
+     * @var absolute path to a (CSV-based text) file which contains a table to translate location codes into human readable strings
+     */
+    protected $locationsFile;
+
+    /**
      * @var string Pica-Record as a Pica-Plus string
      */
     private $picaRecord;
@@ -49,6 +54,8 @@ class DAIA_PICA extends DAIA {
         $this->basicUrl = $iniArray['basicUrl'];
         $this->picaPlusUrl = $iniArray['picaPlusUrl'];
         $this->reservationUrl = $iniArray['reservationUrl'];
+        
+        $this->locationsFile = $iniArray['locationsFile'];
         
         foreach ($docs as $docId) {
             $this->documents[] = $this->getDocument($docId);
@@ -249,7 +256,7 @@ class DAIA_PICA extends DAIA {
                     	$stor_id = null; // TODO: get barcode as ID
                     	$stor_href = null; // TODO: get location href from file
                     	// get the real storage location from translation table
-                    	$locations = file('/drbd/www/SST_TUHH.txt');
+                    	$locations = file($this->locationsFile);
                     	foreach ($locations as $locLine) {
                     		$l = explode(';', $locLine);
                     		if ($l[0] === $storageCode) {

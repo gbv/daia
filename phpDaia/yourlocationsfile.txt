@@ -1,0 +1,1 @@
+Code;german location;english location;URL to location

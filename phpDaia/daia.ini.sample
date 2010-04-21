@@ -9,3 +9,5 @@ infoUrl = "http://www.tub.tu-harburg.de" ; URL of the Library's homepage
 basicUrl = "http://katalog.b.tu-harburg.de/DB=1/PPN?PPN=" ; URL to get one PPN from the catalog
 picaPlusUrl = "http://katalog.b.tu-harburg.de/DB=1/SET=1/TTL=1/PRS=PP%7F/PPN?PPN=" ; URL to get PicaPlus Output for one PPN from the catalog
 reservationUrl = "http://katalog.b.tu-harburg.de/php/em.php?F=1&EPN=" ; URL to reserve an ordered copy by its EPN
+
+locationsFile = "yourlocationfile.txt" ; absolute path to txt file to translate location codes from PICA into human interpretable strings 

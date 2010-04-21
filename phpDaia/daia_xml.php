@@ -20,11 +20,12 @@ class DAIA_XML {
         $xml = new DOMDocument('1.0', 'utf-8');
         $xml->formatOutput = true;
         $this->xml = $xml;
-
-        $daiaRoot = $xml->createElement('daia');
-        $daiaRoot->createAttributeNS('http://ws.gbv.de/daia/');
+        
+        $daiaRoot = $xml->createElementNS('http://ws.gbv.de/daia/', 'd:daia');
         $daiaRoot->setAttribute('version', $this->daia->getVersion());
         $daiaRoot->setAttribute('timestamp', $this->daia->getTimestamp());
+        $daiaRoot->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:s', 'http://www.w3.org/2001/XMLSchema-instance/');
+        $daiaRoot->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance/', 's:schemaLocation', 'http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd');
         /*$daiaRoot->appendChild($this->getMessage(array()));*/
         $daiaRoot->appendChild($this->getInstitution($this->daia->getInstitution()));
         $xml->appendChild($daiaRoot);
@@ -43,7 +44,7 @@ class DAIA_XML {
      * @return DOMElement daia/document in XML
      **/
     public function getHoldingInformation($doc) {
-        $element = $this->xml->createElement('document');
+        $element = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:document');
         $element->setAttribute('id', $doc->id);
         if ($doc->holdingHref !== null) $element->setAttribute('href', $doc->holdingHref);
         $items = $doc->getItems();
@@ -65,7 +66,7 @@ class DAIA_XML {
      * @return DOMNode document in DAIA format
      **/
     public function getItemInformation($item) {
-        $itemElement = $this->xml->createElement('item');
+        $itemElement = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:item');
         if (empty($item->id) === false) $itemElement->setAttribute('id', $item->id);
         if (empty($item->href) === false) $itemElement->setAttribute('href', $item->href);
         if (empty($item->fragment) === false) $itemElement->setAttribute('fragment', $item->fragment);
@@ -97,7 +98,7 @@ class DAIA_XML {
         else {
             $availabilityType = 'unavailable';
         }
-        $availability = $this->xml->createElement($availabilityType);
+        $availability = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:' . $availabilityType);
         $availability->setAttribute('service', $service);
         if (is_object($item->getAvailability($service)) === true) {
             if ($item->getAvailability($service)->getHref() !== null) $availability->setAttribute('href', $item->getAvailability($service)->getHref());
@@ -129,47 +130,41 @@ class DAIA_XML {
     }
 
     public function getMessage($message) {
-        $node = $this->xml->createElement('message');
+        $node = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:message', $message->content);
         $node->setAttribute('lang', $message->lang);
         if (empty($message->errno) !== true) $node->setAttribute('errno', $message->errno);
-        $node->nodeValue = $message->content;
         return $node;
     }
 
     public function getInstitution($institution) {
-        $node = $this->xml->createElement('institution');
+        $node = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:institution', $institution->getContent());
         if ($institution->getId() !== null) $node->setAttribute('id', $institution->getId());
         if ($institution->getHref() !== null) $node->setAttribute('href', $institution->getHref());
-        $node->nodeValue = $institution->getContent();
         return $node;
     }
     public function getDepartment($department) {
-        $node = $this->xml->createElement('department');
+        $node = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:department', $department->getContent());
         if ($department->getId() !== null) $node->setAttribute('id', $department->getId());
         if ($department->getHref() !== null) $node->setAttribute('href', $department->getHref());
-        $node->nodeValue = $department->getContent();
         return $node;
     }
 
     public function getStorage($storage) {
-        $node = $this->xml->createElement('storage');
+        $node = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:storage', $storage->getContent());
         if ($storage->getId() !== null) $node->setAttribute('id', $storage->getId());
         if ($storage->getHref() !== null) $node->setAttribute('href', $storage->getHref());
-        $node->nodeValue = $storage->getContent();
         return $node;
     }
 
     public function getLimitation($limit) {
-        $node = $this->xml->createElement('limitation');
+        $node = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:limitation', $limit->getContent());
         if ($limit->getId() !== null) $node->setAttribute('id', $limit->getId());
         if ($limit->getHref() !== null) $node->setAttribute('href', $limit->getHref());
-        $node->nodeValue = $limit->getContent();
         return $node;
     }
 
     public function getLabel($content) {
-        $node = $this->xml->createElement('label');
-        $node->nodeValue = $content;
+        $node = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:label', $content);
         return $node;
     }
 }
