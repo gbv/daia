@@ -22,7 +22,7 @@ switch ($_REQUEST['output']) {
         $_xml->loadXml($doc->toXml(true));
 
         $_xslt = new DomDocument;
-        $_xslt->load('../xslt/daia.xsl');
+        $_xslt->load('daia.xsl');
         $_proc->importStyleSheet($_xslt);
 
         echo $_proc->transformToXML($_xml);

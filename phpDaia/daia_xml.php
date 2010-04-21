@@ -111,9 +111,9 @@ class DAIA_XML {
         if ($item->getLabel() !== null) $itemElement->appendChild($this->getLabel($item->getLabel(), $namespaced));
         if ($item->getDepartment() !== null) $itemElement->appendChild($this->getDepartment($item->getDepartment(), $namespaced));
         if ($item->getStorage() !== null) $itemElement->appendChild($this->getStorage($item->getStorage(), $namespaced));
-        $availability = $this->getAvailabilityInformation($item, 'presentation');
+        $availability = $this->getAvailabilityInformation($item, 'presentation', $namespaced);
         $itemElement->appendChild($availability);
-        $availability = $this->getAvailabilityInformation($item, 'loan');
+        $availability = $this->getAvailabilityInformation($item, 'loan', $namespaced);
         $itemElement->appendChild($availability);
         /* not set yet
         $availability = $this->getAvailabilityInformation($item, 'openaccess');
