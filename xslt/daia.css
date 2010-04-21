@@ -38,12 +38,12 @@ td { border: 1px solid #666; padding: 3px; }
 /* status icons (0=unknown, 1=available, 2=not available, 3=currently not available) */
 .status0, .available, .status2, .status3 { padding-left: 25px; line-height: 20px;
     display: inline-block; }
-.status0 { background:transparent url(icons/questionmark_16.png) center left no-repeat; }
+.status0 { background:transparent url(icons/18px-Bullet-grey.png) center left no-repeat; }
 
 
-.available { background:transparent url(18px-Bullet-green.png) center left no-repeat; }
-.status2 { background:transparent url(18px-Bullet-red.png) center left no-repeat; }
-.status3 { background:transparent url(questionmark_16.png) center left no-repeat; }
+.available { background:transparent url(icons/18px-Bullet-green.png) center left no-repeat; }
+.status2 { background:transparent url(icons/18px-Bullet-red.png) center left no-repeat; }
+.status3 { background:transparent url(icons/18px-Bullet-ambar.png) center left no-repeat; }
 
 .loan .available { background:transparent url(icons/daia_loan_16.png) center left no-repeat; }
 .presentation .available { background:transparent url(icons/daia_presentation_16.png) center left no-repeat; }

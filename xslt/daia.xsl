@@ -174,7 +174,7 @@
       </td>
       <td>
         <xsl:call-template name="content-with-optional-href">
-          <xsl:with-param name="content" select="label" />
+          <xsl:with-param name="content" select="d:label" />
         </xsl:call-template>
       </td>
       <td>
