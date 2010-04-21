@@ -18,7 +18,8 @@ switch ($_REQUEST['output']) {
         // Transform to HTML
         $_xml = new DomDocument;
         $_proc = new XSLTProcessor;
-        $_xml->loadXml($doc->toXml());
+        // use the namespaced XML version by calling toXml with parameter true
+        $_xml->loadXml($doc->toXml(true));
 
         $_xslt = new DomDocument;
         $_xslt->load('../xslt/daia.xsl');

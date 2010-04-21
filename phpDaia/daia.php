@@ -249,8 +249,17 @@ class DAIA {
         return $this->message;
     }
 
-    public function toXml() {
+    /**
+     * get the XML representation of DAIA data
+     * 
+     * @param boolean $namespaced (optional) get the normal XML string or a version with different namespaces (defaults to false for non-namespaced XML)
+     * @return string XML-Document as plain text string
+     */
+    public function toXml($namespaced = false) {
         $xml = new DAIA_XML($this);
+        if ($namespaced === true) {
+        	return $xml->createNamespacedXml()->saveXml();
+        }
         return $xml->createXml()->saveXml();
     }
 
