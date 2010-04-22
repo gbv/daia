@@ -278,6 +278,7 @@ class DAIA_PICA extends DAIA {
                 $storage = $item->getStorage();
                 // if more than one item is inside one PPN, items should get expanded to seperate items
                 $counter = 0;
+                // only execute this, when there is more then one sample inside this PPN/EPN...
                 if (count($itemArray) > 2) {
                 foreach ($itemArray as $i) {
                 	$itemCopy = new DAIA_Item;
