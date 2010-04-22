@@ -184,7 +184,7 @@ class DAIA_PICA extends DAIA {
                             $item->setAvailability('loan', false);
                             $item->setAvailability('presentation', false);
                             // The item is only currently not available,
-                            // but PICA does not tell us, when it is expected...
+                            // look when its shall be back
                             $item->getAvailability('loan')->setExpected($this->getDuedate($href));
                             $item->getAvailability('presentation')->setExpected($this->getDuedate($href));
                         }
@@ -196,6 +196,10 @@ class DAIA_PICA extends DAIA {
                             $item->setAvailability('loan', true);
                             $item->setAvailability('presentation', true);
                         }
+                        else {
+                            $item->setAvailability('loan', 'unknown');
+                            $item->setAvailability('presentation', 'unknown');
+                        }
                         break;
                     case 'Nicht ausleihbar (Sonderstandort)':
                         $item->setAvailability('loan', false);
@@ -204,9 +208,9 @@ class DAIA_PICA extends DAIA {
                         }
                         break;
                     default:
-                    	// set Availability to Unavailable
-                    	$item->setAvailability('loan', false);
-                        $item->setAvailability('presentation', false);
+                    	// set Availability to unknown
+                    	$item->setAvailability('loan', 'unknown');
+                        $item->setAvailability('presentation', 'unknown');
                 }
                 if (is_object($item->getAvailability('loan')) === true) {
                 	$item->getAvailability('loan')->setHref($href);
@@ -269,11 +273,36 @@ class DAIA_PICA extends DAIA {
                 }
             }
             else if (substr($line, 0, 4) === '209G') {
-            	$textToCheck = substr($line, 0);
             	$textToExplode = html_entity_decode(substr($line, 0));
-            	$readPos = strpos($textToExplode, "\$a");
+            	$itemArray = explode("\$a", $textToExplode);
                 $storage = $item->getStorage();
-                $item->setStorage(new DAIA_Element($storage->getContent(), substr($textToExplode, $readPos+2) , $storage->getHref()));
+                // if more than one item is inside one PPN, items should get expanded to seperate items
+                $counter = 0;
+                if (count($itemArray) > 2) {
+                foreach ($itemArray as $i) {
+                	$itemCopy = new DAIA_Item;
+                    if ($counter === 1) {
+                        $item->setStorage(new DAIA_Element($storage->getContent(), $i, $storage->getHref()));
+                    	if ($item->href !== null) {
+                    		$item = $this->checkSubHoldingsAvailabilities($item, $i);
+                    	}
+                    }
+                    if ($counter > 0) {
+                        $itemCopy->setStorage(new DAIA_Element($storage->getContent(), $i, $storage->getHref()));
+                    	$itemCopy->href = $item->href;
+                    	$itemCopy->setLabel($item->getLabel());
+                    	if ($item->href !== null) {
+                    		$itemCopy = $this->checkSubHoldingsAvailabilities($itemCopy, $i);
+                    	}
+                    }
+                    // The first item has already been added to items array
+                    // so start at the second
+                    if ($counter > 1) {
+                    	$items[] = $itemCopy;
+                    }
+                    $counter++;
+                }
+                }
             }
             else if (substr($line, 0, 4) === '237A') {
             	$textToCheck = substr($line, 0);
@@ -348,7 +377,7 @@ class DAIA_PICA extends DAIA {
     }
     
     /**
-     * Gets a Pica-plus record from Pica using HTTP
+     * Gets a duedate from Pica using HTTP
      * 
      * @param string $ppn PPN of the recor
      * @return array Array of records as strings for each search result
@@ -414,6 +443,37 @@ class DAIA_PICA extends DAIA {
         }
         yaz_close($con);
         return $rec;
-    }	
+    }
+    
+    private function checkSubHoldingsAvailabilities($item, $barcode) {
+	    if ($item->href === null) return $item;
+	    if (!($fp = fopen($item->href, "r"))) {
+            return $item;
+        }
+
+        $a = file_get_contents($item->href . '&LOGIN=ANONYMOUS&LNG=EN');
+        
+        // Look for barcode in document
+        // if it has been found, this item is on loan, now look for the duedate
+        // if it has not been found, this item is presumably available
+        $barcodePosition = strrpos($a, 'VBAR='.$barcode);
+        if ($barcodePosition !== false) {
+            $position = strpos($a, '<td class="table" nowrap>&nbsp;Lent till', $barcodePosition);
+            $duedate = substr($a, $position+41, 10);
+            $item->setAvailability('loan', false);
+            $item->setAvailability('presentation', false);
+            if ($position !== false) {
+                // The item is only currently not available,
+                $item->getAvailability('loan')->setExpected($duedate);
+                $item->getAvailability('presentation')->setExpected($duedate);
+            }
+            return $item;
+        }
+        // if it has not been found, this item is presumably available
+        $item->setAvailability('loan', true);
+        $item->setAvailability('presentation', true);
+    	
+    	return $item;
+    }
 }
 ?>

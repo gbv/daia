@@ -134,8 +134,12 @@ class DAIA_Item {
         if ($value === true) {
             $this->availabilities[$service] = new DAIA_Available();
         }
-        else {
+        else if ($value === false){
             $this->availabilities[$service] = new DAIA_Unavailable();
+        }
+        else {
+        	// unknown Availability, so set Availability to null
+        	$this->availabilities[$service] = null;
         }
     }
 
