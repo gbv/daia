@@ -300,7 +300,7 @@ class DAIA_PICA extends DAIA {
         return $items;
     }
     
-    private function getAvailabilities($item, $generalAvailability, $usage, $avail, $documentType, $limitation237A) {
+    private function getAvailabilities($item, $generalAvailability = null, $usage = null, $avail = null, $documentType = null, $limitation237A = null) {
         //$item->setMessage(new DAIA_Message("Indikator generelle Verfügbarkeit: " . $generalAvailability, 'de'));
         // get general availability
         switch ($generalAvailability) {
@@ -332,8 +332,6 @@ class DAIA_PICA extends DAIA {
                 $item->setAvailability('presentation', true);
                 $item->setAvailability('loan', true);
                 $item->setAvailability('interloan', true);
-               	$item->getAvailability('loan')->setLimitation(new DAIA_Element('Besondere Zustimmung erforderlich'));
-               	$item->getAvailability('interloan')->setLimitation(new DAIA_Element('Besondere Zustimmung erforderlich'));
                 break;
             case 'i':
                 $item->setAvailability('presentation', true);
@@ -421,10 +419,6 @@ class DAIA_PICA extends DAIA {
                     $item->setAvailability('loan', true);
                     $item->setAvailability('presentation', true);
                 }
-                else {
-                    $item->setAvailability('loan', 'unknown');
-                    $item->setAvailability('presentation', 'unknown');
-                }
                 break;
             case 'Nicht ausleihbar (Sonderstandort)':
                 $item->setAvailability('loan', false);
@@ -434,11 +428,6 @@ class DAIA_PICA extends DAIA {
                 else {
                 	$item->setAvailability('presentation', false);
                 }
-                break;
-            default:
-               	// set Availability to unknown
-                $item->setAvailability('loan', 'unknown');
-                $item->setAvailability('presentation', 'unknown');
         }
         if (is_object($item->getAvailability('loan')) === true) {
            	$item->getAvailability('loan')->setHref($item->href);
@@ -449,58 +438,12 @@ class DAIA_PICA extends DAIA {
         if (is_object($item->getAvailability('presentation')) === true) {
            	$item->getAvailability('presentation')->setHref($item->href);
         }
+        if (is_object($item->getAvailability('interloan')) === true) {
+           	$item->getAvailability('interloan')->setHref($item->href);
+        }
         return $item;
     }
-    /**
-     * Gets the items for this document by parsing the PSI-XML-output
-     *
-     * This does not work properly! Parsing this XML-output is not effective.
-     * 
-     * @param string $id PPN of the document that should be parsed
-     * @return array Array of DAIA_Items
-    **/
-    protected function getItemsFromXml($id) {
-        $items = array();
-        $katurl= $this->basicUrl . $id;
 
-        if (!($fp = fopen("$katurl", "r"))) {
-            return new DAIA_Message("could not open XML Shorttitle input", 'en', 100);
-        }
-
-        $a = file_get_contents($katurl);
-        // Request info suchen
-        $itemCount = substr_count($a, 'Request info');
-        
-        $itemPosition = 0;
-        for ($counter = 0; $itemCount > $counter; $counter++) {
-            $itemPosition = strpos($a, 'Request info', $itemPosition+1);
-            // if there are more items found with Request info, only read until the next item
-            if ($itemCount > $counter+1) {
-                $nextItemPosition = strpos($a, 'Request info', $itemPosition+1);
-                $textlength = $nextItemPosition-$itemPosition;
-                $textToCheck = substr($a, $itemPosition, $textlength);
-            }
-            else {
-                $textToCheck = substr($a, $itemPosition);
-            }
-            $item = new DAIA_Item();
-            // find EPN and put it into id field
-            $item->id = $this->getEpn();
-            $item->setMessage(new DAIA_Message($textToCheck, 'en'));
-            if (strstr($textToCheck, 'reading room use only') !== false) {
-                $item->setAvailability('presentation', true);
-            }
-            if (strstr($textToCheck, 'Lendable Holding') !== false && strstr($textToCheck, 'available') !== false) {
-                $item->setAvailability('loan', true);
-            }
-            if (strstr($textToCheck, 'Lendable Holding') !== false && strstr($textToCheck, 'lent') !== false) {
-                $item->setAvailability('loan', false);
-            }
-            $items[] = $item;
-        }
-        return $items;
-    }
-    
     /**
      * Gets a duedate from Pica using HTTP
      * 
@@ -591,13 +534,15 @@ class DAIA_PICA extends DAIA {
                 // The item is only currently not available,
                 $item->getAvailability('loan')->setExpected($duedate);
                 $item->getAvailability('presentation')->setExpected($duedate);
+                $item->getAvailability('presentation')->setHref($item->href);
+                $item->getAvailability('loan')->setHref($item->href);
             }
             return $item;
         }
         // if it has not been found, this item is presumably available
         $item->setAvailability('loan', true);
         $item->setAvailability('presentation', true);
-    	
+
     	return $item;
     }
 }

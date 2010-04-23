@@ -115,12 +115,10 @@ class DAIA_XML {
         $itemElement->appendChild($availability);
         $availability = $this->getAvailabilityInformation($item, 'loan', $namespaced);
         $itemElement->appendChild($availability);
-        /* not set yet
-        $availability = $this->getAvailabilityInformation($item, 'openaccess');
-        $item->appendChild($availability);
-        $availability = $this->getAvailabilityInformation($item, 'interloan');
-        $item->appendChild($availability);
-        */
+        $availability = $this->getAvailabilityInformation($item, 'openaccess', $namespaced);
+        $itemElement->appendChild($availability);
+        $availability = $this->getAvailabilityInformation($item, 'interloan', $namespaced);
+        $itemElement->appendChild($availability);
         return $itemElement;
     }
     
