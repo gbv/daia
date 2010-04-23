@@ -130,6 +130,11 @@ class DAIA_Item {
         return $this->availabilities[$service];
     }
     
+    public function hasAvailabilities() {
+    	if (count($this->availabilities) > 0) return true;
+        return false;
+    }
+
     public function setAvailability($service, $value) {
         if ($value === true) {
             $this->availabilities[$service] = new DAIA_Available();
