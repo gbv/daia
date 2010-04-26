@@ -1,0 +1,17 @@
+The following bugs and feature requests are known
+-------------------------------------------------
+
+- use javascript to highlight jump targets (linke '#'-ref in Wikipedia)
+- flip messages on/off (data mode)
+
+better visualize department and/or storage
+
+test multiple availability/unavailability per item
+
+visualize extract and broader(?) - for instance
+  doc = item
+  doc < item
+  doc > item
+  doc ~ item 
+
+add unit tests

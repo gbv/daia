@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="daia.xsl"?>
+<d:daia version="0.5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" timestamp="2010-01-14T16:12:36.582+01:00" xmlns:d="http://ws.gbv.de/daia/" xsi:schemaLocation="http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd">
+   <d:institution href="http://dispatch.opac.ddb.de/DB=1.2/CMD?ACT=SRCHA&amp;IKT=8529&amp;TRM=DE-18" id="isil:DE-18">
+      Staats- und Universitätsbibliothek Hamburg Carl von Ossietzky
+   </d:institution>
+   <d:document href="https://kataloge.uni-hamburg.de/CHARSET=UTF-8/LNG=EN/DB=1/PPN?PPN=57793371X" id="57793371X">
+      <d:item id="epn:801587727">
+         <d:message lang="en">
+            lendable|borrowed by
+         </d:message>
+         <d:message lang="en">
+            Lent till 11-02-2010
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42234
+         </d:label>
+         <d:available service="loan" delay="P3W6D" />
+         <d:unavailable service="presentation" expected="2010-02-11" />
+         <d:unavailable service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/1">
+         <d:message lang="en">
+            Available, case Fachbereich Informatik
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42272
+         </d:label>
+         <d:available service="presentation" />
+         <d:available service="loan" />
+         <d:available service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/2">
+         <d:message lang="en">
+            Lent till 01-02-2010
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42271
+         </d:label>
+         <d:available service="loan" delay="P2W3D" />
+         <d:available service="interloan" />
+         <d:unavailable service="presentation" expected="2010-02-01" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/3">
+         <d:message lang="en">
+            Available, case Fachbereich Informatik
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42270
+         </d:label>
+         <d:available service="presentation" />
+         <d:available service="loan" />
+         <d:available service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/4">
+         <d:message lang="en">
+            Lent till 08-02-2010
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42269
+         </d:label>
+         <d:available service="loan" delay="P3W3D" />
+         <d:available service="interloan" />
+         <d:unavailable service="presentation" expected="2010-02-08" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/5">
+         <d:message lang="en">
+            Available, case Fachbereich Informatik
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42268
+         </d:label>
+         <d:available service="presentation" />
+         <d:available service="loan" />
+         <d:available service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/6">
+         <d:message lang="en">
+            Available, case Fachbereich Informatik
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42267
+         </d:label>
+         <d:available service="presentation" />
+         <d:available service="loan" />
+         <d:available service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/7">
+         <d:message lang="en">
+            Available, case Fachbereich Informatik
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42266
+         </d:label>
+         <d:available service="presentation" />
+         <d:available service="loan" />
+         <d:available service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/8">
+         <d:message lang="en">
+            Available, case Fachbereich Informatik
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42265
+         </d:label>
+         <d:available service="presentation" />
+         <d:available service="loan" />
+         <d:available service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/9">
+         <d:message lang="en">
+            Lent till 01-02-2010
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42264
+         </d:label>
+         <d:available service="loan" delay="P2W3D" />
+         <d:available service="interloan" />
+         <d:unavailable service="presentation" expected="2010-02-01" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:889615551/10">
+         <d:message lang="en">
+            Lent till 08-02-2010
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=72" id="18/228">
+            Informatik
+         </d:department>
+         <d:label>
+            P BAR 42263
+         </d:label>
+         <d:available service="loan" delay="P3W3D" />
+         <d:available service="interloan" />
+         <d:unavailable service="presentation" expected="2010-02-08" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+      <d:item id="epn:1102248738">
+         <d:message lang="en">
+            non-lending collection, ask for circulation possibility|Available, case Inst.f.Theoretische Physik. Lending at the desk only
+         </d:message>
+         <d:department href="http://www.sub.uni-hamburg.de/bibitem.shtml?id=209" id="18/270">
+            Physikalische Institute Bahrenfeld - Theoretische Physik
+         </d:department>
+         <d:label>
+            89.50 Bar 4.A
+         </d:label>
+         <d:available service="presentation" />
+         <d:unavailable service="loan" />
+         <d:unavailable service="interloan" />
+         <d:unavailable service="openaccess" />
+      </d:item>
+   </d:document>
+</d:daia>

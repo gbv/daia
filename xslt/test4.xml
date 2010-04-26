@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="daia.xsl"?>
+<daia xmlns="http://ws.gbv.de/daia/" timestamp="2009-10-22T11:21:29Z" version="0.5">
+
+  <institution id="my:id" /> <!-- institution without name and link -->
+
+  <!-- test messages (fixed language) -->
+  <message lang="en">This is a message</message>
+  <message lang="en" errno="3">This is an error message</message>
+  <message lang="en" errno="32" /> <!-- error without message -->
+  <message lang="en" /> <!-- empty message -->
+  
+  <document>
+    <item>
+      <available service="loan" delay="P3W6D">
+        <limitation/>
+      </available>
+    </item>
+    <item fragment="true" href="http://example.com">
+      <unavailable service="presentation" queue="3"/>
+      <available service="openaccess" href="http://example.org">
+        <message>foobar</message>
+        <limitation>not in China</limitation>
+        <limitation href="http://example.com">sometimes</limitation>
+      </available>
+    </item>
+  </document>
+  
+</daia>

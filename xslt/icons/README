@@ -5,7 +5,7 @@ Title:        DAIA core icons
 Description:  PICOL based DAIA icons
 Creator:      Jakob Voss
 E-Mail:       jakob.voss@gbv.de
-Date:         2009-10-15
+Date:         2010-04-22
 
 ------------------------------------------------------------------------
 
@@ -23,11 +23,18 @@ the DAIA format description:
 - openaccess   - item can be accessed online without restriction
 - interloan    - item can be accessed via another institution
 
+In addition the following icons are used
+
+- queue        - indicates a waiting queue
+- limitation   - indicates a limitation
+
 Furthermore the following standard PICOL icons are included:
 
 - questionmark
 - calendar
 - clock
+- book_sans
+- information
 
 ------------------------------------------------------------------------
 
@@ -58,5 +65,5 @@ In detail DAIA core icons are based on the following PICOL icons:
 - daia_loan:          home and dropbox
 - daia_interloan:     home and filter
 - daia_openaccess:    globe
-
-
+- daia_queue:         group
+- dotted_document:    document_text

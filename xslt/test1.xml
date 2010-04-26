@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="daia.xsl"?>
+<daia xmlns="http://ws.gbv.de/daia/" timestamp="2009-10-22T11:21:29Z" version="0.5">
+
+  <institution >This is the name of the institution</institution>
+  
+  <!-- test messages (fixed language) -->
+  <message lang="en">This is a message</message>
+  <message lang="en" errno="3">This is an error message</message>
+  <message lang="en" errno="32" /> <!-- error without message -->
+  <message lang="en" /> <!-- empty message -->
+  
+  <document> 
+  </document>
+  
+  <document>
+    <message lang="en">This is a message</message>
+  <message lang="en" errno="3">This is an error message</message>
+</document>
+  
+</daia>
