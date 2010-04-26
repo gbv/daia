@@ -12,3 +12,5 @@ schemas - DAIA XSD and OWL schemas for validating
 Please make sure that all packaged distributions can be used independently!
 This can be done by copying content from the common modules.
 
+The directory 'documentation' contains additional documentation
+
