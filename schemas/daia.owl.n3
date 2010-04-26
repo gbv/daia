@@ -191,7 +191,10 @@ service:Openaccess a owl:Class ;
     rdfs:domain :Document ;
     rdfs:range :Item ;
     rdfs:seeAlso dct:hasPart ;
-    rdfs:seeAlso :exemplar .
+    rdfs:seeAlso :exemplar ;
+    skos:scopeNote "This property implies that the item is an exemplar of another document which itself part if the related document." ; 
+    skos:scopeNote "{ ?x daia:extract ?y } => { ?y daia:exemplarOf [ dcterms:isPartOf ?x ] }" ; 
+    rdfs:seeAlso bibo:DocumentPart .
 
 ###  http://purl.org/ontology/daia/extractOf
 
@@ -250,7 +253,7 @@ service:Openaccess a owl:Class ;
 
 :unavailableOf a owl:ObjectProperty ;
     rdfs:label "available of"@en ;
-    rdfs:comment "Relates a unavailable Service to the Item which this Service refers to"@en ;
+    rdfs:comment "Relates a unavailable Service to the Item which this Service refers to."@en ;
     rdfs:domain :Service ;
     rdfs:range :Item ;
     owl:inverseOf :availableFor .
@@ -307,10 +310,12 @@ service:Openaccess a owl:Class ;
 ###  http://purl.org/ontology/daia/holds
 :holds a owl:ObjectProperty ;
     rdfs:label "holds"@en ;
-    rdfs:comment "Relates an Institution to an Item which the Institution holds. Holding does not imply owning but beeing able to provide a service."@en ;
+    rdfs:comment "Relates an Institution to an Item which the Institution holds."@en ;
+    skos:scopeNote "Holding does not necessarily imply owning but beeing able to provide a service."@en ;
     rdfs:domain :Institution ;
     rdfs:range :Item ;
-    owl:inverseOf :heldBy .
+    owl:inverseOf :heldBy ;
+    rdfs:seeAlso bibo:owns .
 
 ###  http://purl.org/ontology/daia/heldBy
 :heldBy a owl:ObjectProperty ;
