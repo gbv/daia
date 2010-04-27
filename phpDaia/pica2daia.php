@@ -156,7 +156,7 @@ class DAIA_PICA extends DAIA {
                 	// l contains the link to the item directly
                     // LOGIN=ANONYMOUS should be added to avoid naked login screen
                 	if (substr($field, 0, 1) === 'l') {
-                		$item->href = substr($field, 1) . '&LOGIN=ANONYMOUS';
+                		$item->href = urldecode(substr($field, 1)) . '&LOGIN=ANONYMOUS';
                 		$href = $item->href;
                 	}
                     // e contains epn, the ID of the item
@@ -407,7 +407,7 @@ class DAIA_PICA extends DAIA {
                     $item->setAvailability('loan', true);
                     $item->setAvailability('presentation', true);
                 }
-                else if ($avail === 'entliehen') {
+                else if (strtolower($avail) === 'entliehen') {
                     $item->setAvailability('loan', false);
                     $item->setAvailability('presentation', false);
                     // The item is only currently not available,
@@ -420,6 +420,10 @@ class DAIA_PICA extends DAIA {
                     }
                 }
                 else if (substr($avail, -9) === 'entnehmen') {
+                    $item->setAvailability('loan', true);
+                    $item->setAvailability('presentation', true);
+                }
+                else if (substr($avail, -9) === 'ausleihen') {
                     $item->setAvailability('loan', true);
                     $item->setAvailability('presentation', true);
                 }
@@ -464,7 +468,7 @@ class DAIA_PICA extends DAIA {
             return $duedate;
         }
 
-        $a = file_get_contents($url);
+        $a = file_get_contents(urldecode($url));
         $position = strpos($a, '<td width="100%" class="plain" nowrap>Lent till');
         $duedate = substr($a, $position+48, 10);
 	    return $duedate;
@@ -527,7 +531,7 @@ class DAIA_PICA extends DAIA {
             return $item;
         }
 
-        $a = file_get_contents($item->href . '&LOGIN=ANONYMOUS&LNG=EN');
+        $a = file_get_contents(urldecode($item->href) . '&LOGIN=ANONYMOUS&LNG=EN');
         
         // Look for barcode in document
         // if it has been found, this item is on loan, now look for the duedate
