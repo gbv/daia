@@ -391,6 +391,10 @@ class DAIA_PICA extends DAIA {
                 // but PICA does not tell us, when it is expected...
                 $item->getAvailability('loan')->setExpected('unknown');
                 $item->getAvailability('presentation')->setExpected('unknown');
+                if ($item->getAvailability('interloan') !== null) {
+                  	$item->setAvailability('interloan', false);
+                    $item->getAvailability('interloan')->setExpected('unknown');
+                }
                 $href = $this->reservationUrl . $item->id;
                 $item->href = $href;
                 break;
@@ -410,6 +414,10 @@ class DAIA_PICA extends DAIA {
                     // look when it shall be back
                     $item->getAvailability('loan')->setExpected($this->getDuedate($item->href));
                     $item->getAvailability('presentation')->setExpected($this->getDuedate($item->href));
+                    if ($item->getAvailability('interloan') !== null) {
+                    	$item->setAvailability('interloan', false);
+                        $item->getAvailability('interloan')->setExpected($this->getDuedate($item->href));
+                    }
                 }
                 else if (substr($avail, -9) === 'entnehmen') {
                     $item->setAvailability('loan', true);

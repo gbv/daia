@@ -116,21 +116,13 @@ class DAIA_XML {
         if ($item->getDepartment() !== null) $itemElement->appendChild($this->getDepartment($item->getDepartment(), $namespaced));
         if ($item->getStorage() !== null) $itemElement->appendChild($this->getStorage($item->getStorage(), $namespaced));
         $availability = $this->getAvailabilityInformation($item, 'presentation', $namespaced);
-        if ($availability !== null) {
-            $itemElement->appendChild($availability);
-        }
+        if ($availability !== null) $itemElement->appendChild($availability);
         $availability = $this->getAvailabilityInformation($item, 'loan', $namespaced);
-        if ($availability !== null) {
-            $itemElement->appendChild($availability);
-        }
+        if ($availability !== null) $itemElement->appendChild($availability);
         $availability = $this->getAvailabilityInformation($item, 'openaccess', $namespaced);
-        if ($availability !== null) {
-            $itemElement->appendChild($availability);
-        }
+        if ($availability !== null) $itemElement->appendChild($availability);
         $availability = $this->getAvailabilityInformation($item, 'interloan', $namespaced);
-        if ($availability !== null) {
-            $itemElement->appendChild($availability);
-        }
+        if ($availability !== null) $itemElement->appendChild($availability);
         return $itemElement;
     }
     
