@@ -122,8 +122,11 @@ class DAIA_Item {
             if (get_class($this->availabilities[$service]) === 'DAIA_Available') {
                 return true;
             }
+            else if (get_class($this->availabilities[$service]) === 'DAIA_Unavailable') {
+                return false;
+            }
         }
-        return false;
+        return null;
     }
 
     public function getAvailability($service) {

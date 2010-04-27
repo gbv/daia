@@ -82,8 +82,12 @@ class DAIA_XML {
             }
         }
         foreach ($doc->getItems() as $it) {
-            $item = $this->getItemInformation($it, $namespaced);
-            $element->appendChild($item);
+            if ($it !== null) {
+                $item = $this->getItemInformation($it, $namespaced);
+                if ($item !== null) {                
+                    $element->appendChild($item);
+                }
+            }
         }
         return $element;
     }
@@ -112,13 +116,21 @@ class DAIA_XML {
         if ($item->getDepartment() !== null) $itemElement->appendChild($this->getDepartment($item->getDepartment(), $namespaced));
         if ($item->getStorage() !== null) $itemElement->appendChild($this->getStorage($item->getStorage(), $namespaced));
         $availability = $this->getAvailabilityInformation($item, 'presentation', $namespaced);
-        $itemElement->appendChild($availability);
+        if ($availability !== null) {
+            $itemElement->appendChild($availability);
+        }
         $availability = $this->getAvailabilityInformation($item, 'loan', $namespaced);
-        $itemElement->appendChild($availability);
+        if ($availability !== null) {
+            $itemElement->appendChild($availability);
+        }
         $availability = $this->getAvailabilityInformation($item, 'openaccess', $namespaced);
-        $itemElement->appendChild($availability);
+        if ($availability !== null) {
+            $itemElement->appendChild($availability);
+        }
         $availability = $this->getAvailabilityInformation($item, 'interloan', $namespaced);
-        $itemElement->appendChild($availability);
+        if ($availability !== null) {
+            $itemElement->appendChild($availability);
+        }
         return $itemElement;
     }
     
@@ -126,8 +138,11 @@ class DAIA_XML {
         if ($item->isAvailable($service) === true) {
             $availabilityType = 'available';
         }
-        else {
+        else if ($item->isAvailable($service) === false) {
             $availabilityType = 'unavailable';
+        }
+        else {
+        	return null;
         }
         if ($namespaced === true) {
         	$availability = $this->xml->createElementNS('http://ws.gbv.de/daia/', 'd:' . $availabilityType);
