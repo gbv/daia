@@ -40,6 +40,15 @@ class DAIA_PICA extends DAIA {
      */
     private $picaRecord;
 
+     /**
+     * @var string Pica-Plus-Contents of PPNs as an array
+     */
+    private $picaPlusContent = array();
+
+    private $duedateContent = array();
+
+    private $detailsContent = array();
+
     /**
      * Constructor
      * 
@@ -459,36 +468,43 @@ class DAIA_PICA extends DAIA {
     /**
      * Gets a duedate from Pica using HTTP
      * 
-     * @param string $ppn PPN of the recor
-     * @return array Array of records as strings for each search result
+     * @param string $url URL of the record
+     * @return string duedate as a string
      */
     private function getDuedate($url) {
 	    $duedate = 'unknown';
-	    if (!($fp = fopen("$url", "r"))) {
-            return $duedate;
-        }
 
-        $a = file_get_contents(urldecode($url));
-        $position = strpos($a, '<td width="100%" class="plain" nowrap>Lent till');
-        $duedate = substr($a, $position+48, 10);
+        if ($this->duedateContent[$url] === null) {
+        	$this->duedateContent[$url] = file_get_contents(urldecode($url));
+        }
+        
+	    if (empty($this->duedateContent[$url]) === true) {
+            return $duedate;
+        }                
+        
+        $position = strpos($this->duedateContent[$url], '<td width="100%" class="plain" nowrap>Lent till');
+        $duedate = substr($this->duedateContent[$url], $position+48, 10);
 	    return $duedate;
     }
 
     /**
      * Gets a Pica-plus record from Pica using HTTP
      * 
-     * @param string $ppn PPN of the recor
+     * @param string $ppn PPN of the record
      * @return array Array of records as strings for each search result
      */
     private function getRecordsByHTTP($ppn) {
 	    $katurl = $this->picaPlusUrl . $ppn;
-	    if (!($fp = fopen("$katurl", "r"))) {
-            return new DAIA_Message("could not open PICA+ input", 'en', 100);
-        }
 
-        $a = file_get_contents($katurl);
+        if ($this->picaPlusContent[$ppn] === null) {
+        	$this->picaPlusContent[$ppn] = file_get_contents($katurl);
+        }
         
-        $return = str_replace('<TD>', '', $a);
+	    if (empty($this->picaPlusContent[$ppn]) === true) {
+            return new DAIA_Message("could not open PICA+ input", 'en', 100);
+        }        
+        
+        $return = str_replace('<TD>', '', $this->picaPlusContent[$ppn]);
         $return = str_replace('<TR>', '', $return);
         $return = str_replace('</TR>', '', $return);
         $return = str_replace('</TD>', '', $return);
@@ -527,19 +543,18 @@ class DAIA_PICA extends DAIA {
     
     private function checkSubHoldingsAvailabilities($item, $barcode) {
 	    if ($item->href === null) return $item;
-	    if (!($fp = fopen($item->href, "r"))) {
-            return $item;
-        }
 
-        $a = file_get_contents(urldecode($item->href) . '&LOGIN=ANONYMOUS&LNG=EN');
+        if ($this->detailsContent[$item->href] === null) {
+        	$this->detailsContent[$item->href] = file_get_contents(urldecode($item->href) . '&LOGIN=ANONYMOUS&LNG=EN');
+        }
         
         // Look for barcode in document
         // if it has been found, this item is on loan, now look for the duedate
         // if it has not been found, this item is presumably available
-        $barcodePosition = strrpos($a, 'VBAR='.$barcode);
+        $barcodePosition = strrpos($this->detailsContent[$item->href], 'VBAR='.$barcode);
         if ($barcodePosition !== false) {
-            $position = strpos($a, '<td class="table" nowrap>&nbsp;Lent till', $barcodePosition);
-            $duedate = substr($a, $position+41, 10);
+            $position = strpos($this->detailsContent[$item->href], '<td class="table" nowrap>&nbsp;Lent till', $barcodePosition);
+            $duedate = substr($this->detailsContent[$item->href], $position+41, 10);
             $item->setAvailability('loan', false);
             $item->setAvailability('presentation', false);
             if ($position !== false) {
