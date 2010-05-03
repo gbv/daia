@@ -32,6 +32,8 @@ clients/xmlverbatim.xsl
 clients/daia.xsd
 clients/daia
 
+examples/gvk.pl
+
 Makefile.PL
 README
 Changes

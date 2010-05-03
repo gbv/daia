@@ -8,7 +8,7 @@ DAIA::Availability - Abstract base class of availability information
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use Carp::Clan;
 use Data::Validate::URI qw(is_uri);
 
@@ -71,17 +71,15 @@ their short form equivalent.
 
 =item href
 
-a link to perform, register or reserve the service
+An URL to perform, register or reserve the service.
 
 =item limitation
 
-an array reference with limitations (L<DAIA::Limitation> objects) 
-of the availability
+An array reference with limitations (L<DAIA::Limitation> objects).
 
 =item message
 
-an array reference with L<DAIA::Messages> about the specific
-availability
+An array reference with L<DAIA::Message> objects about this specific service.
 
 =back
 
@@ -227,7 +225,7 @@ Jakob Voss C<< <jakob.voss@gbv.de> >>
 
 =head1 LICENSE
 
-Copyright (C) 2009 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at

@@ -7,10 +7,11 @@ DAIA::Object - Abstract base class of all DAIA classes
 =cut
 
 use strict;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use Carp::Clan;
 use Data::Validate::URI qw(is_uri is_web_uri);
 use IO::Scalar;
+use UNIVERSAL 'isa';
 use JSON;
 
 our $AUTOLOAD;
@@ -115,32 +116,37 @@ sub add {
 
 A DAIA object can be serialized by the following methods:
 
-=head3 xml ( [ xmlns => 0|1 ] [ xslt => $xslt ] [ header => 0|1 ] )
+=head3 xml ( [ xmlns => 0|1 ] [ xslt => $xslt ] [ header => 0|1 ] [ pi => $pi ] )
 
 Returns the object in DAIA/XML. With the C<xmlns> as parameter you can 
 specify that a namespace declaration is added (disabled by default 
 unless you enable xslt or header). With C<xslt> you can add an XSLT 
-processing instruction. If you enable C<header>, an XML-header is 
-prepended.
+processing instruction and with C<pi> any other processing instructions.
+If you enable C<header>, an XML-header is prepended.
 
 =cut
 
 sub xml {
     my ($self, %param) = @_;
 
-    $param{xmlns} = ($param{xslt} or $param{header}) unless $param{xmlns};
+    my $xmlns = $param{xmlns} || ($param{xslt} or $param{header});
+    my $pi = $param{pi} || [ ];
+    $pi = [$pi] unless isa($pi,'ARRAY');
+
+    push @$pi, 'xml-stylesheet type="text/xsl" href="' . xml_escape_value($param{xslt}) . '"'
+        if $param{xslt};
+    @$pi = map { $_ =~ /^<\?.*\?>$/ ? "$_\n" : "<?$_?>\n" } @$pi;
 
     my $name = lc(ref($self)); 
     $name =~ s/^daia:://;
     $name = 'daia' if $name eq 'response';
 
     my $struct = $self->struct;
-    $struct->{xmlns} = "http://ws.gbv.de/daia/" if $param{xmlns};
+    $struct->{xmlns} = "http://ws.gbv.de/daia/" if $xmlns;
     my $xml = xml_write( $name, $struct, 0 );
-    delete $struct->{xmlns} if $param{xmlns};
+    delete $struct->{xmlns} if $xmlns;
 
-    $xml = "<?xml-stylesheet type=\"text/xsl\" href=\"" . xml_escape_value($param{xslt}) . "\"?>\n$xml" 
-        if $param{xslt};
+    $xml = join('', @$pi ) . $xml;
     $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n$xml" if $param{header};
 
     return $xml;
@@ -208,9 +214,17 @@ format is C<xml>. Other possible options are:
 
 Print HTTP headers (default). Use C<header =E<gt> 0> to disable headers.
 
+=head xmlheader
+
+Print the XML header of XML format is used. Enabled by default.
+
 =item xslt
 
-Add a link to the given XSLT stylesheet if XML format is requested.
+Add a link to the given XSLT stylesheet if XML format is used.
+
+=item pi
+
+Add one or more processing instructions if XML format is used.
 
 =item callback
 
@@ -221,13 +235,12 @@ You can disable callback support by setting C<callback =E<gt> undef>.
 =item to
 
 Serialize to a given stream (L<IO::Handle>, GLOB, or string reference)
-instead of STDOUT. You probably also want to set C<exitif> if you use
+instead of STDOUT. You may also want to set C<exitif> if you use
 this option.
 
 =item exitif
 
-By default this method exits the program. You can change this behavior
-with this parameter. With C<exitif = 0> the method never calls exit. If
+By setting this method to a true value you make it to exit the program.
 you provide a method, the method is called and the script exits if only
 if the return value is true.
 
@@ -246,13 +259,16 @@ sub serve {
         $attr{cgi} = CGI->new unless $attr{cgi};
         $attr{format} = $attr{'cgi'}->param('format');
     }
-    $attr{exitif} = 1 unless exists $attr{exitif};
+    $attr{exitif} = 0 unless exists $attr{exitif};
 
     my $format = lc($attr{format});
     my $header = defined $attr{header} ? $attr{header} : 1;
     my $xslt = $attr{xslt};
+    my $pi = $attr{pi};
+    my $xmlheader = defined $attr{xmlheader} ? $attr{xmlheader} : 1;
     my $to = $attr{to} || \*STDOUT;
     if ( ref($to) eq 'SCALAR' ) {
+        $$to = "";
         $to = IO::Scalar->new( $to );
     }
     _enable_utf8_layer($to);
@@ -266,7 +282,7 @@ sub serve {
         print $to $self->json( $attr{callback} );
     } else {
         print $to CGI::header( -type => "application/xml; charset=utf-8" ) if $header;
-        print $to $self->xml( xmlns => 1, header => 1, xslt => $xslt );
+        print $to $self->xml( xmlns => 1, header => 1, xslt => $xslt, pi => $pi, header => $xmlheader );
     }
 
     $attr{'exitif'} = $attr{'exitif'}() if ref($attr{'exitif'}) eq 'CODE';
@@ -522,7 +538,7 @@ Jakob Voss C<< <jakob.voss@gbv.de> >>
 
 =head1 LICENSE
 
-Copyright (C) 2009 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at

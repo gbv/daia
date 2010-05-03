@@ -68,6 +68,20 @@ ok( $@, "detect errors in XML" );
 $object = DAIA->parse_xml("<item label='&gt;' />");
 is_deeply( $object->struct, { label => ">" }, "label attribute (undocumented)" );
 
+my $msg = new DAIA::Message("hi");
+my $xml;
+$msg->serve( pi => 'foo bar', to => \$xml );
+like( $xml, qr/<\?foo\sbar\?>/, 'pi' );
+
+$msg->serve( pi => [ 'foo', 'bar' ], to => \$xml );
+my @pis = grep { $_ =~ /<\?(foo|bar|xml.*)\?>/;} split("\n", $xml);
+is( scalar @pis, 3, 'pis' );
+
+$msg->serve( pi => [ 'foo', '<?bar?>' ], to => \$xml, xslt => 'http://example.com', xmlheader => 0 );
+@pis = grep { $_ =~ /<\?(foo|bar|xml.*)\?>/;} split("\n", $xml);
+is( scalar @pis, 3, 'pis with xslt' );
+
+
 # TODO: add more examples (read and write), including edge cases and errors
 
 

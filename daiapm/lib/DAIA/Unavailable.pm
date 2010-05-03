@@ -6,15 +6,17 @@ DAIA::Unavailable - Information about a service that is currently unavailable
 
 =head1 DESCRIPTION
 
-This class is derived from L<DAIA::Availability> - see that class for details.
-In addition there are the properties C<expected> and C<queue>. Obviously the
-C<status> property of a C<DAIA::Unavailable> object is always C<0>.
+This class models a service that is (currently or in general) not available. 
+It is derived from L<DAIA::Availability> so see that class for details and 
+examples. In addition an instance of this class can have the properties
+C<expected> and C<queue>. Obviously the C<status> property of a
+C<DAIA::Unavailable> object is always C<0>.
 
 =cut
 
 use strict;
 use base 'DAIA::Availability';
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 use DateTime::Format::ISO8601;
 use DAIA::Available qw(parse_duration);
 
@@ -24,9 +26,18 @@ use DAIA::Available qw(parse_duration);
 
 =item href
 
+An URL to perform, register or reserve the service. As the service is unavailable
+you will rarely be able to directly perform the service. However the link could
+provide more information or alternatives.
+
 =item limitation
 
+An array reference with limitations (L<DAIA::Limitation> objects) 
+of the availability.
+
 =item message
+
+An array reference with L<DAIA::Message> objects about this specific service.
 
 =item queue
 
@@ -37,7 +48,7 @@ difference between no queue and a queue of length zero.
 =item expected
 
 An optional time period until the service will be available again. The property
-is given as ISO time period string (as XML Schema subset xs:date or xs:dateTime)
+is given as ISO time period string (as XML Schema subset C<xs:date> or C<xs:dateTime>)
 or the special value "unknown". If no period (nor "unknown") is given, the service 
 probably won't be available in the future.
 
@@ -66,7 +77,7 @@ our %PROPERTIES = (
 
 =head1 FUNCTIONS
 
-=head2 normalize_date ( $date-or-datetime )
+=head2 normalize_date ( $date_or_datetime )
 
 Returns a canonical xs:date or xs:dateTime value or undef. Can can pass a 
 L<DateTime> object or a string that will be parsed with the parse_datetime
@@ -95,7 +106,7 @@ Jakob Voss C<< <jakob.voss@gbv.de> >>
 
 =head1 LICENSE
 
-Copyright (C) 2009 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at

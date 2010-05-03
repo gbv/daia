@@ -15,7 +15,7 @@ a C<DAIA::Unavailable> object is always C<1>.
 
 use strict;
 use base 'DAIA::Availability';
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 use DateTime::Duration;
 use DateTime::Format::Duration;
 
@@ -28,13 +28,19 @@ our @EXPORT_OK = qw(parse_duration normalize_duration);
 
 =item href
 
+An URL to perform, register or reserve the service.
+
 =item limitation
+
+An array reference with limitations (L<DAIA::Limitation> objects).
 
 =item message
 
+An array reference with L<DAIA::Message> objects about this specific service.
+
 =item delay
 
-A delay as duration string (XML Schema xs:duration). To get the
+A delay as duration string (XML Schema C<xs:duration>). To get the
 delay as L<DateTime::Duration> object, use the C<parse_duration>
 function that can be exported on request.
 
@@ -146,7 +152,7 @@ Jakob Voss C<< <jakob.voss@gbv.de> >>
 
 =head1 LICENSE
 
-Copyright (C) 2009 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at
