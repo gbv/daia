@@ -21,8 +21,15 @@
   <xsl:import href="xmlverbatim.xsl"/>
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
 
-  <!-- URL of CSS file -->
-  <xsl:param name="stylesheet">daia.css</xsl:param>
+  <!-- URL of CSS file. You can use the <?cssurl $URL ?> processing instruction -->
+  <xsl:param name="stylesheet">
+    <xsl:choose>
+      <xsl:when test="/processing-instruction('cssurl')">
+        <xsl:value-of select="normalize-space(/processing-instruction('cssurl'))"/>
+      </xsl:when>
+      <xsl:otherwise>daia.css</xsl:otherwise>
+    </xsl:choose>
+  </xsl:param>
 
   <!-- prefered language to show messages in (TODO: test) -->
   <xsl:param name="language">de</xsl:param>
