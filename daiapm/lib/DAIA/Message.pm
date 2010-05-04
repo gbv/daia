@@ -68,6 +68,13 @@ To append a message you can use the C<add> or the C<addMessage> method:
 
   $document += $msg;              # same as $document->add( $msg );
 
+In addition to the C<message> function there is the C<error> function to quickly
+construct error messages. The first parameter is always treated as error number:
+
+  error() # errno = 0
+  error( $errno [, $lang => $content ] ) 
+  error( $errno, $content [, lang => $lang ] )
+
 =cut
 
 our $DEFAULT_LANG = 'en';

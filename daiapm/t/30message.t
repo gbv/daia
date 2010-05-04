@@ -77,6 +77,27 @@ $msg = message( $content );
 is_deeply( $msg, $m1 );
 
 
+#### explicit errors
+
+@constructors = (
+  error(),  message( errno => 0 ),
+  error(7), message( errno => 7 ),
+  error(2, 'foo' ), message( 'foo', errno => 2 ),
+  error(2, 'es' => 'foo' ), message( 'es' => 'foo', errno => 2 ),
+  error(3, 'foo', lang => 'fr' ), message( 'fr' => 'foo', errno => 3 ),
+);
+while (@constructors) {
+    my $e = shift @constructors;
+    my $m = shift @constructors;
+    is_deeply( $e, $m, 'error' );
+}
+
+# TODO
+# my $item = item();
+# $item->addError( 9, 'bla' );
+# my @msgs = $item->message;
+# is_deeply( \@msgs, [error(9,'bla')], 'addError' );
+
 #### message accessors
 
 my @holders = (

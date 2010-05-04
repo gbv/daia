@@ -1,3 +1,5 @@
+0.?? 2010-??-??
+      - added 'error' function    
 0.27 2010-05-03
      - Some more documentation and an example
      - added 'pi' parameter in method 'serve'

@@ -1,19 +1,22 @@
 The following feature requests and bug reports are known:
 
 Additional functionality
-* add 'limited' property to a reponse?
-* redesign 'fragmented' property
+
+* redesign 'fragmented' property (narrowerExemplar? nested documents?)
 * add inferencing (same id = same object policy)
 * support DAIA/RDF 
+* add support of logging with Log4Perl
+* implement DAIA::Error as object so you can also use
+** ->error, ->addError, ->provideError
+* add 'limited' property to a response (or just open world assumption?)
 
 Additional methods
 * validating as method (move code from daia.pl)
-* add 'error' and 'addError' methods
-* add 'removeMessages([lang])' and 'getMessages()'
+* add 'removeMessages([lang])' ? can be solve with grep!
 * user-defined XML-namespace-prefix in XML serialization
 
 More tests and documentation
-* how to add properties (add/provide)
+* better describe how to add properties (add/provide) and to query the structure
 * document and test setting via unblessed struct
 * test UTF-8 (when reading from streams), append*, ...
 * more serialization and unserialization

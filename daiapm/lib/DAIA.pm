@@ -163,7 +163,7 @@ our %EXPORT_TAGS = (
 );
 our @EXPORT_OK = qw(is_uri);
 Exporter::export_ok_tags;
-$EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve'];
+$EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve', 'error'];
 Exporter::export_tags('all');
 
 use Carp::Clan; # qw(^DAIA::);
@@ -197,8 +197,8 @@ To disable exporting of the functions include DAIA like this:
   use DAIA qw();      # do not export any functions
   use DAIA qw(serve); # only export function 'serve'
 
-By default all functions are exported (group :all) in addition you can specify
-the following groups:
+By default all functions are exported (group :all) which adds 13 functions 
+to the default namespace! Alternatively you can specify the following groups:
 
 =over 4
 
@@ -220,6 +220,9 @@ C<limitation> (L<DAIA::Limitation>)
 
 =back
 
+The functions C<message>, C<error> and C<serve> are also exported by default.
+See L<DAIA::Message> for the parameters of C<message> or C<error>.
+
 =cut
 
 sub response     { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Response->new( @_ ) }
@@ -233,6 +236,12 @@ sub institution  { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::I
 sub department   { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Department->new( @_ ) }
 sub storage      { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Storage->new( @_ ) }
 sub limitation   { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Limitation->new( @_ ) }
+
+sub error { 
+    local $Carp::CarpLevel = $Carp::CarpLevel + 1; 
+    my $errno = @_ ? shift : 0;
+    return DAIA::Message->new( @_ ? (@_, errno => $errno) : (errno => $errno) );
+}
 
 =head2 serve( [ [ format => ] $format ] [ %options ] )
 
