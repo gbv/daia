@@ -69,10 +69,10 @@ show_feed(
   <li><a href="http://sourceforge.net/projects/daia/support">Get support</a></li> 
   <li>read <a href="http://www.gbv.de/wikis/cls/Verf%C3%BCgbarkeitsrecherche_mit_DAIA">a German introduction to DAIA</a></li>
   <li>Tools
-    <ul><li><a href="http://ws.gbv.de/daia/validator/">DAIA validator</a></li></ul>
+    <ul><li><a href="http://ws.gbv.de/daia/validator/">DAIA validator</a> (included <a href="http://daia.svn.sourceforge.net/viewvc/daia/trunk/daiapm/clients/daia?view=markup">in the Perl implementation</a></li></ul>
   </li>
   <li>
-   <a href="http://wiki.code4lib.org/index.php/DAIA">DAIA extensions</a> - open discussion and collection if the Code4Lib wiki
+   <a href="http://wiki.code4lib.org/index.php/DAIA">DAIA extensions</a> - open discussion and collection of ideas in the Code4Lib wiki
   </li>
 </ul> 
 </p>
