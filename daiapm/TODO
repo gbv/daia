@@ -1,8 +1,14 @@
 The following feature requests and bug reports are known:
 
-Additional functionality
+Bugfix
+* Use XML::Filter::Namespace to really strip XML 
+* Allow availability without service (unspecified) and custom services
+* Change URIs like http://purl.org/NET/DAIA/services/presentation to final URIs
+* http://purl.org/ontology/daia/Service/... or .../service/... ?
+* fix fragment/broader/narrower issue
+* =redesign 'fragmented' property (narrowerExemplar? nested documents?)
 
-* redesign 'fragmented' property (narrowerExemplar? nested documents?)
+Additional functionality
 * add inferencing (same id = same object policy)
 * support DAIA/RDF 
 * add support of logging with Log4Perl
