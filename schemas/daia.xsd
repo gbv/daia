@@ -5,7 +5,7 @@
     <xs:annotation>
       <xs:documentation>Document Availability Information API (DAIA) XML Schema.
         Describes the current availability of different services about an information
-        resource at a given institution. Version: 0.53 (2009-10-15) by Jakob Voss.
+        resource at a given institution. Version: 0.54 (2010-05-06) by Jakob Voss.
       </xs:documentation>
     </xs:annotation>
   </xs:element> 
@@ -139,7 +139,7 @@
         <xs:element maxOccurs="unbounded" minOccurs="0" ref="limitation"/>
       </xs:choice>
     </xs:sequence>
-    <xs:attribute name="service" use="required" type="service" />
+    <xs:attribute name="service" type="service" use="optional"/>
     <xs:attribute name="href" type="xs:anyURI" use="optional">
       <xs:annotation>
         <xs:documentation>URL to get or reserve the service</xs:documentation>

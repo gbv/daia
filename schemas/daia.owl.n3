@@ -3,7 +3,7 @@
 #################################################################
 
 @prefix : <http://purl.org/ontology/daia/> .
-@prefix service: <http://purl.org/ontology/daia/service/> .
+@prefix service: <http://purl.org/ontology/daia/Service/> .
 
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix bibo: <http://purl.org/ontology/bibo/> .
@@ -26,7 +26,7 @@
 <http://purl.org/ontology/daia/> a owl:Ontology ;
     dct:title "Document Availability Information Ontology (DAIA)" ;
     dct:description """The Document Availability Information Ontology (DAIA) describes the current availability of documents in libraries and similar institutions. Availability can be expressed in terms of specific services."""@en ;
-    owl:versionInfo "Beta version 2010-04-20" .
+    owl:versionInfo "Beta version 2010-05-06" .
 
 #################################################################
 # DAIA Classes
@@ -115,7 +115,8 @@
     skos:scopeNote "The property dct:coverage may be used to refer to a scope of this service - but this is outside of the core purpose of DAIA"@en ;
     rdfs:seeAlso dct:coverage ;
     skos:scopeNote "Messages can be added with dct:description."@en ;
-    rdfs:seeAlso dct:description .
+    skos:scopeNote "There should always be a service connected to a availability status. By default this should be this general 'unknown' service type."@en ;
+    rdfs:seeAlso dct:description, :availableFor, :unavailableFor .
 
 ###  http://purl.org/ontology/daia/Storage
 
@@ -131,25 +132,25 @@
 # DAIA Services
 #################################################################
 
-###  http://purl.org/ontology/daia/service/Loan
+###  http://purl.org/ontology/daia/Service/Loan
 service:Loan a owl:Class ;
     rdfs:label "loan service"@en ;
     rdfs:comment "Use outside of the holding institution (by lending or online access)"@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/service/Presentation
+###  http://purl.org/ontology/daia/Service/Presentation
 service:Presentation a owl:Class ;
     rdfs:label "presentation service"@en ;
     rdfs:comment "Use within the holding institution (in their rooms, in their intranet etc.)"@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/service/Interloan
+###  http://purl.org/ontology/daia/Service/Interloan
 service:Interloan a owl:Class ;
     rdfs:label "interloan service"@en ;
     rdfs:comment "Use mediated by another institution."@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/service/Openaccess
+###  http://purl.org/ontology/daia/Service/Openaccess
 service:Openaccess a owl:Class ;
     rdfs:label "open access service"@en ;
     rdfs:comment "Use within an institution (in their rooms, in their intranet etc.)"@en ;
@@ -167,7 +168,8 @@ service:Openaccess a owl:Class ;
     rdfs:domain :Document ;
     rdfs:range :Item ;
     owl:inverseOf :exemplarOf ;
-    rdfs:seeAlso :extractOf ;
+    rdfs:seeAlso :narrowerExemplar ;
+    rdfs:seeAlso :broaderExemplar ;
     rdfs:seeAlso frbr:exemplarOf ;
     rdfs:seeAlso frbr:embodimentOf .
 
@@ -178,33 +180,61 @@ service:Openaccess a owl:Class ;
     rdfs:comment "Relates an Item to the Document that is exemplified by the Item."@en ;
     rdfs:range :Document ;
     rdfs:domain :Item ;
-    rdfs:seeAlso :extractOf ;
+    rdfs:seeAlso :narrowerExemplarOf ;
+    rdfs:seeAlso :broaderExemplarOf ;
     rdfs:seeAlso frbr:exemplar ;
     rdfs:seeAlso frbr:embodiment ;
     owl:inverseOf :exemplar .
 
-###  http://purl.org/ontology/daia/extract
+###  http://purl.org/ontology/daia/narrowerExemplar
 
-:extract a owl:ObjectProperty ;
-    rdfs:label "extract"@en ;
+:narrowerExemplar a owl:ObjectProperty ;
+    rdfs:label "has narrower exemplar"@en ;
     rdfs:comment "Relates a Document to an Item that is an exemplar of a part of the Document."@en ;
     rdfs:domain :Document ;
     rdfs:range :Item ;
     rdfs:seeAlso dct:hasPart ;
     rdfs:seeAlso :exemplar ;
+    rdfs:seeAlso :broaderExemplar ;
+    owl:inverseOf :narrowerExemplarOf ;
     skos:scopeNote "This property implies that the item is an exemplar of another document which itself part if the related document." ; 
-    skos:scopeNote "{ ?x daia:extract ?y } => { ?y daia:exemplarOf [ dcterms:isPartOf ?x ] }" ; 
-    rdfs:seeAlso bibo:DocumentPart .
+    skos:scopeNote "{ ?x daia:narrowerExemplar ?y } => { ?y daia:exemplarOf [ dcterms:isPartOf ?x ] }" ; 
+    rdfs:seeAlso bibo:DocumentPart, bibo:Collection .
 
-###  http://purl.org/ontology/daia/extractOf
+###  http://purl.org/ontology/daia/narrowerExemplarOf
 
-:extractOf a owl:ObjectProperty ;
-    rdfs:label "extract of"@en ;
+:narrowerExemplarOf a owl:ObjectProperty ;
+    rdfs:label "is narrower exemplar of"@en ;
     rdfs:comment "Relates an Item to a Document which is partly exemplified by the Item."@en ;
     rdfs:range :Document ;
     rdfs:domain :Item ;
-    owl:inverseOf :extract ;
+    owl:inverseOf :narrowerExemplar ;
     rdfs:seeAlso :exemplarOf .
+
+###  http://purl.org/ontology/daia/broaderExemplar
+
+:broaderExemplar a owl:ObjectProperty ;
+    rdfs:label "has broader exemplar"@en ;
+    rdfs:comment "Relates a Document to an Item that contains an exemplar of more then the Document."@en ;
+    rdfs:domain :Document ;
+    rdfs:range :Item ;
+    rdfs:seeAlso dct:hasPart ;
+    rdfs:seeAlso :exemplar ;
+    rdfs:seeAlso :narrowerExemplar ;
+    owl:inverseOf :broaderExemplarOf ;
+    skos:scopeNote "This property implies that the item is an exemplar of another document which contains the related document as part." ; 
+    skos:scopeNote "{ ?doc daia:broaderExemplar ?item } => { ?item daia:exemplarOf [ dcterms:hasPart ?doc ] }" ; 
+    rdfs:seeAlso bibo:DocumentPart, bibo:Collection .
+
+###  http://purl.org/ontology/daia/broaderExemplarOf
+
+:broaderExemplarOf a owl:ObjectProperty ;
+    rdfs:label "is broader exemplar of"@en ;
+    rdfs:comment "Relates an Item to a Document which contains more than what is exemplified by the Item."@en ;
+    rdfs:range :Document ;
+    rdfs:domain :Item ;
+    owl:inverseOf :broaderExemplar ;
+    rdfs:seeAlso :exemplarOf, :narrowerExemplarOf .
 
 ###  http://purl.org/ontology/daia/limits
 :limits a owl:ObjectProperty ;
@@ -430,7 +460,7 @@ dct:description rdfs:type rdfs:Property .
 
 ###  http://purl.org/dc/terms/hasPart
 dct:hasPart rdfs:type rdfs:Property ;
-    skos:scopeNote "This property can be inferred from a daia:extract property."@en .
+    skos:scopeNote "This property can be inferred from a daia:narrowerExemplar property."@en .
 
 ###  http://purl.org/dc/terms/identifier
 dct:identifier rdfs:type rdfs:Property .
