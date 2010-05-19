@@ -1,7 +1,7 @@
 The following feature requests and bug reports are known:
 
 Bugfix
-* Use XML::Filter::Namespace to really strip XML 
+* Allow multiple DAIA elements in one document when parsing
 * Allow availability without service (unspecified) and custom services
 * Change URIs like http://purl.org/NET/DAIA/services/presentation to final URIs
 * http://purl.org/ontology/daia/Service/... or .../service/... ?

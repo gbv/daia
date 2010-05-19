@@ -27,6 +27,22 @@ if ($@) {
 }
 
 
+#### internal methods
+use XML::Simple qw(XMLin);
+
+my $from = "<foo xmlns='htpp://example.com'><bar/></foo>";
+my $xml = eval { XMLin( $from, KeepRoot => 1, NSExpand => 1, KeyAttr => [ ] ); };
+is_deeply( DAIA::daia_xml_roots($xml), {}, 'internal: daia_xml_roots');
+$from = "<foo xmlns='htpp://example.com'><b>" .
+        "<institution xmlns='http://purl.org/ontology/daia/'/></b></foo>";
+$xml = eval { XMLin( $from, KeepRoot => 1, NSExpand => 1, KeyAttr => [ ] ); };
+is_deeply( DAIA::daia_xml_roots($xml), {
+  '{http://purl.org/ontology/daia/}institution' => {                                                   
+    'xmlns' => 'http://purl.org/ontology/daia/' } }
+, 'internal: daia_xml_roots');
+
+
+#### public methods
 my $item = item();
 
 like( $item->xml( xmlns => 1 ), qr/<item xmlns="http:\/\/ws.gbv.de\/daia\/"\s*\/>/, "xlmns" );
@@ -43,9 +59,9 @@ $item = item(
   ]
 );
 my $data = join("",<DATA>);
-is ( $item->xml, $data, 'xml example' );
+is ( $item->xml( xmlns => 1 ), $data, 'xml example' );
 
-$validate->( $item->xml( xmlns => 1) );
+$validate->( $item->xml( xmlns => 1 ) );
 
 my $object;
 # use Data::Dumper;
@@ -56,7 +72,8 @@ is_deeply( $object, $item, 'parsed xml' );
 $object = DAIA->parse_xml( "<message lang='de' xmlns='http://ws.gbv.de/daia/'>Hallo</message>" );
 is_deeply( $object, message( 'de' => 'Hallo' ), 'ignore xmlns' );
 
-$object = DAIA::parse_xml( "<d:message lang='de' xmlns:d='http://ws.gbv.de/daia/'>Hallo</d:message>", xmlns => 1 );
+$from =  "<d:message lang='de' xmlns:d='http://ws.gbv.de/daia/'>Hallo</d:message>";
+$object = DAIA::parse_xml( $from );
 is_deeply( $object, message( 'de' => 'Hallo' ), 'use xmlns' );
 
 $object = DAIA->parse_xml( "<message lang='de'>Hallo</message>" );
@@ -69,7 +86,7 @@ $object = DAIA->parse_xml("<item label='&gt;' />");
 is_deeply( $object->struct, { label => ">" }, "label attribute (undocumented)" );
 
 my $msg = new DAIA::Message("hi");
-my $xml;
+$xml = "";
 $msg->serve( pi => 'foo bar', to => \$xml );
 like( $xml, qr/<\?foo\sbar\?>/, 'pi' );
 
@@ -84,11 +101,10 @@ is( scalar @pis, 3, 'pis with xslt' );
 
 # TODO: add more examples (read and write), including edge cases and errors
 
-
 my $fromjson = DAIA::parse("t/example.json");
 
 open FILE, "t/example.xml";
-my @files = ("t/example.xml", \*FILE, IO::File->new("t/example2.xml"));
+my @files = ("t/example.xml", \*FILE, IO::File->new("t/example2.xml"), "t/foreign.xml");
 foreach my $file (@files) {
     my $d = DAIA::parse( $file );
     isa_ok( $d, 'DAIA::Response' );
@@ -103,7 +119,7 @@ eval { DAIA->parse( data => '{}', format => 'xml' ); };
 like( $@, qr/XML is not well-formed/ );
 
 __DATA__
-<item>
+<item xmlns="http://ws.gbv.de/daia/">
   <message lang="en">hi</message>
   <label>&quot;</label>
   <department>foo</department>

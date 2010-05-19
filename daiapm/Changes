@@ -1,4 +1,5 @@
 0.?? 2010-??-??
+      - parsing DAIA/XML inside other XML now possible
       - added 'error' function    
 0.27 2010-05-03
      - Some more documentation and an example

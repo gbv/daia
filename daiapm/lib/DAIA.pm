@@ -267,13 +267,10 @@ function and as method:
   DAIA->parse_xml( $xml );
   DAIA::parse_xml( $xml );
 
-=head2 parse_xml( $xml, [ xmlns => 0|1 ] )
+=head2 parse_xml( $xml )
 
 Parse DAIA/XML from a file or string. The first parameter must be a 
-filename, a string of XML, or a L<IO::Handle> object. The optional 
-parameter C<xmlns> defines whether parsing is namespace-aware - in
-this case all elements outside the DAIA XML namespace 
-C<http://ws.gbv.de/daia/> are ignored.
+filename, a string of XML, or a L<IO::Handle> object.
 
 Parsing is more lax then the specification so it silently ignores 
 elements and attributes in foreign namespaces. Returns either a DAIA 
@@ -326,9 +323,6 @@ A scalar ending with C<.json> is parsed as DAIA/JSON.
 A scalar ending with C<.xml> is is parsed as DAIA/XML.
 
 =back
-
-The parameter C<xmlns> (by default set to true) can be used to disable 
-namespace-expanding when parsing DAIA/XML.
 
 =cut
 
@@ -383,18 +377,21 @@ sub parse {
             utf8::encode($from);;
             #print "IS UTF8?". utf8::is_utf8($from) . "\n";
         }
-        $param{xmlns} = 1 unless defined $param{xmlns};
-        my $xml = eval { XMLin( $from, KeepRoot => 1, NSExpand => $param{xmlns} ); };
+
+        my $xml = eval { XMLin( $from, KeepRoot => 1, NSExpand => 1, KeyAttr => [ ] ); };
+        $xml = daia_xml_roots($xml);
 
         croak $@ if $@;
-        croak "XML does not contain DATA information" unless $xml;
+        croak "XML does not contain DAIA elements" unless $xml;
 
         ($root, $value) = %$xml;
         $root =~ s/{[^}]+}//;
         $root = ucfirst($root);
         $root = 'Response' if $root eq 'Daia';
 
-        _filter_xml( $value );
+        _filter_xml( $value ); # filter out all non DAIA elements and namespaces
+
+        # TODO: $value may contain multiple daia elements (wantarray?)!
 
     } elsif ( $format eq 'json' ) {
         eval { $value = JSON->new->decode($from); };
@@ -440,6 +437,54 @@ and can be exported into the default namespace on request.
 
 =cut
 
+#### internal methods (subject to be changed)
+
+my $NSEXPDAIA = qr/{http:\/\/(ws.gbv.de|purl.org\/ontology)\/daia\/}(.*)/;
+
+# =head1 daia_xml_roots ( $xml )
+#
+# This internal method is passed a hash reference as parsed by L<XML::Simple>
+# and traverses the XML tree to find the first DAIA element(s). It is needed
+# if DAIA/XML is wrapped in other XML structures.
+#
+# =cut
+
+sub daia_xml_roots {
+    my $xml = shift; # hash reference
+    my $out = { };
+
+    return { } unless UNIVERSAL::isa($xml,'HASH');
+
+    foreach my $key (keys %$xml) {
+        my $value = $xml->{$key};
+
+        if ( $key =~ /^{([^}]*)}(.*)/ and !($key =~ $NSEXPDAIA) ) {
+            # non DAIA element
+            my $children = UNIVERSAL::isa($value,'ARRAY') ? $value : [ $value ];
+            @$children = grep {defined $_} map { daia_xml_roots($_) } @$children;
+            foreach my $n (@$children) {
+                while ( my ($k,$v) = each(%{$n}) ) {
+                    next if $k =~ /^xmlns/;
+                    $v = [$v] unless UNIVERSAL::isa($v,'ARRAY');
+                    if ($out->{$k}) {
+                        push @$v, (UNIVERSAL::isa($out->{$k},'ARRAY') ? 
+                                   @{$out->{$k}} : $out->{$k});
+                    }
+                    # filter out scalars
+                    @$v = grep {ref($_)} @$v;
+                    if (@$v) {
+                        $out->{$k} = (@$v > 1 ? $v : $v->[0]); 
+                    }
+                }
+            }
+        } else { # DAIA element or element without namespace
+            $out->{$key} = $value;
+        }
+    }
+
+    return $out;
+}
+
 # filter out non DAIA XML elements and 'xmlns' attributes
 sub _filter_xml { 
     my $xml = shift;
@@ -449,9 +494,9 @@ sub _filter_xml {
     my (@del,%add);
     foreach my $key (keys %$xml) {
         if ($key =~ /^{([^}]*)}(.*)/) {
-            if ($1 eq "http://ws.gbv.de/daia/") {
-                #%add{$2} = 
-                $xml->{$2} = $xml->{$key};
+            my $local = $2;
+            if ($1 =~ /^http:\/\/(ws.gbv.de|purl.org\/ontology)\/daia\/$/) {
+                $xml->{$local} = $xml->{$key};
             }
             push @del, $key;
         } elsif ($key =~ /^xmlns/ or $key =~ /:/) {

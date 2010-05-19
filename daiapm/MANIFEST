@@ -25,6 +25,7 @@ t/85json.t
 t/example.json
 t/example.xml
 t/example2.xml
+t/foreign.xml
 
 clients/daia.css  
 clients/daia.xsl
