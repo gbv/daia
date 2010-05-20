@@ -1,7 +1,11 @@
 [Library]
 name = "Universitätsbibliothek der TU Hamburg-Harburg" ; Name of the Library
-sigel = "0830" ; Signature of the Library
+sigel = "info:isil/DE-830" ; Signature of the Library
 infoUrl = "http://www.tub.tu-harburg.de" ; URL of the Library's homepage 
+
+[IDPrefixes]
+documentIdPrefix = gvk:ppn:
+itemIdPrefix = eln:
 
 ; The catalog section is only needed for PICA-catalogs
 

@@ -8,7 +8,16 @@ include_once 'pica2daia.php';
 
 $doc = new DAIA_PICA(array($_REQUEST['ppn']));
 
-switch ($_REQUEST['output']) {
+$outputFormat = null;
+
+if ($_REQUEST['format']) {
+	$outputFormat = $_REQUEST['format'];
+}
+if ($_REQUEST['output']) {
+	$outputFormat = $_REQUEST['output'];
+}
+
+switch ($outputFormat) {
     case 'xml': 
         // show as plain XML
         header('Content-Type: text/xml; charset=UTF-8');

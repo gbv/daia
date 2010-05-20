@@ -49,6 +49,10 @@ class DAIA_PICA extends DAIA {
 
     private $detailsContent = array();
 
+    private $prefixPPN;
+
+    private $prefixEPN;
+
     /**
      * Constructor
      * 
@@ -64,6 +68,9 @@ class DAIA_PICA extends DAIA {
         $this->picaPlusUrl = $iniArray['picaPlusUrl'];
         $this->reservationUrl = $iniArray['reservationUrl'];
         
+        $this->prefixPPN = $iniArray['documentIdPrefix'];
+        $this->prefixEPN = $iniArray['itemIdPrefix'];
+
         $this->locationsFile = $iniArray['locationsFile'];
         
         foreach ($docs as $docId) {
@@ -90,7 +97,7 @@ class DAIA_PICA extends DAIA {
             $this->picaRecord = $this->getRecordsByHTTP($id);
         }
 
-        $doc = new DAIA_Document($id, $this->basicUrl . $id);
+        $doc = new DAIA_Document($this->prefixPPN . $id, $this->basicUrl . $id);
 
         if (count($this->picaRecord) === 0) {
             $doc->setMessage(new DAIA_Message("PPN not found!", 'en', 100));
@@ -170,7 +177,7 @@ class DAIA_PICA extends DAIA {
                 	}
                     // e contains epn, the ID of the item
                 	if (substr($field, 0, 1) === 'e') {
-                		$item->id = substr($field, 1);
+                		$item->id = $this->prefixEPN . substr($field, 1);
                 	}
                 	// u contains holding information
                 	if (substr($field, 0, 1) === 'u') {
