@@ -120,6 +120,7 @@ if ( $outformat =~ /^(json|xml)$/ ) {
     $xslt = undef unless -f $xslt;
     $daia = DAIA::Response->new();
     $daia->serve( format => $outformat, callback => $callback, xslt => $xslt );
+    exit;
 } elsif ( $outformat and $outformat ne 'html' ) {
     $error = "Unknown output format - using HTML instead";
 }
