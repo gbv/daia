@@ -41,6 +41,11 @@ is_deeply( DAIA::daia_xml_roots($xml), {
     'xmlns' => 'http://purl.org/ontology/daia/' } }
 , 'internal: daia_xml_roots');
 
+$from = "<institution>I1</institution>";
+$from = "<x:foo xmlns:x='htpp://example.com' xmlns='http://purl.org/ontology/daia/'>$from</x:foo>";
+$xml = eval { XMLin( $from, KeepRoot => 1, NSExpand => 1, KeyAttr => [ ] ); };
+is_deeply( DAIA::daia_xml_roots($xml), {
+  '{http://purl.org/ontology/daia/}institution' => 'I1' }, 'internal: daia_xml_roots');
 
 #### public methods
 my $item = item();
@@ -98,6 +103,16 @@ $msg->serve( pi => [ 'foo', '<?bar?>' ], to => \$xml, xslt => 'http://example.co
 @pis = grep { $_ =~ /<\?(foo|bar|xml.*)\?>/;} split("\n", $xml);
 is( scalar @pis, 3, 'pis with xslt' );
 
+
+# parse multiple
+my $from1 = '<department>D</department><institution id="i:1">I1</institution><institution>I2</institution>';
+$from = "<x:foo xmlns:x='htpp://example.com' xmlns='http://purl.org/ontology/daia/'>$from1</x:foo>";
+
+my @objs = DAIA::parse($from);
+@objs = sort map { $_->xml } @objs;
+is( join('',@objs), $from1, "parsed multiple in XML" );
+
+is( DAIA::parse($from), undef, "parsed multiple in XML unexpected" );
 
 # TODO: add more examples (read and write), including edge cases and errors
 

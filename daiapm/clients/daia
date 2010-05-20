@@ -15,7 +15,7 @@ use Data::Dumper;
 use CGI::Carp qw(fatalsToBrowser);
 use DAIA;
 
-our $VERSION = '0.6';
+our $VERSION = '0.62';
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ my $outformat = lc(param('out'));
 my $callback  = param('callback'); 
 $callback = "" unless $callback =~ /^[a-z][a-z0-9._\[\]]*$/i;
 
-my ($error, $daia);
+my ($error, $daia, @daiaobjs);
 
 my $xsd = "daia.xsd"; # TODO: search somewhere else
 
@@ -75,9 +75,9 @@ if( not $url =~  /^\s*http[s]?:\/\// and not $cgimode and not $data ) {
 
 # parse DAIA
 if ( $data ) {
-    $daia = eval { DAIA->parse( data => $data, format => $informat ) };
+    @daiaobjs = eval { DAIA->parse( data => $data, format => $informat ) };
 } elsif( $url ) {
-    $daia = eval { DAIA->parse( file => $url, format => $informat ) };
+    @daiaobjs = eval { DAIA->parse( file => $url, format => $informat ) };
 }
 if ($@) {
     $error = $@;
@@ -91,21 +91,34 @@ if( not $cgimode ) {
     } else {
         binmode STDOUT, "utf8";
         if ($outformat eq 'xml') {
-            print $daia->xml(xmlns => 1);
+            foreach my $daia (@daiaobjs) {
+                print $daia->xml(xmlns => 1);
+            }
         } elsif($outformat eq 'dump') {
-            print Dumper($daia);
+            foreach my $daia (@daiaobjs) {
+                print Dumper($daia);
+            }
         } else {
-            print $daia->json;
+            foreach my $daia (@daiaobjs) {
+                print $daia->json;
+            }
         }
         print "\n";
     }
     exit;
 }
 
+if (@daiaobjs > 1) {
+    $error = "Found multiple DAIA elements, but expected one";
+} elsif (@daiaobjs) {
+    $daia = shift @daiaobjs;
+}
+
 # called as CGI
 if ( $outformat =~ /^(json|xml)$/ ) {
     my $xslt = "daia.xsl";
     $xslt = undef unless -f $xslt;
+    $daia = DAIA::Response->new();
     $daia->serve( format => $outformat, callback => $callback, xslt => $xslt );
 } elsif ( $outformat and $outformat ne 'html' ) {
     $error = "Unknown output format - using HTML instead";
@@ -202,7 +215,8 @@ print <<HTML;
 <div class='footer'>
 The source of this script is
 <a href='http://search.cpan.org/perldoc?daia'>available at CPAN</a>.
-The current version is $VERSION.
+The current version is $VERSION. Visit the 
+<a href="http://daia.sourceforge.net/">DAIA project at Sourceforge</a>.
 </div></body>
 HTML
 

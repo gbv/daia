@@ -1,6 +1,6 @@
-0.?? 2010-??-??
+0.28 2010-05-20
       - parsing DAIA/XML inside other XML now possible
-      - added 'error' function    
+      - added 'error' function   
 0.27 2010-05-03
      - Some more documentation and an example
      - added 'pi' parameter in method 'serve'

@@ -1,10 +1,10 @@
 The following feature requests and bug reports are known:
 
 Bugfix
-* Allow multiple DAIA elements in one document when parsing
 * Allow availability without service (unspecified) and custom services
 * Change URIs like http://purl.org/NET/DAIA/services/presentation to final URIs
 * http://purl.org/ontology/daia/Service/... or .../service/... ?
+* change XML namespace
 * fix fragment/broader/narrower issue
 * =redesign 'fragmented' property (narrowerExemplar? nested documents?)
 

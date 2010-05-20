@@ -7,7 +7,7 @@ DAIA - Document Availability Information API in Perl
 =cut
 
 use strict;
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 DESCRIPTION
 
@@ -324,6 +324,11 @@ A scalar ending with C<.xml> is is parsed as DAIA/XML.
 
 =back
 
+Normally this function or method returns a single DAIA object. When parsing 
+DAIA/XML it may also return a list of objects. It is recommended to always
+expect a list unless you are absolutely sure that the result of parsing will
+be a single DAIA object!
+
 =cut
 
 sub parse {
@@ -365,6 +370,7 @@ sub parse {
     $format = guess($from) unless $format;
 
     my $value;
+    my @objects;
     my $root = 'Response';
 
     if ( $format eq 'xml' ) {
@@ -384,18 +390,26 @@ sub parse {
         croak $@ if $@;
         croak "XML does not contain DAIA elements" unless $xml;
 
-        ($root, $value) = %$xml;
-        $root =~ s/{[^}]+}//;
-        $root = ucfirst($root);
-        $root = 'Response' if $root eq 'Daia';
+        while (my ($root,$value) = each(%$xml)) {
+            $root =~ s/{[^}]+}//;
+            $root = ucfirst($root);
+            $root = 'Response' if $root eq 'Daia';
 
-        _filter_xml( $value ); # filter out all non DAIA elements and namespaces
+            _filter_xml( $value ); # filter out all non DAIA elements and namespaces
 
-        # TODO: $value may contain multiple daia elements (wantarray?)!
+            $value = [ $value ] unless ref($value) eq 'ARRAY';
+
+            foreach my $v (@$value) {
+                my $object = eval 'DAIA::'.$root.'->new( $v )';  ##no critic
+                croak $@ if $@;
+                push @objects, $object;
+            }
+        }
 
     } elsif ( $format eq 'json' ) {
         eval { $value = JSON->new->decode($from); };
         croak $@ if $@;
+
         if ( (keys %$value) == 1 ) {
             my ($k => $v) = %$value;
             if (not $k =~ /^(timestamp|message|institution|document)$/ and ref($v) eq 'HASH') {
@@ -403,15 +417,17 @@ sub parse {
             }
         }
         delete $value->{schema} if $root eq 'Response'; # ignore schema attribute
+
+        croak "JSON does not contain DAIA elements" unless $value;
+        push @objects, eval('DAIA::'.$root.'->new( $value )');  ##no critic
+        croak $@ if $@;
+
     } else {
         croak "Unknown DAIA serialization format $format";
     }
 
-    croak "DAIA serialization is empty (maybe you forgot the XML namespace?)" unless $value;
-    my $object = eval 'DAIA::'.$root.'->new( $value )';  ##no critic
-    croak $@ if $@;
-
-    return $object;    
+    return if not wantarray and @objects > 1;
+    return wantarray ? @objects : $objects[0];
 }
 
 =head2 guess ( $string )
@@ -471,7 +487,7 @@ sub daia_xml_roots {
                                    @{$out->{$k}} : $out->{$k});
                     }
                     # filter out scalars
-                    @$v = grep {ref($_)} @$v;
+                    @$v = grep {ref($_)} @$v unless $k =~ $NSEXPDAIA;
                     if (@$v) {
                         $out->{$k} = (@$v > 1 ? $v : $v->[0]); 
                     }
