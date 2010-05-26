@@ -491,6 +491,9 @@ class DAIA_PICA extends DAIA {
         
         $position = strpos($this->duedateContent[$url], '<td width="100%" class="plain" nowrap>Lent till');
         $duedate = substr($this->duedateContent[$url], $position+48, 10);
+	    // reformat duedate, its coming in dd-mm-yyyy and should be yyyy-mm-dd
+	    $duedateArray = explode('-', $duedate);
+	    $duedate = $duedateArray[2].'-'.$duedateArray[1].'-'.$duedateArray[0];
 	    return $duedate;
     }
 
