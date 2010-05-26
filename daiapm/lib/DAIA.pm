@@ -400,6 +400,7 @@ sub parse {
             $value = [ $value ] unless ref($value) eq 'ARRAY';
 
             foreach my $v (@$value) {
+                # TODO: croak of $root is not known!
                 my $object = eval 'DAIA::'.$root.'->new( $v )';  ##no critic
                 croak $@ if $@;
                 push @objects, $object;

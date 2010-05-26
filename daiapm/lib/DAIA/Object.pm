@@ -519,7 +519,10 @@ sub _enable_utf8_layer {
 # some constants
 our %COMMON_PROPERTIES =( 
     id => {
-        filter => sub { my $v = "$_[0]"; is_uri($v) ? $v : undef; }
+        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_uri($v) ? $v : undef; }
+    },
+    href => {
+        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; }
     },
     href => { 
         filter => sub { my $v = "$_[0]"; is_web_uri($v) ? $v : undef; }

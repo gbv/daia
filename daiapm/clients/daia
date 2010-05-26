@@ -109,7 +109,7 @@ if( not $cgimode ) {
 }
 
 if (@daiaobjs > 1) {
-    $error = "Found multiple DAIA elements, but expected one";
+    $error = "Found multiple DAIA elements (".(scalar @daiaobjs)."), but expected one";
 } elsif (@daiaobjs) {
     $daia = shift @daiaobjs;
 }
@@ -157,7 +157,7 @@ print <<HTML;
 <body>
 <h1>DAIA Converter</h1>
 <p>Convert and Validate <a href="http://purl.org/NET/DAIA">DAIA response format</a></p>
-<form method="get" accept-charset="utf-8" action="">
+<form method="post" accept-charset="utf-8" action="">
 HTML
 print $msg, $error,
   fieldset(label('Input: ',

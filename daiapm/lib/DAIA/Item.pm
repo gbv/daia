@@ -8,10 +8,9 @@ DAIA::Item - Holds information about an item of a L<DAIA::Document>
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use DAIA;
-use Data::Validate::URI qw(is_uri is_web_uri);
 use JSON;
 
 =head1 PROPERTIES

@@ -9,7 +9,7 @@ DAIA::Entity - Abstract base class of Department, Institution, Storage, and Limi
 use strict;
 use Data::Validate::URI qw(is_uri is_web_uri);
 use base 'DAIA::Object';
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 =head1 PROPERTIES
 
@@ -37,10 +37,10 @@ our %PROPERTIES = (
         filter => sub { defined $_[0] ? "$_[0]" : "" }
     },
     href => {
-        filter => sub { my $v = "$_[0]"; is_web_uri($v) ? $v : undef; }
+        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; }
     },
     id => {
-        filter => sub { my $v = "$_[0]"; is_uri($v) ? $v : undef; }
+        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_uri($v) ? $v : undef; }
     }
 );
 

@@ -29,14 +29,19 @@ foreach my $class (keys %entities) {
     isa_ok( $e, $class, "empty constructor" );
 
     my $uri = "info:isil/DE-Tue120";
+    $uri = "  $uri " if ($class eq 'Storage'); # add whitespace
+
     my $content = "hello, world!"; # TODO: use Unicode here
     my $url = "http://search.cpan.org";
+    $url = "  $url " if ($class eq 'Storage'); # add whitespace
+
     my $hashref = { id => $uri, content => $content, href => $url };
 
     $e = &$shortcut( %$hashref );
     is( $e->id, $uri, "id (shortcut constructor)" );
     is( $e->content, $content, "content (shortcut constructor)" );
     is( $e->href, $url, "href (shortcut constructor)" );
+
 
     my $e2 = &$shortcut();
     $e2->id( $uri );
