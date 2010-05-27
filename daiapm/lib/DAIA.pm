@@ -50,7 +50,7 @@ to run a DAIA Server below under under L<#DAIA Server hints>.
 
   #!/usr/bin/perl
   use DAIA qw(is_uri);
-  use CGI;
+  use CGI; # or some other CGI module, for instance CGI::Minimal
   use utf8; # if source code containts UTF-8
 
   my $r = response( institution => {

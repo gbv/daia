@@ -7,8 +7,9 @@ DAIA::Object - Abstract base class of all DAIA classes
 =cut
 
 use strict;
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 use Carp::Clan;
+use CGI; # TODO: allow other kind of CGI
 use Data::Validate::URI qw(is_uri is_web_uri);
 use IO::Scalar;
 use UNIVERSAL 'isa';
@@ -250,7 +251,7 @@ sub serve {
     my $self = shift;
     my $first = shift if @_ % 2;
     my (%attr) = @_;
-    if ( UNIVERSAL::isa( $first,"CGI" ) ) {
+    if ( UNIVERSAL::isa( $first,'CGI' ) ) {
         $attr{cgi} = $first;
     } elsif (defined $first) {
         $attr{format} = $first;

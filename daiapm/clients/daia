@@ -15,31 +15,36 @@ use Data::Dumper;
 use CGI::Carp qw(fatalsToBrowser);
 use DAIA;
 
-our $VERSION = '0.62';
+our $VERSION = '0.64';
 
 =head1 DESCRIPTION
 
-You can pass either an URL which will be queried, or a string of serialized DAIA.
-The serialization format (JSON or XML) can be specified or it will get guessed.
-You can use this as a proxy to convert serialization format or just show the result
-in HTML - in this case you can also validate DAIA/XML against the XML Schema.
+You can pass either an URL which will be queried, or a string of serialized
+DAIA. The serialization format (JSON or XML) can be specified or it will get
+guessed. You can use this as a proxy to convert serialization format or just
+show the result in HTML - in this case you can also validate DAIA/XML against
+the XML Schema.
 
 =head1 COMMAND LINE USAGE
 
-To get usage information call this script with C<-?>, C<-h> or C<--help> as only
-parameter. Options can be passed as C<key=value> pairs and the first parameter
-is treated as filename or URL to read from (use '-' for STDIN as set by default).
+To get usage information call this script with C<-?>, C<-h> or C<--help> as 
+only parameter. Options can be passed as C<key=value> pairs and the first 
+parameter is treated as filename or URL to read from (use '-' for STDIN as
+set by default).
 
   daia input.xml  out=json  # convert to DAIA/JSON (default)
   daia input.json out=xml   # convert to DAIA/XML
 
 =head1 CGI USAGE
 
-Put this script in a directory of your webserver where it is executed as CGI script.
-You may have to change its filename to C<daia.pl> and add the following line to the 
-file C<.htaccess>:
+Put this script in a directory of your webserver where it is executed as CGI
+script. You may have to change its filename to C<daia.pl> or add a symlink or
+create a RewriteRule). In addition you may have to add the following lines 
+to C<.htaccess>:
 
-  AddHandler cgi-script .pl
+  Options +ExecCGI           # unless script is located in a cgi-directory
+  AddHandler cgi-script .pl  # unless this handler is already enabled
+  SetEnv PERL5LIB ../lib     # pointer to DAIA library if it is not installed
 
 =cut
 
@@ -50,16 +55,18 @@ my $cgimode = (not @ARGV and CGI->http);
 my $url = param('url');
 $url = shift @ARGV unless defined $url or $cgimode;
 
+# TODO: add proxy-parameter to append other parameters to and reuse as URL
+
 my $data = param('data'); # icoming raw data is UTF-8
 eval{ $data = Encode::decode_utf8( $data ); };
 
 my $informat  = lc(param('in'));
-my $outformat = lc(param('out'));
+my $outformat = lc(param('out')) || lc(param('format'));
 
 my $callback  = param('callback'); 
 $callback = "" unless $callback =~ /^[a-z][a-z0-9._\[\]]*$/i;
 
-my ($error, $daia, @daiaobjs);
+my ($error, $daia, @daiaobjs, $eurl);
 
 my $xsd = "daia.xsd"; # TODO: search somewhere else
 
@@ -71,6 +78,9 @@ if( not $url =~  /^\s*http[s]?:\/\// and not $cgimode and not $data ) {
         print join("",<DATA>)."\n";
         exit;
     }
+} else {
+    $eurl = $url; # url_encode
+    $eurl =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 }
 
 # parse DAIA
@@ -118,7 +128,9 @@ if (@daiaobjs > 1) {
 if ( $outformat =~ /^(json|xml)$/ ) {
     my $xslt = "daia.xsl";
     $xslt = undef unless -f $xslt;
-    $daia = DAIA::Response->new();
+    $daia = DAIA::Response->new() unless $daia;
+    $daia->addMessage(error(500,'en' => $error)) if $error;
+    binmode(STDOUT, ":utf8"); # TODO: remove this hack
     $daia->serve( format => $outformat, callback => $callback, xslt => $xslt );
     exit;
 } elsif ( $outformat and $outformat ne 'html' ) {
@@ -155,7 +167,7 @@ print <<HTML;
   </style>
 </head>
 <body>
-<h1>DAIA Converter</h1>
+<h1 id='top'>DAIA Converter</h1>
 <p>Convert and Validate <a href="http://purl.org/NET/DAIA">DAIA response format</a></p>
 <form method="post" accept-charset="utf-8" action="">
 HTML
@@ -176,7 +188,7 @@ print $msg, $error,
     label('JSONP Callback: ', textfield('callback'))
   ),
   fieldset('<input type="submit" value="Convert" class="submit" />'),
-  "</form>"
+  '</form>'
 ;
 if ($daia) {
   if ( $informat eq 'xml' or DAIA::guess($data) eq 'xml' ) {
@@ -204,18 +216,24 @@ if ($daia) {
      print p("validation is rather lax so the input may be invalid - but it was parseable");
   }
   print "<div id='result'>";
-  print "<h2>Result in DAIA/JSON</h2>";
+  my ($pjson, $pxml);
+  if (!$data && $url) {
+    $pjson = $pxml = url()."?callback=$callback&url=$eurl";
+    $pjson = " (<a href='$pjson&format=json'>get via proxy</a>)";
+    $pxml  = " (<a href='$pxml&format=json'>get via proxy</a>)";
+  }
+  print "<h2 id='json'>Result in DAIA/JSON$pjson <a href='#top'>&#x2191;</a> <a href='#xml'>&#x2193;</a></h2>";
   binmode(STDOUT, ":utf8");
   print pre(escapeHTML( $daia->json( $callback ) ));
-  print "<h2>Result in DAIA/XML</h2>";
+  print "<h2 id='xml'>Result in DAIA/XML$pxml <a href='#json'>&#x2191;</a></h2>";
   print pre(escapeHTML( $daia->xml( xmlns => 1 ) ) );
   print "</div>";
 }
 
 print <<HTML;
 <div class='footer'>
-The source of this script is
-<a href='http://search.cpan.org/perldoc?daia'>available at CPAN</a>.
+The source of this script is available<!--
+a href='http://search.cpan.org/perldoc?daia'>available at CPAN</a-->.
 The current version is $VERSION. Visit the 
 <a href="http://daia.sourceforge.net/">DAIA project at Sourceforge</a>.
 </div></body>
