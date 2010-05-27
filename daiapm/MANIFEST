@@ -17,6 +17,7 @@ t/10object.t
 t/20entities.t
 t/30message.t
 t/40availability.t
+t/45datetime.t
 t/50item.t
 t/60document.t
 t/70response.t

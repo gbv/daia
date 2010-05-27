@@ -9,10 +9,10 @@ use ExtUtils::MakeMaker;
     ABSTRACT_FROM   => 'lib/DAIA.pm',
     AUTHOR          => 'Jakob Voss <jakob.voss@gbv.de>',
     PREREQ_PM       => {
-        'Data::Validate::URI' => '0.05',
+        'DateTime' => '0.52',
         'DateTime::Duration' => '0',
         'DateTime::Format::Duration' => '1.03',
-        'DateTime::Format::ISO8601' => '0.06',
+        'Data::Validate::URI' => '0.05',
         'JSON' => '2.15',
         'LWP::Simple' => '1.4',
         'CGI' => '3.0',

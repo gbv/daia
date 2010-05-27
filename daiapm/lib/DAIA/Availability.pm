@@ -8,9 +8,15 @@ DAIA::Availability - Abstract base class of availability information
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 use Carp::Clan;
 use Data::Validate::URI qw(is_uri);
+use DateTime::Duration;
+use DateTime::Format::Duration;
+
+use DateTime;
+use base 'Exporter';
+our @EXPORT_OK = qw(parse_duration normalize_duration date_or_datetime);
 
 =head1 DESCRIPTION
 
@@ -107,8 +113,7 @@ our %PROPERTIES = (
     }
 );
 
-#anyURI
-
+# known services
 our %SERVICES = (
     'presentation' => 'http://purl.org/NET/DAIA/services/presentation',
     'loan' => 'http://purl.org/NET/DAIA/services/loan',
@@ -133,7 +138,7 @@ C<addUnavailable>, and C<addAvailability> of L<DAIA::Item>.
 sub _buildargs {
     my $self = shift;
     my %args = ();
-    
+
     if ( not (@_ % 2) ) { # even number
         %args = @_;
         if ( not defined $args{status} ) { # $service => $status
@@ -215,6 +220,128 @@ sub status {
     }
 
     return $status;
+}
+
+=head1 FUNCTIONS
+
+=head1 FUNCTIONS
+
+This package implements a duration parsing method based on
+code from L<DateTime::Format::Duration::XSD> by Smal D A.
+
+=head2 parse_duration ( $string )
+
+Parses a XML Schema xs:duration string and returns
+a L<DateTime::Duration> object or undef.
+
+=cut
+
+sub parse_duration {
+    return $_[0] if UNIVERSAL::isa( $_[0], 'DateTime::Duration' );
+    my $duration = "$_[0]";
+
+    my ($neg, $year, $mounth, $day, $hour, $min, $sec, $fsec);
+    if ($duration =~ /^(-)?
+                      P
+                      ((\d+)Y)?
+                      ((\d+)M)?
+                      ((\d+)D)?
+                      (
+                      T
+                      ((\d+)H)?
+                      ((\d+)M)?
+                      (((\d+)(\.(\d+))?)S)?
+                      )?
+                    $/x) {
+        ($neg, $year, $mounth, $day, $hour, $min, $sec, $fsec) =
+        ($1,   $3,    $5,      $7,   $10,   $12,  $15,  $17);
+        return unless (grep {defined} ($year, $mounth, $day, $hour, $min, $sec));
+    } else {
+        return;
+    }
+    $duration = DateTime::Duration->new(
+      years   => $year || 0,
+      months  => $mounth || 0,
+      days    => $day || 0,
+      hours   => $hour || 0,
+      minutes => $min || 0,
+      seconds => $sec || 0,
+      nanoseconds => ($fsec ? "0.$fsec" * 1E9  : 0),
+    );
+    $duration = $duration->inverse if $neg;
+    return $duration;
+}
+
+=head2 normalize_duration ( $string-or-duration-object )
+
+Returns a normalized duration (according to XML Schema xs:duration).
+You can pass a duration string or a L<DateTime::Duration> object.
+Returns undef on failure.
+
+=cut
+
+sub normalize_duration {
+    my $duration = $_[0];
+    $duration = parse_duration( $duration )
+        unless UNIVERSAL::isa( $duration, 'DateTime::Duration' );
+    return unless defined $duration;
+
+    return "P0D" if $duration->is_zero;
+
+    # TODO: replace this
+    my $fmt = DateTime::Format::Duration->new(
+          pattern => '%PP%YY%mM%dDT%HH%MM%S.%NS',
+          normalize => 1,
+    );
+
+    my %d = $fmt->normalize( $duration );
+    if (exists $d{seconds} or exists $d{nanoseconds}) {
+        $d{seconds} = ($d{seconds} || 0)
+                    + (exists $d{nanoseconds} ? $d{nanoseconds} / 1E9 : 0);
+    }
+    my $str = $d{negative} ? "-P" : "P";
+    $str .= "$d{years}Y" if exists $d{years} and $d{years} > 0;
+    $str .= "$d{months}M" if exists $d{months} and $d{months} > 0;
+    $str .= "$d{days}D" if exists $d{days} and $d{days} > 0;
+    $str .= "T" if grep {exists $d{$_} and $d{$_} > 0} qw(hours minutes seconds);
+    $str .= "$d{hours}H" if exists $d{hours} and $d{hours} > 0;
+    $str .= "$d{minutes}M" if exists $d{minutes} and $d{minutes} > 0;
+    $str .= "$d{seconds}S" if exists $d{seconds} and $d{seconds} > 0;
+
+    return $str;
+}
+
+=head2 date_or_datetime ( $date_or_datetime )
+
+Returns a canonical xs:date or xs:dateTime value or undef. You can pass a 
+L<DateTime> object or a string as defined in section 3.2.7.1 of the XML Schema
+Datatypes specification. Fractions of seconds are ignored.
+
+=cut
+
+sub date_or_datetime {
+    my $dt = $_[0];
+    if ( not UNIVERSAL::isa( $dt, 'DateTime' ) ) {
+        return unless 
+            $dt =~ /^(-?\d\d\d\d+-\d\d-\d\d)(T\d\d:\d\d:\d\d(\.\d+)?)?([+-]\d\d:\d\d|Z)?$/;
+        my ($date,$time,$tz) = ($1,$2,$4);
+        $date =~ /(-?\d\d\d\d+)-(\d\d)-(\d\d)/;
+        my %p = (year=>$1,month=>$2,day=>$3);
+        if ($time) {
+            $time =~ /T(\d\d):(\d\d):(\d\d)(\.\d+)?/;
+            ($p{hour},$p{minute},$p{second})=($1,$2,$3);
+        }
+        if ($tz) {
+            $tz =~ s/://; $tz =~ s/Z/UTC/;
+            $p{time_zone} = $tz;
+        }
+        $dt = eval { DateTime->new(%p) } || return;
+    }
+    $dt->set_time_zone('floating');
+
+    my $date = $dt->strftime("%FT%T");
+    $dt =~ s/T00:00:00$//; # remove time part if is zero
+    return $dt;
 }
 
 1;

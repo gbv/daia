@@ -1,5 +1,6 @@
 0.29 2010-??-??
       - improved daia client/proxy
+      - removed some package dependencies
 0.28 2010-05-20
       - parsing DAIA/XML inside other XML now possible
       - added 'error' function   

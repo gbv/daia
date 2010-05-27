@@ -16,9 +16,9 @@ C<DAIA::Unavailable> object is always C<0>.
 
 use strict;
 use base 'DAIA::Availability';
-our $VERSION = '0.27';
-use DateTime::Format::ISO8601;
-use DAIA::Available qw(parse_duration);
+our $VERSION = '0.28';
+
+use DateTime;
 
 =head1 PROPERTIES
 
@@ -62,41 +62,18 @@ our %PROPERTIES = (
         filter => sub { return $_[0] =~ /^[0-9]+$/ ? $_[0] : undef }
     },
     expected => { 
-        filter => sub {
+        filter => sub { # TODO: move this to function in DAIA::Availability (?)
             return 'unknown' if lc("$_[0]") eq 'unknown';
             my $exp = $_[0];
-            if ( $exp =~ /^P/ or UNIVERSAL::isa( $exp, 'DateTime::Duration' ) ) {
-                my $span = parse_duration( $exp );
+            if ($exp =~ /^P/ or UNIVERSAL::isa( $exp, 'DateTime::Duration' )) {
+                my $span = DAIA::Availability::parse_duration( $exp );
                 my $now = DateTime->from_epoch( epoch => time() );
                 $exp = $now->add_duration( $span );
             }
-            return normalize_date( $exp );
+            return DAIA::Availability::date_or_datetime( $exp );
         }
     },
 );
-
-=head1 FUNCTIONS
-
-=head2 normalize_date ( $date_or_datetime )
-
-Returns a canonical xs:date or xs:dateTime value or undef. Can can pass a 
-L<DateTime> object or a string that will be parsed with the parse_datetime
-method of L<DateTime::Format::ISO8601>.
-
-=cut
-
-sub normalize_date {
-    my $dt = $_[0];
-    if ( not UNIVERSAL::isa( $dt, 'DateTime' ) ) {
-        # parse_datetime
-        $dt = DateTime::Format::ISO8601->parse_datetime( $dt );
-    }
-    $dt->set_time_zone('floating');
-
-    my $date = $dt->strftime("%FT%T");
-    $dt =~ s/T00:00:00$//; # remove time part if zero
-    return $dt;
-}
 
 1;
 
