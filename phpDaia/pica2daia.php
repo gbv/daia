@@ -236,7 +236,7 @@ class DAIA_PICA extends DAIA {
                     	// get the real storage location from translation table
                     	$locations = file($this->locationsFile);
                     	foreach ($locations as $locLine) {
-                    		$l = explode(';', $locLine);
+                    		$l = explode(';', html_entity_decode(stripslashes($locLine), ENT_COMPAT, 'UTF-8'));
                     		if ($l[0] === $storageCode) {
                     			$storage = $l[1];
                     			$stor_href = $l[3];
