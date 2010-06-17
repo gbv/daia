@@ -56,6 +56,7 @@ show_feed(
 <p>
 <ul>
   <li><a href="http://sourceforge.net/projects/daia/">daia project page</a></li>
+  <li><a href="http://www.ohloh.net/p/daia">daia at ohloh</a></li>
 <li>
   DAIA data model
   <ul>
@@ -69,7 +70,7 @@ show_feed(
   <li><a href="http://sourceforge.net/projects/daia/support">Get support</a></li> 
   <li>read <a href="http://www.gbv.de/wikis/cls/Verf%C3%BCgbarkeitsrecherche_mit_DAIA">a German introduction to DAIA</a></li>
   <li>Tools
-    <ul><li><a href="http://ws.gbv.de/daia/validator/">DAIA validator</a> (included <a href="http://daia.svn.sourceforge.net/viewvc/daia/trunk/daiapm/clients/daia?view=markup">in the Perl implementation</a></li></ul>
+    <ul><li><a href="http://ws.gbv.de/daia/validator/">DAIA validator</a> (included <a href="http://daia.svn.sourceforge.net/viewvc/daia/trunk/daiapm/clients/daia?view=markup">in the Perl implementation</a>)</li></ul>
   </li>
   <li>
    <a href="http://wiki.code4lib.org/index.php/DAIA">DAIA extensions</a> - open discussion and collection of ideas in the Code4Lib wiki
@@ -96,8 +97,8 @@ TODO:
 -->
 </div>
 <p id='footer'>
-  This project is kindly hosted <a href="http://sourceforge.net/projects/daia">at SourceForge</a> since Apr 16, 2010.<br /> 
-  <a href="http://sourceforge.net/projects/daia"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=317073&amp;type=13" width="120" height="30" alt="Get daia at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+  <a href="http://sourceforge.net/projects/daia"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=317073&amp;type=13" width="120" height="30" alt="Get daia at SourceForge.net. Fast, secure and Free Open Source software downloads" border="0"/></a>
+  <script type="text/javascript" src="http://www.ohloh.net/p/483524/widgets/project_partner_badge.js"></script>
 </p>
 </body>
 </html>
