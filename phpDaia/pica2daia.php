@@ -309,7 +309,7 @@ class DAIA_PICA extends DAIA {
                 }
             }
             $lineCounter++;
-            if ($itemRegistered === true && $lineCounter === count($lines)) {
+            if ($storageCode !== "Ei" && $itemRegistered === true && $lineCounter === count($lines)) {
             	$item = $this->getAvailabilities($item, $generalAvailability, $usage, $avail, $documentType, $limitation237A);
             }
         }
