@@ -67,6 +67,7 @@ class DAIA_PICA extends DAIA {
         $this->basicUrl = $iniArray['basicUrl'];
         $this->picaPlusUrl = $iniArray['picaPlusUrl'];
         $this->reservationUrl = $iniArray['reservationUrl'];
+        $this->catalogPostfix = $iniArray['catalogPostfix'];
         
         $this->prefixPPN = $iniArray['documentIdPrefix'];
         $this->prefixEPN = $iniArray['itemIdPrefix'];
@@ -172,7 +173,7 @@ class DAIA_PICA extends DAIA {
                 	// l contains the link to the item directly
                     // LOGIN=ANONYMOUS should be added to avoid naked login screen
                 	if (substr($field, 0, 1) === 'l') {
-                		$item->href = urldecode(substr($field, 1)) . '&LOGIN=ANONYMOUS';
+                		$item->href = urldecode(substr($field, 1)) . $this->catalogPostfix;
                 		$href = $item->href;
                 	}
                     // e contains epn, the ID of the item
@@ -482,7 +483,7 @@ class DAIA_PICA extends DAIA {
 	    $duedate = 'unknown';
 
         if ($this->duedateContent[$url] === null) {
-        	$this->duedateContent[$url] = file_get_contents(urldecode($url));
+        	$this->duedateContent[$url] = file_get_contents(html_entity_decode(urldecode($url)));
         }
         
 	    if (empty($this->duedateContent[$url]) === true) {
@@ -555,7 +556,7 @@ class DAIA_PICA extends DAIA {
 	    if ($item->href === null) return $item;
 
         if ($this->detailsContent[$item->href] === null) {
-        	$this->detailsContent[$item->href] = file_get_contents(urldecode($item->href) . '&LOGIN=ANONYMOUS&LNG=EN');
+        	$this->detailsContent[$item->href] = file_get_contents(urldecode($item->href) . $this->catalogPostfix);
         }
         
         // Look for barcode in document
