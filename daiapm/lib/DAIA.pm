@@ -13,10 +13,11 @@ our $VERSION = '0.28';
 
 The Document Availability Information API (DAIA) defines a data model with 
 serializations in JSON and XML to encode information about the current 
-availability of documents. See L<http://purl.org/NET/DAIA> for a detailed
-specification. This package provides Perl classes and functions to easily
-create and manage DAIA information. It can be used to implement DAIA servers,
-clients, and other programs that handle availability information.
+availability of documents. See L<http://daia.sourceforge.net/> for more 
+information and the recent developer version. This package provides Perl 
+classes and functions to easily create and manage DAIA information. It can
+be used to implement DAIA servers, clients, and other programs that handle 
+availability information.
 
 The DAIA information objects as decriped in the DAIA specification are
 directly mapped to Perl packages. In addition a couple of functions can
@@ -166,7 +167,7 @@ Exporter::export_ok_tags;
 $EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve', 'error'];
 Exporter::export_tags('all');
 
-use Carp::Clan; # qw(^DAIA::);
+use Carp; # use Carp::Clan; # qw(^DAIA::);
 use IO::File;
 use LWP::Simple qw(get);
 use XML::Simple; # only for parsing (may be changed)
@@ -417,6 +418,11 @@ sub parse {
                 ($root, $value) = (ucfirst($k), $v);
             }
         }
+
+        # outdated variants
+        $root = "Response" if $root eq 'Daia';
+        delete $value->{'xmlns:xsi'};
+
         delete $value->{schema} if $root eq 'Response'; # ignore schema attribute
 
         croak "JSON does not contain DAIA elements" unless $value;

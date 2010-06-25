@@ -15,7 +15,7 @@ use Data::Dumper;
 use CGI::Carp qw(fatalsToBrowser);
 use DAIA;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 =head1 DESCRIPTION
 
@@ -39,12 +39,16 @@ set by default).
 
 Put this script in a directory of your webserver where it is executed as CGI
 script. You may have to change its filename to C<daia.pl> or add a symlink or
-create a RewriteRule). In addition you may have to add the following lines 
+create a RewriteRule. In addition you may have to add the following lines 
 to C<.htaccess>:
 
   Options +ExecCGI           # unless script is located in a cgi-directory
   AddHandler cgi-script .pl  # unless this handler is already enabled
-  SetEnv PERL5LIB ../lib     # pointer to DAIA library if it is not installed
+  SetEnv PERL5LIB ../lib     # pointer to DAIA library (if it is not installed)
+
+=head1 VERSION
+
+Have a look for the $VERSION variable in the source code of this script.
 
 =cut
 
@@ -54,6 +58,9 @@ my $cgimode = (not @ARGV and CGI->http);
 # set parameters
 my $url = param('url');
 $url = shift @ARGV unless defined $url or $cgimode;
+
+my $debug = param('debug') || 0;
+$Carp::Verbose = 1 if ($debug);
 
 # TODO: add proxy-parameter to append other parameters to and reuse as URL
 
@@ -70,11 +77,10 @@ my ($error, $daia, @daiaobjs, $eurl);
 
 my $xsd = "daia.xsd"; # TODO: search somewhere else
 
-if( not $url =~  /^\s*http[s]?:\/\// and not $cgimode and not $data ) {
-    $url = '-' unless defined $url;
+if( not $url =~ /^\s*http[s]?:\/\// and not $cgimode and not $data ) {
     $url =~ s#^file://##;
     $url = \*STDIN if $url eq '-';
-    if ($url =~ /^-(\?|h|-help)$/) {
+    if (not defined $url or $url =~ /^-(\?|h|-help)$/) {
         print join("",<DATA>)."\n";
         exit;
     }
@@ -91,7 +97,8 @@ if ( $data ) {
 }
 if ($@) {
     $error = $@;
-    $error =~ s/ at .* line.*//;
+    $error =~ s/DAIA::([A-Z]+::)?[a-z_]+\(\)://ig unless $debug;
+    $error =~ s/ at .* line.*//g unless $debug;
 }
 
 # called from command line
@@ -142,8 +149,12 @@ $error = "<div class='error'>".escapeHTML($error)."!</div>" if $error;
 my $msg;
 if ( $url and not $data ) {
     $msg = "Data was fetched from URL " . a({href=>$url},escapeHTML($url));
-    $msg .= " (" . a({href=>'#result'}, "result...") . ")";
-    $msg = div({class=>'msg'},$msg);
+    $msg .= " (" . a({href=>'#result'}, "result...") . ")" if $daia;
+    $msg =  div({class=>'msg'},$msg);
+    $msg .= div({class=>'msg'},"Use ". 
+                a({href=>url()."?url=$eurl"},'this URL') .
+                " to to directly pass the URL to this script.");
+
 }
 
 print header(-charset => 'UTF-8');
@@ -232,10 +243,11 @@ if ($daia) {
 
 print <<HTML;
 <div class='footer'>
-The source of this script is available<!--
-a href='http://search.cpan.org/perldoc?daia'>available at CPAN</a-->.
-The current version is $VERSION. Visit the 
-<a href="http://daia.sourceforge.net/">DAIA project at Sourceforge</a>.
+The source of this script is available as Open Source. 
+Visit the <a href="http://daia.sourceforge.net/">DAIA project at Sourceforge</a>
+for details. A packaged version is 
+<a href='http://search.cpan.org/perldoc?daia'>available at CPAN</a>. 
+The current version is $VERSION.
 </div></body>
 HTML
 
@@ -254,4 +266,5 @@ first parameter is used instead. By default reads from STDIN (url=-).
       dump            Perl Dump format (only for command line)
   in=...            set input format (json or xml)
   callback=...      use callback method (if out=json)
+  debug=0|1         disable|enable debug information
   -?|-h|--help      show this help

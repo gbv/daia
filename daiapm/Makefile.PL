@@ -21,6 +21,7 @@ use ExtUtils::MakeMaker;
         'IO::File' => 0,
         'IO::Scalar' => '1.126',
         'Carp::Clan' => '5.0',
+        'Carp' => 0
     },
     EXE_FILES       => [ 
         'clients/daia', 

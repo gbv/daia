@@ -1,0 +1,14 @@
+# Copy this script to .htaccess and adopt to you web server's needs
+
+# Enable execution of perl scripts here and/or in your web server
+Options +ExecCGI
+AddHandler cgi-script .pl
+
+# Enabe this if the DAIA modules are not installed in the perl library path
+# SetEnv PERL5LIB ../lib
+
+# If you want to prevent directory listing and simpler URLs
+DirectoryIndex daia.pl
+
+# rewrite is not needed in the current version but maybe later
+# RewriteEngine on
