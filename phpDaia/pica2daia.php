@@ -288,7 +288,11 @@ class DAIA_PICA extends DAIA {
                 	// 209R $a contains the link to an eBook
                 	if (substr($field, 0, 1) === 'a') {
                 		$storage = $item->getStorage();
-                		$item->setStorage(new DAIA_Element($storage->getContent(), urldecode(substr($field, 1)), urldecode(substr($field, 1))));
+                		$storageYet = '';
+                		if (is_object($storage) === true) {
+                			$storageYet = $storage->getContent();
+                		}
+                		$item->setStorage(new DAIA_Element($storageYet, urldecode(substr($field, 1)), urldecode(substr($field, 1))));
                 	}
                 }            	
             }
