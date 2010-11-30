@@ -7,7 +7,7 @@
 
     Recent changes:
 
-      2010-11-30: fixed msg display in documents
+      2010-11-30: fixed msg display in documents and added grouping
       2010-04-26: refactored
       2008-11-06: adopted schema version 0.4
       2008-11-05: included parts of hebis
@@ -33,7 +33,7 @@
   </xsl:param>
 
   <!-- prefered language to show messages in (TODO: test) -->
-  <xsl:param name="language">de</xsl:param>
+  <xsl:param name="language"></xsl:param>
 
   <!-- root -->
   <xsl:template match="/">
@@ -126,14 +126,10 @@
             <th><div class="openaccess-icon">open access</div></th>
             <th><div class="interloan-icon">interloan</div></th>
             <xsl:if test="$items[d:message]">
-              <th></th>
+              <th>message</th>
             </xsl:if>
           </tr>
-          <xsl:apply-templates select="$items">
-            <xsl:sort select="d:department"/>
-            <xsl:sort select="d:label"/>
-            <xsl:sort select="d:storage"/>
-          </xsl:apply-templates>
+          <xsl:apply-templates select="d:document" mode="itemtable"/>
         </table>
       </p>
 
@@ -144,7 +140,37 @@
       </xsl:if-->
 
     </xsl:if>
+  </xsl:template>
 
+  <xsl:template match="d:document" mode="itemtable">
+    <xsl:variable name="items_without_depid" select="d:item[not(d:department/@id)]"/>
+    <xsl:for-each select="$items_without_depid">
+      <xsl:sort select="d:label"/>
+      <xsl:sort select="d:storage"/>
+      <xsl:apply-templates select=".">
+        <xsl:with-param name="item_position" select="1"/>
+        <xsl:with-param name="department_position" select="position()"/>
+      </xsl:apply-templates>
+    </xsl:for-each>
+    
+
+    <xsl:for-each select="d:item[d:department/@id and not( d:department/@id = preceding-sibling::d:item/d:department/@id )]">
+      <xsl:sort select="d:department/@id"/>
+      <xsl:variable name="item_position">
+        <xsl:if test="count($items_without_depid)"><xsl:value-of select="position()+1"/></xsl:if>
+        <xsl:if test="not(count($items_without_depid))"><xsl:value-of select="position()"/></xsl:if>
+      </xsl:variable>
+      <xsl:variable name="depid" select="d:department/@id"/>
+      <xsl:for-each select="../d:item[ d:department/@id = $depid ]">
+	<xsl:sort select="d:department"/>
+	<xsl:sort select="d:label"/>
+	<xsl:sort select="d:storage"/>
+        <xsl:apply-templates select=".">
+          <xsl:with-param name="item_position" select="$item_position"/>
+          <xsl:with-param name="department_position" select="position()"/>
+        </xsl:apply-templates>
+      </xsl:for-each>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="d:document">
@@ -200,15 +226,22 @@
 
   <!-- show a row in the availability table -->
   <xsl:template match="d:item">
+    <xsl:param name="item_position"/>
+    <xsl:param name="department_position"/> 
     <xsl:variable name="status" select="d:available|d:unavailable"/>
     <tr>
-      <xsl:if test="position() = 1">
-        <td rowspan="{count(../d:item)}" valign="top">
-          <xsl:apply-templates select="parent::d:document" mode="about"/>
-          <xsl:apply-templates select="parent::d:document/d:message"/>        
-        </td>
+      <xsl:if test="$department_position = 1">
+        <xsl:attribute name="class">newdepartment</xsl:attribute>
+        <xsl:if test="$item_position = 1">
+          <td rowspan="{count(../d:item)}" valign="top">
+            <xsl:apply-templates select="parent::d:document" mode="about"/>
+            <xsl:apply-templates select="parent::d:document/d:message"/>        
+          </td>
+        </xsl:if>
       </xsl:if>
       <td>
+        <!--xsl:value-of select="$item_position"/>_
+        <xsl:value-of select="$department_position"/-->
         <xsl:apply-templates select="d:department"/>
         <xsl:apply-templates select="d:storage"/>
       </td>
@@ -216,9 +249,14 @@
         <xsl:if test="@fragment='true' or @fragment='1'">
           <span class='limitation'>only partial!</span>
         </xsl:if>
-        <xsl:call-template name="content-with-optional-href">
-          <xsl:with-param name="content" select="d:label" />
-        </xsl:call-template>
+        <div>
+          <xsl:if test="d:label">
+            <xsl:attribute name="title">label</xsl:attribute>
+          </xsl:if>
+          <xsl:call-template name="content-with-optional-href">
+            <xsl:with-param name="content" select="d:label" />
+          </xsl:call-template>
+        </div>
       </td>
       <td>
         <xsl:apply-templates select="$status[@service='presentation']"/>
@@ -355,7 +393,7 @@
   <!-- print a message or an error -->
   <xsl:template match="d:message">
     <xsl:if test="not($language) or @lang=$language or not(../d:message[@lang=$language])">
-    <div>
+    <div title="message">
       <xsl:attribute name="class">
         <xsl:choose>
           <xsl:when test="@errno and @errno != '0'">error</xsl:when>
@@ -410,8 +448,7 @@
 
   <!-- print information about a department -->
   <xsl:template match="d:department">
-    <div class='department'>
-      <b>Dep.: </b> <!-- TODO: en -->
+    <div class='department' title="department">
       <xsl:call-template name="content-with-optional-href"/>
     </div>
   </xsl:template>
@@ -419,7 +456,7 @@
 
   <!-- print information about a storage -->
   <xsl:template match="d:storage">
-    <div class='storage'>
+    <div class='storage' title="storage">
       <xsl:call-template name="content-with-optional-href"/>
     </div>
   </xsl:template>
@@ -460,7 +497,7 @@
     </xsl:choose>
     <xsl:if test="$content and $nid">
       <xsl:text>&#xA;</xsl:text>
-        <span class="id"><xsl:call-template name="id"/></span>
+        <div class="id"><xsl:call-template name="id"/></div>
     </xsl:if>
   </xsl:template>
 

@@ -38,9 +38,10 @@ td {
 .id { font-family: monospace; font-size: medium; }
 .invalid-id { color: #f00; }
 
+div.id { padding: 0; }
 
 /* status icons */
-.available, .unavailable, .cur-unavail, .queue, .limitation, .time, .date { 
+.available, .unavailable, .cur-unavail, .queue, .limitation, .time, .date, .storage { 
     padding-left: 23px; line-height: 20px;
     padding-right: 3px;
     /*display: inline-block; */
@@ -57,6 +58,7 @@ td {
 
 .queue      { background:transparent url(icons/daia_queue_16.png) center left no-repeat; }
 .limitation { background:transparent url(icons/daia_limitation_16.png) center left no-repeat; }
+.storage    { background:transparent url(icons/daia_storage_16.png) center left no-repeat; }
 
 /* header icons */
 .document-icon, .item-icon, .location-icon, .loan-icon, 
@@ -67,7 +69,7 @@ td {
 .location-icon { background:transparent url(icons/home_16.png) left top no-repeat; }
 .loan-icon { background:transparent url(icons/daia_loan_16.png) left top no-repeat; }
 .interloan-icon { background:transparent url(icons/daia_interloan_16.png) left top no-repeat; }
-.document-icon { background:transparent url(icons/dotted_document_16.png) left top no-repeat; }
+.document-icon { background:transparent url(icons/daia_document_16.png) left top no-repeat; }
 .item-icon { background:transparent url(icons/daia_item_16.png) left top no-repeat; }
 .openaccess-icon { background:transparent url(icons/daia_openaccess_16.png) left top no-repeat; }
 
