@@ -7,6 +7,7 @@
 
     Recent changes:
 
+      2010-11-30: fixed msg display in documents
       2010-04-26: refactored
       2008-11-06: adopted schema version 0.4
       2008-11-05: included parts of hebis
@@ -39,14 +40,14 @@
     <html>
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Document Availability Information API</title>
+        <title>Document Availability Information</title>
         <xsl:if test="$stylesheet">
           <link rel="stylesheet" type="text/css" href="{$stylesheet}"/>
         </xsl:if>
       </head>
       <body>
         <!-- preambel -->
-        <h1>Document Availability Information API</h1>
+        <h1>Document Availability Information</h1>
         <!-- content -->
         <xsl:apply-templates select="d:daia"/>
         <!-- source -->
@@ -67,7 +68,7 @@
       <a href="http://purl.org/NET/DAIA">DAIA</a>
       response to report availability information of documents.
       <xsl:if test="@timestamp or @version">
-        <xsl:text>The document </xsl:text>
+        <xsl:text>The response </xsl:text>
         <xsl:if test="@timestamp">
           has timestamp 
           <b><xsl:value-of select="@timestamp"/></b>
@@ -80,6 +81,8 @@
         <xsl:text>.</xsl:text>
       </xsl:if>
       The full XML source is <a href="#rawxml">shown below</a>.
+      You can also get the DAIA response in DAIA/JSON and
+      in DAIA/RDF.
     </p>
 
     <!-- content -->
@@ -113,28 +116,32 @@
     <xsl:if test="$items">
       <h2>Availability</h2>
       <p>
-        <table border="1">
+        <table>
           <tr>
-            <th><div class="document-icon"></div>Document</th>
-            <th><div class="item-icon"></div>Item</th>
-            <th><div class="location-icon"></div>Location</th>
-            <th><div class="presentation-icon"></div>local presentation</th>
-            <th><div class="loan-icon"></div>loan</th>
-            <th><div class="openaccess-icon"></div>open access</th>
-            <th><div class="interloan-icon"></div>interloan</th>
+            <th><div class="document-icon">document</div></th>
+            <th><div class="location-icon">location</div></th>
+            <th><div class="item-icon">item</div></th>
+            <th><div class="presentation-icon">presentation</div></th>
+            <th><div class="loan-icon">loan</div></th>
+            <th><div class="openaccess-icon">open access</div></th>
+            <th><div class="interloan-icon">interloan</div></th>
             <xsl:if test="$items[d:message]">
               <th></th>
             </xsl:if>
           </tr>
-          <xsl:apply-templates select="$items"/>
+          <xsl:apply-templates select="$items">
+            <xsl:sort select="d:department"/>
+            <xsl:sort select="d:label"/>
+            <xsl:sort select="d:storage"/>
+          </xsl:apply-templates>
         </table>
       </p>
 
       <!-- TODO: fix this -->
-      <xsl:if test="count($items) &gt; 1">
+      <!--xsl:if test="count($items) &gt; 1">
         <h3>Summary</h3>
         <p><xsl:call-template name="summary"/></p>
-      </xsl:if>
+      </xsl:if-->
 
     </xsl:if>
 
@@ -142,13 +149,21 @@
 
   <xsl:template match="d:document">
     <p>
-      The response contains information about 
-      <!-- TODO: catch case of 0-items -->
-      <b><xsl:value-of select="count(d:item)"/> item[s]</b>
-      <!-- TODO: link to items in the availability table below -->
-      of document <xsl:apply-templates select="." mode="about"/>.
+      <xsl:if test="d:item">
+        <xsl:text>The response contains information about </xsl:text>
+        <b>
+          <xsl:value-of select="count(d:item)"/>
+          <xsl:text> item</xsl:text>
+          <xsl:if test="count(d:item) &gt; 1">s</xsl:if>
+        </b>
+        <xsl:text> of document </xsl:text>
+        <xsl:apply-templates select="." mode="about"/>
+        <xsl:text>.</xsl:text>
+      </xsl:if>
     </p>
-    <xsl:apply-templates select="d:message"/>
+    <xsl:if test="not(d:item)">
+      <xsl:apply-templates select="d:message"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- show the general status (available|unavailable|cur-unavail) -->
@@ -194,17 +209,16 @@
         </td>
       </xsl:if>
       <td>
+        <xsl:apply-templates select="d:department"/>
+        <xsl:apply-templates select="d:storage"/>
+      </td>
+      <td>
         <xsl:if test="@fragment='true' or @fragment='1'">
           <span class='limitation'>only partial!</span>
         </xsl:if>
         <xsl:call-template name="content-with-optional-href">
           <xsl:with-param name="content" select="d:label" />
         </xsl:call-template>
-      </td>
-      <td>
-        <xsl:apply-templates select="d:department"/>
-        <xsl:if test="d:department and d:storage"><br/></xsl:if>
-        <xsl:apply-templates select="d:storage"/>
       </td>
       <td>
         <xsl:apply-templates select="$status[@service='presentation']"/>
@@ -219,7 +233,7 @@
         <xsl:apply-templates select="$status[@service='interloan']"/>
       </td>
       <!-- TODO: show additional services -->
-      <xsl:if test="d:message">
+      <xsl:if test="//d:item[d:message]">
         <td>
           <xsl:apply-templates select="d:message"/>
         </td>
@@ -445,7 +459,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:if test="$content and $nid">
-      <xsl:text>&#xA0;</xsl:text>
+      <xsl:text>&#xA;</xsl:text>
         <span class="id"><xsl:call-template name="id"/></span>
     </xsl:if>
   </xsl:template>
