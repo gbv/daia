@@ -1,16 +1,20 @@
-
 The DAIA project is grouped into modules that can be used independently:
 
 phpDaia - PHP implementation
 daiapm  - DAIA perl module
 xslt    - XSLT client
 
-In addition some common modules group resources used by other modules:
+In practise you are more likely interested in only one of this modules.
+Packaged distributions may include shared parts of other modules so it
+is recommended to either use a packaged distribution or get all modules
+from the source code repository.
 
-schemas - DAIA XSD and OWL schemas for validating
+The following modules contain resources used by other modules:
 
-Please make sure that all packaged distributions can be used independently!
-This can be done by copying content from the common modules.
+schemas       - DAIA XSD and OWL schemas for validating
+documentation - additional documentation
 
-The directory 'documentation' contains additional documentation
-
+If you modify and distribute code, make sure that all packaged
+distributions can be used independently! This can be done by 
+including content from the common modules via symlinks and
+dereference symlinks on packing (parameter -h on the tar command).

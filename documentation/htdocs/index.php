@@ -83,6 +83,13 @@ show_feed(
   <a href="http://vufind.svn.sourceforge.net/viewvc/vufind/trunk/web/Drivers/DAIA.php?view=markup">a DAIA driver</a>.
 </p>
 <p>
+  DAIA packages:
+  <ul>
+    <li><a href="http://search.cpan.org/perldoc?DAIA">DAIA</a> at CPAN
+    (<a href="https://rt.cpan.org/Dist/Display.html?Name=DAIA">report bugs here</a>)</li>
+  </ul>
+</p>
+<p>
   To join this project, please contact the project administrators of this project, 
   as shown on the <a href="http://sourceforge.net/projects/daia/develop">project develop page</a>.
 </p> 

@@ -28,11 +28,28 @@ t/example.xml
 t/example2.xml
 t/foreign.xml
 
+clients/daia
 clients/daia.css  
 clients/daia.xsl
 clients/xmlverbatim.xsl
 clients/daia.xsd
-clients/daia
+clients/icons
+clients/icons/README
+clients/icons/clock_16.png
+clients/icons/calendar_16.png
+clients/icons/18px-Bullet-green.png
+clients/icons/18px-Bullet-red.png
+clients/icons/18px-Bullet-ambar.png
+clients/icons/daia_queue_16.png
+clients/icons/daia_limitation_16.png
+clients/icons/daia_storage_16.png
+clients/icons/daia_presentation_16.png
+clients/icons/home_16.png
+clients/icons/daia_loan_16.png
+clients/icons/daia_interloan_16.png
+clients/icons/daia_document_16.png
+clients/icons/daia_item_16.png
+clients/icons/daia_openaccess_16.png
 
 examples/gvk.pl
 

@@ -121,8 +121,8 @@
             <th><div class="document-icon">document</div></th>
             <th><div class="location-icon">location</div></th>
             <th><div class="item-icon">item</div></th>
-            <th><div class="presentation-icon">presentation</div></th>
             <th><div class="loan-icon">loan</div></th>
+            <th><div class="presentation-icon">presentation</div></th>
             <th><div class="openaccess-icon">open access</div></th>
             <th><div class="interloan-icon">interloan</div></th>
             <xsl:if test="$items[d:message]">
@@ -155,7 +155,7 @@
     
 
     <xsl:for-each select="d:item[d:department/@id and not( d:department/@id = preceding-sibling::d:item/d:department/@id )]">
-      <xsl:sort select="d:department/@id"/>
+      <xsl:sort select="d:department/@id" order="descending"/>
       <xsl:variable name="item_position">
         <xsl:if test="count($items_without_depid)"><xsl:value-of select="position()+1"/></xsl:if>
         <xsl:if test="not(count($items_without_depid))"><xsl:value-of select="position()"/></xsl:if>
@@ -258,16 +258,16 @@
           </xsl:call-template>
         </div>
       </td>
-      <td>
-        <xsl:apply-templates select="$status[@service='presentation']"/>
-      </td>
-      <td>
+      <td title="loan">
         <xsl:apply-templates select="$status[@service='loan']"/>
       </td>
-      <td>
+      <td title="presentation">
+        <xsl:apply-templates select="$status[@service='presentation']"/>
+      </td>
+      <td title="openaccess">
         <xsl:apply-templates select="$status[@service='openaccess']"/>
       </td>
-      <td>
+      <td title="interloan">
         <xsl:apply-templates select="$status[@service='interloan']"/>
       </td>
       <!-- TODO: show additional services -->
@@ -352,7 +352,7 @@
       <xsl:apply-templates select="@queue"/> 
 
       <xsl:if test="@expected">
-        <div class="date">
+        <div class="date" title="expected">
           <xsl:value-of select="@expected"/>
         </div>
       </xsl:if>
@@ -416,7 +416,7 @@
 
   <!-- show a limitation -->
   <xsl:template match="d:limitation">
-    <div class="limitation">
+    <div class="limitation" title="limitation">
       <xsl:call-template name="content-with-optional-href">
         <xsl:with-param name="default">limitation</xsl:with-param>
       </xsl:call-template>
