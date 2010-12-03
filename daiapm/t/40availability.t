@@ -9,7 +9,18 @@ use Data::Dumper;
 use DAIA::Available;
 use DAIA::Unavailable;
 
-my $a;
+# no service
+my $a = available();
+is ( $a->xml, "<available />" );
+my $item = item();
+$item->available( $a );
+is_deeply( $item->struct, { 'available' => [ { } ] } );
+$item->available( service => undef );
+is_deeply( $item->struct, { 'available' => [ { } ] } );
+
+my $doc = document( id => 'u:ri' );
+$doc->addItem( $item );
+
 my $service = 'loan'; 
 
 my $avail = DAIA::Available->new( service => $service );

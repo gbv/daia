@@ -1,4 +1,4 @@
-0.29 2010-12-03
+0.30 2010-12-03
       - improved daia client/proxy
       - removed some package dependencies
       - added hidden parameters

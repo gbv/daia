@@ -8,7 +8,7 @@ DAIA::Availability - Abstract base class of availability information
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 use Carp::Clan;
 use Data::Validate::URI qw(is_uri);
 use DateTime::Duration;
@@ -97,7 +97,8 @@ C<expected> are also possible.
 
 our %PROPERTIES = (
     service => {
-        default => sub { croak 'DAIA::Availability->service is required'  },
+        # default => sub { croak 'DAIA::Availability->service is required'  },
+        default => sub { undef }, # TODO: configure whether mandatory
         filter => sub {
             my $s = $_[0];
             return $s if $DAIA::Availability::SERVICES{$s};
