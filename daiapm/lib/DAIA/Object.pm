@@ -16,7 +16,8 @@ use UNIVERSAL 'isa';
 use JSON;
 
 our $AUTOLOAD;
-our @HIDDEN_PROPERTIES = qw(to format xmlns cgi header xmlheader xslt pi callback exitif);
+our @HIDDEN_PROPERTIES = 
+    qw(to format xmlns cgi header xmlheader xslt pi callback exitif noutf8);
 
 =head1 DESCRIPTION
 
@@ -296,7 +297,10 @@ sub serve {
         $$to = "";
         $to = IO::Scalar->new( $to );
     }
-    _enable_utf8_layer($to);
+    #_enable_utf8_layer($to); # TODO: this does not work
+    if (! $attr{noutf8} ) {
+        eval{ binmode $to, ':utf8'  };
+    }
 
     if ( defined $format and $format eq 'json' ) {
         print $to CGI::header( '-type' => "application/javascript; charset=utf-8" ) if $header;

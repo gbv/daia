@@ -94,7 +94,30 @@ available for other DAIA objects. See L<DAIA::Object/serve> for a description.
 In most cases, a simple call of C<$response-E<gt>serve> will be the last
 statement of a DAIA server implementation.
 
-=back
+=head2 check_valid_id ( $id )
+
+Check whether a valid identifier has been provided. If not, this methods 
+appends an error message ("please provide a document id" or "document id
+... is no valid URI") and returns undef.
+
+=cut
+
+sub check_valid_id {
+    my $self = shift;
+    my $id = shift; # TODO: take from CGI object, if not given
+
+    if ( ! defined $id ) {
+        $self->addMessage( "en" => "please provide a document id!", errno => 1 );
+    } elsif ( ! DAIA::is_uri( $id ) ) {
+        $id = " $id";
+        $id = (substr($id,0,32) . '...') if (length($id) > 32);
+        $self->addMessage( "en" => "document id$id is no valid URI!", errno => 2 );
+    } else {
+        return $id;
+    }
+
+    return undef;
+}
 
 =head1 AUTHOR
 

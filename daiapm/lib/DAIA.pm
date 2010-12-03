@@ -7,7 +7,7 @@ DAIA - Document Availability Information API in Perl
 =cut
 
 use strict;
-our $VERSION = '0.29';
+our $VERSION = '0.3';
 
 =head1 DESCRIPTION
 

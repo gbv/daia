@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker;
     ABSTRACT_FROM   => 'lib/DAIA.pm',
     AUTHOR          => 'Jakob Voss <jakob.voss@gbv.de>',
     PREREQ_PM       => {
-        'DateTime' => '0.52',
+        'DateTime' => '0.50',
         'DateTime::Duration' => '0',
         'DateTime::Format::Duration' => '1.03',
         'Data::Validate::URI' => '0.05',
