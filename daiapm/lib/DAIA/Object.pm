@@ -7,7 +7,7 @@ DAIA::Object - Abstract base class of all DAIA classes
 =cut
 
 use strict;
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 use Carp::Clan;
 use CGI; # TODO: allow other kind of CGI
 use Data::Validate::URI qw(is_uri is_web_uri);
@@ -16,6 +16,7 @@ use UNIVERSAL 'isa';
 use JSON;
 
 our $AUTOLOAD;
+our @HIDDEN_PROPERTIES = qw(to format xmlns cgi header xmlheader xslt pi callback exitif);
 
 =head1 DESCRIPTION
 
@@ -41,7 +42,11 @@ abstract base class directly calling is of little use.
 
 =head3 new ( ..attributes... )
 
-Constructs a new DAIA object. Unknown properties are ignored.
+Constructs a new DAIA object. Unknown properties are ignored. In addition
+the following special properties are stored as hidden properties, that 
+will not be copied to other objects, but only used for serializing the
+object: C<to>, C<format>, C<cgi>, C<header>, C<xmlheader>, C<xmlns>,
+C<xslt>, C<pi>, C<callback>, C<exitif>.
 
 =cut
 
@@ -66,16 +71,25 @@ sub new {
         $class = ref($self);
     }
 
+    my %hidden;
+    foreach ( @HIDDEN_PROPERTIES ) {
+        next unless exists $hash{$_};
+        $hidden{$_} = $hash{$_};
+        delete $hash{$_};
+    }
+    $self->{_hidden} = \%hidden if %hidden;
+
     no strict 'refs'; ##no critic
     my $PROPERTIES = \%{$class."::PROPERTIES"};
     foreach my $property (keys %{$PROPERTIES}) {
         $self->$property( undef ) unless exists $hash{$property};
     }
+
     foreach my $property (keys %hash) {
         $self->$property( $hash{$property} );
     }
 
-    # print Dumper($self)."\n";
+    #use Data::Dumper; print Dumper($self)."\n";
     return $self;
 }
 
@@ -125,10 +139,13 @@ unless you enable xslt or header). With C<xslt> you can add an XSLT
 processing instruction and with C<pi> any other processing instructions.
 If you enable C<header>, an XML-header is prepended.
 
+All TODO
+
 =cut
 
 sub xml {
     my ($self, %param) = @_;
+    $self->_hidden_prop( \%param );
 
     my $xmlns = $param{xmlns} || ($param{xslt} or $param{header});
     my $pi = $param{pi} || [ ];
@@ -165,6 +182,7 @@ sub struct {
     my ($self, $json) = @_;
     my $struct = { };
     foreach my $property (keys %$self) {
+        next unless $property =~ /^[a-z]+$/;
         if (ref $self->{$property} eq 'ARRAY') {
             $struct->{$property} = [ map { $_->struct($json) } @{$self->{$property}} ];
         } elsif ( UNIVERSAL::isa( $self->{$property}, "DAIA::Object" ) ) {
@@ -183,12 +201,16 @@ sub struct {
 =head2 json ( [ $callback ] )
 
 Returns the object in DAIA/JSON, optionally wrapped by a JavaScript callback 
-function call. Invalid callback names are ignored without warning.
+function call. Invalid callback names are ignored without warning. The hidden
+property C<callback> is used if no callback parameter is provided, use C<undef>
+to fully disable the callback.
 
 =cut
 
 sub json {
     my ($self, $callback) = @_;
+    $callback = $self->{_hidden}->{callback} 
+        if @_ < 2 and $self->{_hidden} and exists $self->{_hidden}->{callback};
     my $json = JSON->new->pretty->encode( $self->struct(1) );
     if ( defined $callback and $callback =~ /^[a-z][a-z0-9._\[\]]*$/i ) {
         return "$callback($json);"
@@ -204,7 +226,7 @@ appropriate HTTP headers. This method is available for all DAIA objects but
 mostly used to serve a L<DAIA::Response>. The serialized object must already
 be encoded in UTF-8 (but it can contain Unicode strings).
 
-The serialization format should be specified with the first parameter as
+The serialization format can be specified with the first parameter as
 C<format> string (C<json> or C<xml>) or C<cgi> object. If no format is
 given, it is searched for in the L<CGI> query parameters. The default 
 format is C<xml>. Other possible options are:
@@ -251,6 +273,8 @@ sub serve {
     my $self = shift;
     my $first = shift if @_ % 2;
     my (%attr) = @_;
+    $self->_hidden_prop( \%attr );
+
     if ( UNIVERSAL::isa( $first,'CGI' ) ) {
         $attr{cgi} = $first;
     } elsif (defined $first) {
@@ -283,7 +307,8 @@ sub serve {
         print $to $self->json( $attr{callback} );
     } else {
         print $to CGI::header( -type => "application/xml; charset=utf-8" ) if $header;
-        print $to $self->xml( xmlns => 1, header => 1, xslt => $xslt, pi => $pi, header => $xmlheader );
+        my $xml = $self->xml( xmlns => 1, header => 1, xslt => $xslt, pi => $pi, header => $xmlheader );
+        print $to $xml."\n";
     }
 
     $attr{'exitif'} = $attr{'exitif'}() if ref($attr{'exitif'}) eq 'CODE';
@@ -494,11 +519,27 @@ Returns a property-value hash of constructor parameters.
 =cut
 
 sub _buildargs {
-    # TODO croak on un-even-list
     shift; 
     croak "uneven parameter list" if (@_ % 2);
     @_; 
 };
+
+=head2 _hidden_prop ( $hashref )
+
+Enrich a hash with hidden properties.
+
+=cut
+
+sub _hidden_prop {
+    my $self = shift;
+    return unless $self->{_hidden};
+
+    my $hashref = shift;
+    foreach ( @HIDDEN_PROPERTIES ) {
+        next if exists $hashref->{$_} or not exists $self->{_hidden}->{$_};
+        $hashref->{$_} = $self->{_hidden}->{$_};
+    }
+}
 
 =head2 _enable_utf8_layer
 
@@ -522,9 +563,9 @@ our %COMMON_PROPERTIES =(
     id => {
         filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_uri($v) ? $v : undef; }
     },
-    href => {
-        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; }
-    },
+#    href => {
+#        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; }
+#    },
     href => { 
         filter => sub { my $v = "$_[0]"; is_web_uri($v) ? $v : undef; }
     },

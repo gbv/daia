@@ -83,13 +83,16 @@ our %PROPERTIES = (
 
 DAIA::Response provides the default methods of L<DAIA::Object> and accessor 
 methods for all of its properties. To serialize and send a HTTP response, you
-can use the method C<serve> which is accessible for all DAIA objects.
+can use the method C<serve>, which is accessible for all DAIA objects.
 
 =head2 serve ( [ [ format => ] $format ] [ %options ] )
 
 Serialize the response and send it to STDOUT with the appropriate HTTP headers.
-This method is available for all DAIA objects (see L<DAIA::Object>) but mostly
-used to serve a DAIA::Response.
+This method is mostly used to serve DAIA::Response objects, but it is also 
+available for other DAIA objects. See L<DAIA::Object/serve> for a description.
+
+In most cases, a simple call of C<$response-E<gt>serve> will be the last
+statement of a DAIA server implementation.
 
 =back
 

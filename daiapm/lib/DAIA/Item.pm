@@ -132,10 +132,12 @@ sub addAvailability {
 
 =head2 Additional query methods
 
-=head3 services ( [ $list-of-services ] )
+=head3 services ( [ @services ] )
 
 Returns a (possibly empty) hash of services mapped to lists
-of L<DAIA::Availability> objects for the given services.
+of L<DAIA::Availability> objects for the given services. If
+you provide a list of wanted services (each specified by its 
+URI or by its short name), you only get those services.
 
 =cut
 

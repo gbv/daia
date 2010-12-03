@@ -49,9 +49,10 @@ is_deeply( DAIA::daia_xml_roots($xml), {
 
 #### public methods
 my $item = item();
+my $itemqr = qr/<item xmlns="http:\/\/ws.gbv.de\/daia\/"\s*\/>/;
 
-like( $item->xml( xmlns => 1 ), qr/<item xmlns="http:\/\/ws.gbv.de\/daia\/"\s*\/>/, "xlmns" );
-like( $item->xml( xmlns => 1 ), qr/<item xmlns="http:\/\/ws.gbv.de\/daia\/"\s*\/>/, "xlmns" );
+like( $item->xml( xmlns => 1 ), $itemqr, "xlmns" );
+like( item( format => 'json', xmlns => 1 )->xml, $itemqr, "xlmns (hidden property)" );
 
 is( message("en" => "hi")->xml, '<message lang="en">hi</message>', 'message' );
 

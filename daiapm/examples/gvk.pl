@@ -74,7 +74,7 @@ if ($ppn) {
             $query = "ISBN $isbn";
             @records = $gvk->cqlQuery("pica.isb=$isbn")->records();
         } else {
-            $response->addMessage( "You OpenURL does not contain an ISBN, sorry" );
+            $response->addMessage( "You OpenURL does not contain an ISBN or GVK-PPN, sorry" );
         }
     }
 }
@@ -88,6 +88,9 @@ sub itemcount {
     return $count > 1 ? $count : 1;
 }
 
+sub standorte {
+}
+
 if (@records) { 
   foreach my $record (@records) {
     my $ppn = $record->ppn;
@@ -98,6 +101,7 @@ if (@records) {
         my $department = department( id => "gvk:iln:$iln" );
 
         foreach my $copy ( $holding->items ) {
+            my $item = item( id => 'gvk:epn:' . $copy->epn );
 
             # get the library name as department
             if ( 1 ) { #not $department->content ) {
@@ -105,9 +109,7 @@ if (@records) {
                 utf8::encode($name);
                 $department->content($name);
             }
-
-            my $epn = $copy->epn;
-            my $item = item( id => "gvk:epn:$epn", department => $department );
+            $item->department( $department );
 
             #my $label = $copy->sf('209A/..$a');
             #$item->label( $label ) if defined $label;
@@ -116,6 +118,91 @@ if (@records) {
 
             #my $msg = $copy->sf('237A/..$a');
             #$item->message( 'de' => $msg ) if $msg;
+
+            my ($presentation, $loan, $interloan, $openaccess);
+
+            # Signatur
+            $item->label( $pica->subfield('209A/..','a') );
+
+            # Standorte
+            my $f = $pica->sf('209A/..$f');
+            my @standard = standorte($f);
+            my @orte;
+            if (@standard) {
+                @orte = grep { $_->isa('DAIA::Department') or $_->isa('DAIA::Storage') } @standard;
+                ($presentation) = grep { $_->isa('DAIA::Availability') and $_->service eq 'presentation' } @standard;
+                ($loan) = grep { $_->isa('DAIA::Availability') and $_->service eq 'loan' } @standard;
+                ($interloan) = grep { $_->isa('DAIA::Availability') and $_->service eq 'interloan' } @standard;
+                ($openaccess) = grep { $_->isa('DAIA::Availability') and $_->service eq 'openaccess' } @standard;
+            } else {
+                @orte = message( "Unbekannter Standortcode: $b $j $f", errno => -1 );
+            }
+
+            $item->add( @orte );
+
+            # Allgemeine Verfügbarkeit
+            my $ind = $pica->sf('209A/..$b');
+            my $link = $pica->subfield('201@/..','l');
+
+            if ( $ind =~ /[aogz]/ ) {
+                $presentation = unavailable( "presentation" );
+                $loan         = unavailable( "loan" );
+                $interloan    = unavailable( "interloan" );
+                $openaccess   = unavailable( "openaccess" );
+            } elsif ( $ind =~ /[if]/ ) {
+                $loan         = unavailable( "loan" );
+                $openaccess   = unavailable( "openaccess" );
+                $interloan    = unavailable( "interloan" ) if $ind eq 'i';
+            } elsif ( $ind eq 'c' ) {
+                $interloan    = unavailable( "interloan" );
+            }
+
+            # in Beabeitung
+            if ( $f =~ /.:pb/ ) { # Präsenzbestand
+                # TODO: was wenn gerade nicht da ?
+                $presentation = available("presentation", href => $link );
+            }
+
+            #if (not defined $interloan) { # kommt irgendwann wieder
+            #    $interloan = unavailable( service => "interloan", "expected" => "unknown" );
+            #}
+            #$openaccess = unavailable( "openaccess" ); # erstmal rausnehmen
+
+            #$d AUSLEIHINDIKATOR
+            if ( not defined $presentation or not defined $loan ) {
+                my $status = wraploan( $link );
+                if (ref($status)) { 
+                    use Data::Dumper;
+                    $item->addMessage( Dumper( $status ) );
+                    if ($status->{storage} and not $item->storage) {
+                        $item->storage( $status->{storage} );
+                    }
+                    if ($status->{status} eq "-") {
+                        $presentation = available("presentation") unless defined $presentation;
+                        $loan = available("loan") unless defined $loan;
+                        if ( $item->storage and $item->storage->content =~ /Magazin/ ) {
+                            $presentation->delay('PT30M');
+                            $loan->delay('PT30M'); # 30 minuten
+                        }
+                        $interloan = available("interloan") unless defined $interloan;
+                    } elsif ($status->{status} =~ /Lent till (\d\d)-(\d\d)-(\d\d\d\d)/) {
+                        $presentation = unavailable("presentation", expected => "$3-$2-$1");
+                        $loan = unavailable("loan", expected => "$3-$2-$1");
+                        if ( $status->{queue} > 0 ) {
+                            $presentation->queue( $status->{queue} );
+                            $loan->queue( $status->{queue} );
+                        }
+                    } elsif ($status->{status} =~ /shortend loan period/ ) {
+                        $presentation = available("presentation", limitation => $status->{status} );
+                        $loan = available("loan", limitation => $status->{status} );
+                    }
+                } else {
+                    $item->addMessage( $status );
+                }
+            }
+
+            $presentation->href( $link ) if $presentation and not $presentation->href;
+            $loan->href( $link ) if $loan and not $loan->href;
 
             my $count = itemcount($copy);
             foreach (1..$count) { # Mehrfachexemplare
