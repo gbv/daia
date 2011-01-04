@@ -28,6 +28,7 @@ td {
   border-bottom: 1px solid #D5D5D5;  
   padding: 3px;
 }
+.newdepartment td { border-top: 2px solid #d5d5d5; }
 
 /* messages and errors */
 .messsage { background: #D9EDFF; margin: 1px; }
@@ -41,20 +42,30 @@ td {
 div.id { padding: 0; }
 
 /* status icons */
-.available, .unavailable, .cur-unavail, .queue, .limitation, .time, .date, .storage { 
+.queue, .limitation, .time, .date { 
     padding-left: 23px; line-height: 20px;
     padding-right: 3px;
     /*display: inline-block; */
     display: block;
+}
+.available, .unavailable, .cur-unavail, .storage {
+    display: block;
+    padding-left: 18px;
 }
 
 /* delay or expected time */
 .time { background:transparent url(icons/clock_16.png) center left no-repeat; }
 .date { background:transparent url(icons/calendar_16.png) center left no-repeat; }
 
-.available { background:transparent url(icons/18px-Bullet-green.png) center left no-repeat; }
-.unavailable { background:transparent url(icons/18px-Bullet-red.png) center left no-repeat; }
-.cur-unavail { background:transparent url(icons/18px-Bullet-ambar.png) center left no-repeat; }
+.available { background:transparent url(icons/bullet_green.png) center left no-repeat; 
+  color: #009900;
+}
+.unavailable { background:transparent url(icons/bullet_red.png) center left no-repeat; 
+  color: #cc0000;
+}
+.cur-unavail { background:transparent url(icons/bullet_yellow.png) center left no-repeat; 
+  color: #cc9900;
+}
 
 .queue      { background:transparent url(icons/daia_queue_16.png) center left no-repeat; }
 .limitation { background:transparent url(icons/daia_limitation_16.png) center left no-repeat; }

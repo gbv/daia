@@ -27,8 +27,8 @@ In addition the following icons are used
 
 - queue        - indicates a waiting queue
 - limitation   - indicates a limitation
-- item         - indicates an item
-- document     - indicates a document
+- item         - indicates an item (based on PICOL's book_sans)
+- document     - indicates a document (based on PICOL's document_text)
 - storage      - indacates the position of a physical location
 
 Furthermore the following standard PICOL icons are included:
@@ -56,10 +56,10 @@ Under the following conditions:
 
 ------------------------------------------------------------------------
 
-DAIA core icons partly base on PICOL, the Pictorial Commnuication 
-Language created by Melih Bilgil (www.picol.org) with support of 
-Christopher Adjei (www.boffer.net). The original PICOL icons can 
-be found at http://blog.picol.org/downloads/icons
+DAIA cpre icons base on PICOL, the Pictorial Commnuication Language
+created by Melih Bilgil (www.picol.org) with support of Christopher 
+Adjei (www.boffer.net). The original PICOL icons can be found at
+http://blog.picol.org/downloads/icons
 
 In detail DAIA core icons are based on the following PICOL icons:
 
@@ -68,13 +68,4 @@ In detail DAIA core icons are based on the following PICOL icons:
 - daia_interloan:     home and filter
 - daia_openaccess:    globe
 - daia_queue:         group
-- daia_document:      document_text
-- daia_item:          badge_stop
-
-The following icons from the Silk icon theme by Mark James
-(http://www.famfamfam.com/lab/icons/silk/) are also included:
-
-- button_red
-- button_green
-- button_yellow
-
+- dotted_document:    document_text
