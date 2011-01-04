@@ -93,9 +93,16 @@ foreach my $a ( @unavail_constructors ) {
     is_deeply( $a->struct, $unavail2->struct );
 }
 
-# 
-$a = available('http://purl.org/NET/DAIA/services/loan');
-is( $a->service, 'loan' );
+foreach my $s (qw(Loan Presentation Openaccess Interloan)) {
+    my $uri = "http://purl.org/ontology/daia/Service/$s";
+    $a = available( $uri );
+    is( $a->service, lc($s) );
+}
+
+$a = available( service => "http://example.com" );
+isa_ok( $a, 'DAIA::Available' );
+is( $a->service, "http://example.com" );
+
 
 # status is mandatory
 eval { DAIA::Availability->new( service => 'loan' ); };

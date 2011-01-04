@@ -19,9 +19,39 @@ classes and functions to easily create and manage DAIA information. It can
 be used to implement DAIA servers, clients, and other programs that handle 
 availability information.
 
-The DAIA information objects as decriped in the DAIA specification are
-directly mapped to Perl packages. In addition a couple of functions can
-be exported if you prefer to handle DAIA data without much object-orientation.
+For a detailed description what "availability" means in context of DAIA,
+see the L<DAIA specification|http://purl.org/NET/DAIA>. This implementation
+directly maps DAIA information objects to Perl objects. But you can also 
+let the package L<export functions|/"EXPORTED FUNCTIONS"> to handle DAIA 
+data without much object-orientation.
+
+In short the most important concepts of DAIA are:
+
+=over 4
+
+=item B<documents>
+
+An abstract document (work or edition). Implemented as L<DAIA::Document>.
+
+=item B<items>
+
+A particular copy of a document (physical or digital), that services
+can be provided with. Implemented as L<DAIA::Item>.
+
+=item B<availability status>
+
+A boolean value and a service that indicates I<for what> an item is 
+available or not available. Implemented as L<DAIA::Availability> with 
+the subclasses L<DAIA::Available> and L<DAIA::Unavailable>.
+
+=item B<responses>
+
+Information about the availability of a document with a timestamp. Responses
+are used to send and recieve DAIA data. Implemented as L<DAIA::Response>.
+
+=item
+
+=back 
 
 =head1 SYNOPSIS
 
@@ -151,7 +181,7 @@ to the default namespace! Alternatively you can specify the following groups:
 
 =over 4
 
-=item :core
+=item C<:core>
 
 Includes the functions C<response> (L<DAIA::Response>),
 C<document> (L<DAIA::Document>), 
@@ -160,7 +190,7 @@ C<available> (L<DAIA::Available>),
 C<unavailable> (L<DAIA::Unavailable>), and
 C<availability> (L<DAIA::Availability>)
 
-=item :entities
+=item C<:entities>
 
 Includes the functions C<institution> (L<DAIA::Institution>),
 C<department> (L<DAIA::department>),

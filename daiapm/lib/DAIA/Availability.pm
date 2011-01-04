@@ -8,7 +8,7 @@ DAIA::Availability - Abstract base class of availability information
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 use Carp::Clan;
 use Data::Validate::URI qw(is_uri);
 use DateTime::Duration;
@@ -68,12 +68,9 @@ the status changes the object type:
 =item service
 
 One of C<presentation>, C<loan>, C<interloan>, and C<openaccess> (highly
-recommended) or a custom URI (use with care). The predefined URLs
-C<http://purl.org/NET/DAIA/services/presentation>,
-C<http://purl.org/NET/DAIA/services/loan>,
-C<http://purl.org/NET/DAIA/services/interloan>, and
-C<http://purl.org/NET/DAIA/services/openaccess> are converted to
-their short form equivalent.
+recommended) or a custom URI (use with care). The predefined URLs with
+prefix C<http://purl.org/ontology/daia/Service/> are converted to their 
+short form equivalent.
 
 =item href
 
@@ -89,8 +86,8 @@ An array reference with L<DAIA::Message> objects about this specific service.
 
 =back
 
-Depending on whether the availability's status is true (L<DAIA::Available>)
-or false (L<DAIA::Unavailable>), the properties C<delay>, C<queue>, and 
+Depending on whether the availability's status is true (available)
+or false (unavailable), the properties C<delay>, C<queue>, and 
 C<expected> are also possible.
 
 =cut
@@ -116,10 +113,10 @@ our %PROPERTIES = (
 
 # known services
 our %SERVICES = (
-    'presentation' => 'http://purl.org/NET/DAIA/services/presentation',
-    'loan' => 'http://purl.org/NET/DAIA/services/loan',
-    'interloan' => 'http://purl.org/NET/DAIA/services/interloan',
-    'openaccess' => 'http://purl.org/NET/DAIA/services/openaccess',
+    'presentation' => 'http://purl.org/ontology/daia/Service/Presentation',
+    'loan'         => 'http://purl.org/ontology/daia/Service/Loan',
+    'interloan'    => 'http://purl.org/ontology/daia/Service/Interloan',
+    'openaccess'   => 'http://purl.org/ontology/daia/Service/Openaccess',
 );
 
 our %SECIVRES = (
@@ -222,8 +219,6 @@ sub status {
 
     return $status;
 }
-
-=head1 FUNCTIONS
 
 =head1 FUNCTIONS
 

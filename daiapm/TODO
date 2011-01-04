@@ -1,16 +1,15 @@
 The following feature requests and bug reports are known:
 
+Next
+* implement DAIA/RDF 
+
 Bugfix
-* Allow availability without service (unspecified) and custom services
-* Change URIs like http://purl.org/NET/DAIA/services/presentation to final URIs
-* http://purl.org/ontology/daia/Service/... or .../service/... ?
-* change XML namespace
 * fix fragment/broader/narrower issue
-* =redesign 'fragmented' property (narrowerExemplar? nested documents?)
+  = redesign 'fragmented' property (narrowerExemplar? nested documents?)
+* change XML namespace from http://ws.gbv.de/daia/ to http://purl.org/NET/DAIA ?
 
 Additional functionality
 * add inferencing (same id = same object policy)
-* support DAIA/RDF 
 * add support of logging with Log4Perl
 * implement DAIA::Error as object so you can also use
 ** ->error, ->addError, ->provideError
@@ -29,6 +28,5 @@ More tests and documentation
 * does it work on Windows ?
 
 Misc
-* rewrite daia.xsl client (icons missing?)
 * minimize package dependencies
 

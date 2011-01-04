@@ -101,10 +101,10 @@ $item->addAvailable( "loan" );
 test_services( { $item->services }, loan => 1 );
 $item->addService( "loan" => 1 );
 test_services( { $item->services }, loan => 2 );
-$item->addAvailable( "http://purl.org/NET/DAIA/services/presentation" );
+$item->addAvailable( "http://purl.org/ontology/daia/Service/Presentation" );
 test_services( { $item->services }, loan => 2, presentation => 1 );
 
-test_services( { $item->services("http://purl.org/NET/DAIA/services/presentation") }, presentation => 1 );
+test_services( { $item->services("http://purl.org/ontology/daia/Service/Presentation") }, presentation => 1 );
 test_services( { $item->services("foo","presentation") }, presentation => 1 );
 test_services( { $item->services("foo","presentation","loan") }, loan => 2, presentation => 1 );
 

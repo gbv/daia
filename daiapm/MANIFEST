@@ -35,11 +35,12 @@ clients/xmlverbatim.xsl
 clients/daia.xsd
 clients/icons
 clients/icons/README
+
+clients/icons/bullet_green.png
+clients/icons/bullet_red.png
+clients/icons/bullet_yellow.png
 clients/icons/clock_16.png
 clients/icons/calendar_16.png
-clients/icons/18px-Bullet-green.png
-clients/icons/18px-Bullet-red.png
-clients/icons/18px-Bullet-ambar.png
 clients/icons/daia_queue_16.png
 clients/icons/daia_limitation_16.png
 clients/icons/daia_storage_16.png
