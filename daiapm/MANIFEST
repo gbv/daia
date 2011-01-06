@@ -34,9 +34,7 @@ clients/daia.css
 clients/daia.xsl
 clients/xmlverbatim.xsl
 clients/daia.xsd
-clients/icons
 clients/icons/README
-
 clients/icons/bullet_green.png
 clients/icons/bullet_red.png
 clients/icons/bullet_yellow.png
@@ -59,3 +57,4 @@ Makefile.PL
 README
 Changes
 MANIFEST			This list of files
+META.yml                                 Module meta-data (added by MakeMaker)
