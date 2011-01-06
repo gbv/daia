@@ -13,6 +13,7 @@ use ExtUtils::MakeMaker;
         'Carp' => 0,
         'CGI' => '3.0',
         'IO::File' => 0, 
+        'Scalar::Util' => 0,
         # additional modules
         'Carp::Clan' => '5.0',
         'DateTime' => '0.50',

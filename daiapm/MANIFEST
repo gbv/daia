@@ -14,6 +14,7 @@ lib/DAIA/Storage.pm
 lib/DAIA/Unavailable.pm
 
 t/10object.t
+t/15daia.t
 t/20entities.t
 t/30message.t
 t/40availability.t

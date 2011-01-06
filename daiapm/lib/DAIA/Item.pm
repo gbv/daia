@@ -8,7 +8,7 @@ DAIA::Item - Holds information about an item of a L<DAIA::Document>
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use DAIA;
 use JSON;
@@ -87,32 +87,34 @@ our %PROPERTIES = (
 
 =head1 METHODS
 
-DAIA::Item provides the default methods of L<DAIA::Object> and accessor 
-methods for all of its properties.
+=head2 Standard methods
+
+DAIA::Item provides the L<standard methods|DAIA/"DAIA OBJECTS"> and accessor
+methods for its properties as listed above.
 
 =head2 Additional appender methods
 
 =over
 
-=item addMessage ( $message | ... )
+=item C<< addMessage ( $message | ... ) >>
 
-Add a specified or a new L<DAIA::Message>.
+Add a given or a new L<DAIA::Message>.
 
-=item addAvailable ( $available | ... )
+=item C<< addAvailable ( $available | ... ) >>
 
-Add a specified or a new L<DAIA::Available>.
+Add a given or a new L<DAIA::Available>.
 
-=item addUnavailable ( $unavailable | ... )
+=item C<< addUnavailable ( $unavailable | ... ) >>
 
-Add a specified or a new L<DAIA::Unavailable>.
+Add a given or a new L<DAIA::Unavailable>.
 
-=item addAvailability ( $availability | ... )
+=item C<< addAvailability ( $availability | ... ) >>
 
-Add a specified or a new L<DAIA::Availability>.
+Add a given or a new L<DAIA::Availability>.
 
-=item addService ( $availability | ... )
+=item C<< addService ( $availability | ... ) >>
 
-Add a specified or a new L<DAIA::Availability> (alias for addAvailability).
+Add a given or a new L<DAIA::Availability> (alias for addAvailability).
 
 =back
 
@@ -132,12 +134,16 @@ sub addAvailability {
 
 =head2 Additional query methods
 
-=head3 services ( [ @services ] )
+=over
+
+=item C<< services ( [ @services ] ) >>
 
 Returns a (possibly empty) hash of services mapped to lists
 of L<DAIA::Availability> objects for the given services. If
 you provide a list of wanted services (each specified by its 
 URI or by its short name), you only get those services.
+
+=back
 
 =cut
 

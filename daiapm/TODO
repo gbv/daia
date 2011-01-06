@@ -7,6 +7,7 @@ Bugfix
 * fix fragment/broader/narrower issue
   = redesign 'fragmented' property (narrowerExemplar? nested documents?)
 * change XML namespace from http://ws.gbv.de/daia/ to http://purl.org/NET/DAIA ?
+* better catch XML parsing errors
 
 Additional functionality
 * add inferencing (same id = same object policy)

@@ -1,5 +1,8 @@
-0.31 2011-??-??
+0.31 2011-01-06
       - fixed service URIs (http://purl.org/ontology/daia/Service/*)
+      - fixed parsing from URL
+      - improved documentation and tests
+      - started to implement DAIA/RDF
 0.30 2010-12-03
       - improved daia client/proxy
       - removed some package dependencies

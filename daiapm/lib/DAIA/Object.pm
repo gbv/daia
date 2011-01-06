@@ -7,11 +7,12 @@ DAIA::Object - Abstract base class of all DAIA classes
 =cut
 
 use strict;
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 use Carp::Clan;
 use CGI; # TODO: allow other kind of CGI
 use Data::Validate::URI qw(is_uri is_web_uri);
 use IO::Scalar;
+use Scalar::Util qw(refaddr);
 use UNIVERSAL 'isa';
 use JSON;
 
@@ -36,18 +37,13 @@ property).
 
 =head1 METHDOS
 
-=head2 Constructor methods
+=head2 new ( ..attributes... )
 
-All derived DAIA classed use this constructor. As C<DAIA::Object> is an
-abstract base class directly calling is of little use.
-
-=head3 new ( ..attributes... )
-
-Constructs a new DAIA object. Unknown properties are ignored. In addition
-the following special properties are stored as hidden properties, that 
-will not be copied to other objects, but only used for serializing the
-object: C<to>, C<format>, C<cgi>, C<header>, C<xmlheader>, C<xmlns>,
-C<xslt>, C<pi>, C<callback>, C<exitif>.
+Constructs a new DAIA object of the derived type. Unknown properties are 
+ignored. In addition the following special properties are stored as hidden
+properties, that will not be copied to other objects, but only used for 
+serializing the object: C<to>, C<format>, C<cgi>, C<header>, C<xmlheader>, 
+C<xmlns>, C<xslt>, C<pi>, C<callback>, C<exitif>.
 
 =cut
 
@@ -94,9 +90,7 @@ sub new {
     return $self;
 }
 
-=head2 Modification methods
-
-=head3 add ( ... )
+=head2 add ( ... )
 
 Adds typed properties to an object.
 
@@ -199,7 +193,7 @@ sub struct {
     return $struct;
 }
 
-=head2 json ( [ $callback ] )
+=head3 json ( [ $callback ] )
 
 Returns the object in DAIA/JSON, optionally wrapped by a JavaScript callback 
 function call. Invalid callback names are ignored without warning. The hidden
@@ -218,6 +212,35 @@ sub json {
     } else {
         return $json;
     }
+}
+
+=head3 rdfhash
+
+Returns the object as hashref representing an RDF structure. This hashref 
+structure is compatible with RDF/JSON and with the ARC2 library for PHP.
+You can directly pass it the method C<add_hashref> of L<RDF::Trine::Model>.
+
+The current version does not implement this method yet!
+
+=cut
+
+sub rdfhash {
+     my $self = shift;
+
+#     my $data = $self->struct;
+#     my $hashref;
+
+     my $id = $self->{id} ? $self->{id} : "_:".refaddr($self);
+
+     my $type = ref($self); 
+     $type =~ s/^DAIA:://;
+     $type = "http://purl.org/ontology/daia/$type";
+
+     return { $id => {
+         'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => [ {
+             type => 'uri', value => $type
+         } ]
+     } };
 }
 
 =head2 serve ( [ [ format => ] $format | [ cgi => $CGI ] ] [ %more_options ] )
