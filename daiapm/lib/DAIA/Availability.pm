@@ -113,10 +113,10 @@ our %PROPERTIES = (
 
 # known services
 our %SERVICES = (
-    'presentation' => 'http://purl.org/ontology/daia/Service/Presentation',
-    'loan'         => 'http://purl.org/ontology/daia/Service/Loan',
-    'interloan'    => 'http://purl.org/ontology/daia/Service/Interloan',
-    'openaccess'   => 'http://purl.org/ontology/daia/Service/Openaccess',
+    'presentation' => $DAIA::Object::RDFNAMESPACE.'Service/Presentation',
+    'loan'         => $DAIA::Object::RDFNAMESPACE.'Service/Loan',
+    'interloan'    => $DAIA::Object::RDFNAMESPACE.'Service/Interloan',
+    'openaccess'   => $DAIA::Object::RDFNAMESPACE.'Service/Openaccess',
 );
 
 our %SECIVRES = (

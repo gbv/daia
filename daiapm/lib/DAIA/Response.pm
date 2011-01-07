@@ -8,7 +8,7 @@ DAIA::Response - DAIA information root element
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 use POSIX qw(strftime);
 
 =head1 SYNOPSIS
@@ -60,12 +60,14 @@ DAIA format.
 
 our %PROPERTIES = (
     version => {
-        default => '0.5', 
-        filter => sub { '0.5' }
+        default   => '0.5', 
+        filter    => sub { '0.5' }
     },
     timestamp => {
-        default => sub { strftime("%Y-%m-%dT%H:%M:%SZ", gmtime); },
-        filter => sub { $_[0] } # TODO: check format 
+        default   => sub { strftime("%Y-%m-%dT%H:%M:%SZ", gmtime); },
+        filter    => sub { $_[0] }, # TODO: check format 
+        predicate => $DAIA::Object::RDFNAMESPACE.'timestamp',
+        rdftype   => 'http://www.w3c.org/2001/XMLSchema#dateTime'
     },
     message => $DAIA::Object::COMMON_PROPERTIES{message},
     institution => { 

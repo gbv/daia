@@ -2,7 +2,7 @@ package DAIA;
 
 =head1 NAME
 
-DAIA - Document Availability Information API in Perl
+DAIA - Document Availability Information API
 
 =cut
 
@@ -11,33 +11,35 @@ our $VERSION = '0.31';
 
 =head1 DESCRIPTION
 
-The Document Availability Information API (DAIA) defines a data model with 
-serializations in JSON and XML to encode information about the current 
-availability of documents. See L<http://daia.sourceforge.net/> for more 
-information and the recent developer version. This package provides Perl 
-classes and functions to easily create and manage DAIA information. It can
-be used to implement DAIA servers, clients, and other programs that handle 
-availability information.
+The Document Availability Information API (DAIA) defines a model of information
+about the current availability of documents, for instance in a library. DAIA
+includes a specification of serializations in JSON, XML, and RDF. More details
+can be found in the DAIA specification at L<http://purl.org/NET/DAIA> and at
+the developer repository at L<http://daia.sourceforge.net/>.
 
-For a detailed description what "availability" means in context of DAIA,
-see the L<DAIA specification|http://purl.org/NET/DAIA>. This implementation
-directly maps DAIA information objects to Perl objects, that all provide 
-some L<standard methods|/"DAIA OBJECTS">. You can also let the package 
-L<export functions|/"EXPORTED FUNCTIONS"> to handle DAIA data without 
-much object-orientation.
+This package provides Perl classes and functions to easily create and manage
+DAIA information in any form. It can be used to quickly implement DAIA servers,
+clients, and other programs that handle availability information of documents.
 
-In short the most important concepts of DAIA are:
+The most important concepts of the DAIA model are:
 
 =over 4
 
 =item B<documents>
 
-An abstract document (work or edition). Implemented as L<DAIA::Document>.
+These abstract works or editions are implemented as objects of class
+L<DAIA::Document>.
 
 =item B<items>
 
-A particular copy of a document (physical or digital), that services
-can be provided with. Implemented as L<DAIA::Item>.
+These particular copies of documents (physical or digital) are
+implemented as objects of class L<DAIA::Item>.
+
+=item B<services> and C<availability status>
+
+A service is something that can be provided with an item. A particular
+service has a particular availability status, that is implemented as
+object of class L<DAIA::Available> or L<DAIA::Unavailable>.
 
 =item B<availability status>
 
@@ -47,74 +49,72 @@ the subclasses L<DAIA::Available> and L<DAIA::Unavailable>.
 
 =item B<responses>
 
-Information about the availability of a document with a timestamp. Responses
-are used to send and recieve DAIA data. Implemented as L<DAIA::Response>.
+A response contains information about the availability of documents at 
+a given point in time, optionally at some specific institution. It is
+implemented as object of class L<DAIA::Response>.
 
-=item
+=back
 
-=back 
+Additional L<DAIA objects|/"DAIA OBJECTS"> include B<institutions>
+(L<DAIA::Institution>), B<departments> (L<DAIA::Department>), 
+storages (L<DAIA::Storage>), messages (L<DAIA::Message>), and 
+errors (L<DAIA::Message>). All these objects provide standard methods
+for creation, modification, and serialization. This package also
+L<exports functions|/"FUNCTIONS"> as shorthand for object constructors,
+for instance the following two result in the same:
+
+  item( id => $id );
+  DAIA::Item->new( id => $id );
 
 =head1 SYNOPSIS
 
-=head2 DAIA client
+This package includes and installs the client program C<daia> to fetch,
+validate and convert DAIA data (both command line and CGI). See also the
+C<clients> directory for an XML Schema of DAIA/XML and an XSLT script to 
+transform DAIA/XML to HTML.
 
-  #!/usr/bin/perl
+=head2 A DAIA client
+
+  use DAIA;  # or: use DAIA qw(parse);
+
+  $daia = DAIA::parse( $url );
+  $daia = DAIA::parse( file => $file );
+  $daia = DAIA::parse( data => $string ); # $string must be Unicode
+
+=head2 A DAIA server
+
   use DAIA;
 
-  $daia = DAIA::parse( $url );          # parse from URL
-  $daia = DAIA::parse( file => $file ); # parse from File
-
-  # parse from string
-  use Encode; # if incoming data is unencoded UTF-8
-  $data = Encode::decode_utf8( $data ); # skip this if $data is just Unicode
-  $daia = DAIA::parse( data => $string );
-
-This package also includes and installs the command line and CGI client
-L<daia> to fetch, validate and convert DAIA data. See also the C<clients>
-directory for an XML Schema of DAIA/XML and an XSLT script to transform it
-to HTML.
-
-=head2 DAIA server
-
-First an example of a DAIA server as CGI script. You need to implement all
-C<get_...> methods to return meaningful values. Some more hints how
-to run a DAIA Server below under under L</DAIA Server hints>.
-
-  #!/usr/bin/perl
-  use DAIA;
-  use CGI; # or some other CGI module, for instance CGI::Minimal
-  use utf8; # if source code containts UTF-8
+  use CGI;
+  my $id = CGI->new->param('id');
 
   my $r = response( institution => {
-          href    => "http://example.com/homepage.of.institution",
-          content => "Name of the Institution" 
+      href    => "http://example.com/your-institution's-homepage",
+      content => "Your institution's name" 
   } );
 
-  my $id = CGI->new->param('id');
   $r->addMessage("en" => "Not an URI: $id", errno => 1 )
       unless DAIA::is_uri($id);
-  my @holdings = get_holding_information($id);  # YOU need to implement this!
+
+  my @holdings = get_holding_information($id);      # your custom method
 
   if ( @holdings ) {
       my $doc = document( id => $id, href => "http://example.com/docs/$id" );
       foreach my $h ( @holdings ) {
           my $item = item();
 
-          my %sto = get_holding_storage( $h );
-          $item->storage( id => $sto{id}, href => $sto{href}, $sto{name} );
+          my %stor = get_holding_storage( $h );     # your custom method
+          $item->storage( id => $stor{id}, href => $stor{href}, $stor{name} );
 
-          my $label = get_holding_label( $h );
-          $item->label( $label );
-
-          my $url = get_holding_url( $h );
-          $item->href( $url );
+          $item->label( get_holding_label( $h ) );  # your custom method
+          $item->href( get_holding_url( $h ) );     # your custom method
 
           # add availability services
           my @services;
 
-          if ( get_holding_is_here( $h ) ) {
+          if ( get_holding_is_here( $h ) ) {          # your custom method
               push @services, available('presentation'), available('loan');
-          } elsif( get_holding_is_not_here( $h ) ) {
+          } elsif( get_holding_is_not_here( $h ) ) {  # your custom method
               push @services, # expected to be back in 5 days
               unavailable( 'presentation', expected => 'P5D' ),
               unavailable( 'loan', expected => 'P5D' );
@@ -130,9 +130,9 @@ to run a DAIA Server below under under L</DAIA Server hints>.
 
   $r->serve( xslt => "http://path.to/daia.xsl" );
 
-In order to get your script run as CGI, you may have to enable CGI with 
-C<Options +ExecCGI> and C<AddHandler cgi-script .pl> in your Apache
-configuration or C<.htaccess>. 
+To run your script as CGI, you may have to enable CGI with C<Options +ExecCGI>
+and C<AddHandler cgi-script .pl> in your Apache configuration or in C<.htaccess>.
+Some more hints are L<listed below|/"DAIA Server hints">.
 
 =cut
 
@@ -166,42 +166,36 @@ use DAIA::Limitation;
 
 use Data::Validate::URI qw(is_uri);
 
-=head1 EXPORTED FUNCTIONS
+=head1 FUNCTIONS
 
-If you prefer function calls in favor of constructor calls, this package  
-providesfunctions for each DAIA class constructor. The functions are named  
-by the object that they create but in lowercase - for instance C<response> 
-for the L<DAIA::Response> object. The functions can be exported in groups. 
-To disable exporting of the functions include DAIA like this: 
+By default constructor functions are exported for all objects.
+To disable exporting, include DAIA like this:
 
-  use DAIA qw();      # do not export any functions
-  use DAIA qw(serve); # only export function 'serve'
+  use DAIA qw();       # do not export any functions
+  use DAIA qw(serve);  # only export function 'serve'
+  use DAIA qw(:core);  # only export core functions
 
-By default all functions are exported (group :all) which adds 13 functions 
-to the default namespace! Alternatively you can specify the following groups:
+You can select two groups, both are exported by default:
 
 =over 4
 
 =item C<:core>
 
-Includes the functions C<response> (L<DAIA::Response>),
-C<document> (L<DAIA::Document>), 
-C<item> (L<DAIA::Item>),
-C<available> (L<DAIA::Available>), 
-C<unavailable> (L<DAIA::Unavailable>), and
-C<availability> (L<DAIA::Availability>)
+C<response>, C<document>, C<item>, C<available>, C<unavailable>, 
+C<availability>
 
 =item C<:entities>
 
-Includes the functions C<institution> (L<DAIA::Institution>),
-C<department> (L<DAIA::department>),
-C<storage> (L<DAIA::Storage>), and
-C<limitation> (L<DAIA::Limitation>)
+C<institution>, C<department>, C<storage>, C<limitation>
 
 =back
 
-The functions C<message>, C<error> and C<serve> are also exported by default.
-See L<DAIA::Message> for the parameters of C<message> or C<error>.
+Additional functions are C<message> and C<error> as object constructors,
+and C<serve>. The other functions below are not exported by default.
+You can call them as method or as function, for instance:
+
+  DAIA->parse_xml( $xml );
+  DAIA::parse_xml( $xml );
 
 =cut
 
@@ -239,44 +233,6 @@ sub serve {
     shift->serve( @_ );
 }
 
-=head1 ADDITIONAL FUNCTIONS
-
-The following functions are not exported but you can call both them as 
-function and as method:
-
-  DAIA->parse_xml( $xml );
-  DAIA::parse_xml( $xml );
-
-On request you can export the functions C<guess> and C<parse>.
-
-=head2 parse_xml( $xml )
-
-Parse DAIA/XML from a file or string. The first parameter must be a 
-filename, a string of XML, or a L<IO::Handle> object.
-
-Parsing is more lax then the specification so it silently ignores 
-elements and attributes in foreign namespaces. Returns either a DAIA 
-object or croaks on uncoverable errors.
-
-=cut
-
-sub parse_xml {
-    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
-    DAIA::parse( shift, format => 'xml', @_ );
-}
-
-=head2 parse_json( $json )
-
-Parse DAIA/JSON from a file or string. The first parameter must be a 
-filename, a string of XML, or a L<IO::Handle> object.
-
-=cut
-
-sub parse_json {
-    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );    
-    DAIA::parse( shift, format => 'json' );
-}
-
 =head2 parse ( $from [ %parameters ] )
 
 Parse DAIA/XML or DAIA/JSON from a file or string. You can specify the source
@@ -298,8 +254,7 @@ A scalar starting with C<{> and ending with C<}> is parsed as DAIA/JSON.
 
 =item *
 
-A scalar starting with C<http://> or C<https://> is used to fetch data via HTTP.
-The resulting data is interpreted as DAIA/XML or DAIA/JSON.
+A scalar ending with C<.xml> is is parsed as DAIA/XML file.
 
 =item *
 
@@ -307,7 +262,8 @@ A scalar ending with C<.json> is parsed as DAIA/JSON file.
 
 =item *
 
-A scalar ending with C<.xml> is is parsed as DAIA/XML file.
+A scalar starting with C<http://> or C<https://> is used to fetch data via HTTP.
+The resulting data is interpreted again as DAIA/XML or DAIA/JSON.
 
 =back
 
@@ -424,6 +380,34 @@ sub parse {
     return wantarray ? @objects : $objects[0];
 }
 
+=head2 parse_xml( $xml )
+
+Parse DAIA/XML from a file or string. The first parameter must be a 
+filename, a string of XML, or a L<IO::Handle> object.
+
+Parsing is more lax then the specification so it silently ignores 
+elements and attributes in foreign namespaces. Returns either a DAIA 
+object or croaks on uncoverable errors.
+
+=cut
+
+sub parse_xml {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+    DAIA::parse( shift, format => 'xml', @_ );
+}
+
+=head2 parse_json( $json )
+
+Parse DAIA/JSON from a file or string. The first parameter must be a 
+filename, a string of XML, or a L<IO::Handle> object.
+
+=cut
+
+sub parse_json {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );    
+    DAIA::parse( shift, format => 'json' );
+}
+
 =head2 guess ( $string )
 
 Guess serialization format (DAIA/JSON or DAIA/XML) and return C<json>, C<xml> 
@@ -432,6 +416,7 @@ or the empty string.
 =cut
 
 sub guess {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );    
     my $data = shift;
     return '' unless $data;
     return 'xml' if $data =~ m{^\s*\<.*?\>\s*$}s;
@@ -447,27 +432,70 @@ On request the function can be exported into the default namespace.
 
 =head1 DAIA OBJECTS
 
-All objects (documents, items, availability, status, institutions, departments,
+All objects (documents, items, availability status, institutions, departments,
 limitations, storages, messages, errors) are implemented as subclass of
-L<DAIA::Object>. Therefore, all objects have the following methods:
+L<DAIA::Object>, which is just another Perl meta-class framework.
+All objects have the following methods:
 
-=over 4
-
-=item C<new>
+=head2 item
 
 Constructs a new object.
 
-=item C<add>
+=head2 add
 
 Adds typed properties.
 
-=item C<xml>, C<struct>, C<json>, C<rdfhash>
+=head2 xml, struct, json, rdfhash
 
 Returns several serialization forms.
 
-=item C<serve>
+=head2 serve ( [ [ format => ] $format | [ cgi => $CGI ] ] [ %more_options ] )
 
-Serialize the object and send it to STDOUT with the appropriate HTTP headers.
+Serialize the object and send it to STDOUT (or to another stream) with the 
+appropriate HTTP headers. This method is available for all DAIA objects but
+mostly used to serve a L<DAIA::Response>. The serialized object must already
+be encoded in UTF-8 (but it can contain Unicode strings).
+
+The serialization format can be specified with the first parameter as
+C<format> string (C<json> or C<xml>) or C<cgi> object. If no format is
+given, it is searched for in the L<CGI> query parameters. The default 
+format is C<xml>. Other possible options are:
+
+=over
+
+=item header
+
+Print HTTP headers (default). Use C<header =E<gt> 0> to disable headers.
+
+=head xmlheader
+
+Print the XML header of XML format is used. Enabled by default.
+
+=item xslt
+
+Add a link to the given XSLT stylesheet if XML format is used.
+
+=item pi
+
+Add one or more processing instructions if XML format is used.
+
+=item callback
+
+Add this JavaScript callback function in JSON format. If no callback
+function is specified, it is searched for in the CGI query parameters.
+You can disable callback support by setting C<callback =E<gt> undef>.
+
+=item to
+
+Serialize to a given stream (L<IO::Handle>, GLOB, or string reference)
+instead of STDOUT. You may also want to set C<exitif> if you use
+this option.
+
+=item exitif
+
+By setting this method to a true value you make it to exit the program.
+you provide a method, the method is called and the script exits if only
+if the return value is true.
 
 =back
 
@@ -475,7 +503,7 @@ Serialize the object and send it to STDOUT with the appropriate HTTP headers.
 
 #### internal methods (subject to be changed)
 
-my $NSEXPDAIA = qr/{http:\/\/(ws.gbv.de|purl.org\/ontology)\/daia\/}(.*)/;
+my $NSEXPDAIA    = qr/{http:\/\/(ws.gbv.de|purl.org\/ontology)\/daia\/}(.*)/;
 
 # =head1 daia_xml_roots ( $xml )
 #
@@ -504,7 +532,7 @@ sub daia_xml_roots {
                     $v = [$v] unless UNIVERSAL::isa($v,'ARRAY');
                     if ($out->{$k}) {
                         push @$v, (UNIVERSAL::isa($out->{$k},'ARRAY') ? 
-                                   @{$out->{$k}} : $out->{$k});
+                                @{$out->{$k}} : $out->{$k});
                     }
                     # filter out scalars
                     @$v = grep {ref($_)} @$v unless $k =~ $NSEXPDAIA;
@@ -563,58 +591,44 @@ For FastCGI you need to install L<FCGI> and set the CGI handler to
 L<AddHandler fcgid-script .pl> in C<.htaccess>. Your DAIA server must
 consist of an initialization section and a response loop:
 
-  #!/usr/bin/perl
-  use DAIA;
-  use CGI::Fast;
+    #!/usr/bin/perl
+    use DAIA;
+    use CGI::Fast;
+    
+    # ...initialization section, which is executed only once ...
+    
+    while (my $q = new CGI::Fast) { # response loop
+        my $id = $q->param('id');
 
-  # ...initialization section, which is executed only once ...
+        # ... create response ...
 
-  while (my $q = new CGI::Fast) { # response loop
-      my $id = $q->param('id');
-
-      # ... create response ...
-     
-      $response->serve( cgi => $q, exitif => 0 );
-  }
+        $response->serve( cgi => $q, exitif => 0 );
+    }
 
 The C<serve> methods needs a C<cgi> or C<format> parameter and it is
 been told not to exit the script. It is recommended to check every
 given timespan whether the script has been modified and restart in
 this case:
 
-  #!/usr/bin/perl
-  use DAIA;
-  use CGI::Fast;
+    #!/usr/bin/perl
+    use DAIA;
+    use CGI::Fast;
+    
+    my $started = time;
+    my $thisscript = $0;
+    my $lastmod = (stat($thisscript))[9] # mtime;
+    
+    sub restart {
+        return 0 if time - $started < 10; # check every 10 seconds
+            return 1 if (stat($thisscript))[9] > $lastmod;
+    }
+    
+    while (my $q = new CGI::Fast) { # response loop
 
-  my $started = time;
-  my $thisscript = $0;
-  my $lastmod = (stat($thisscript))[9] # mtime;
+        # ... create response ...
 
-  sub restart {
-      return 0 if time - $started < 10; # check every 10 seconds
-      return 1 if (stat($thisscript))[9] > $lastmod;
-  }
-
-  while (my $q = new CGI::Fast) { # response loop
-
-      # ... create response ...
-
-      $response->serve( $q, exitif => \&restart } );
-  }
-
-
-=head1 SEE ALSO
-
-Please report bugs and feature requests via L<https://rt.cpan.org/Public/Dist/Display.html?Name=DAIA>.
-The classes of this package are implemented using L<DAIA::Object> which is just another
-Perl meta-class framework.
-
-The current developer version of this package together with more DAIA
-implementations in other programming languages is availabe in a project
-at Sourceforge: L<http://sourceforge.net/projects/daia/>. Feel free to
-contribute!
-
-A specification of DAIA can be found at L<http://purl.org/NET/DAIA>.
+        $response->serve( $q, exitif => \&restart } );
+    }
 
 =head1 AUTHOR
 
@@ -627,3 +641,4 @@ Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at
 your option, any later version of Perl 5 you may have available.
+

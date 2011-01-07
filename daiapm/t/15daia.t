@@ -13,6 +13,16 @@ my $json = $d->json;
 is( guess($xml), 'xml', 'guessed DAIA/XML' );
 is( guess($json), 'json', 'guessed DAIA/JSON' );
 
+is( DAIA->guess($xml), 'xml', 'guessed DAIA/XML' );
+
+__END__
+use Data::Dumper;
+
+$d = parse( file => 't/example.json' );
+my $p = Dumper( $d->rdfhash ) . "\n";
+$p =~ s/\t|        /  /gm;
+print $p;
+
 __END__
 
 # This seems not to work:

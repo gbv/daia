@@ -8,7 +8,7 @@ DAIA::Document - Information about a single document
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.27';
+our $VERSION = '0.30';
 use Carp qw(croak);
 
 =head1 PROPERTIES
@@ -47,7 +47,10 @@ our %PROPERTIES = (
     },
     href    => $DAIA::Object::COMMON_PROPERTIES{href},
     message => $DAIA::Object::COMMON_PROPERTIES{message},
-    item    => { type => 'DAIA::Item', repeatable => 1 }
+    item    => { 
+        type     => 'DAIA::Item', repeatable => 1,
+        property => $DAIA::Object::RDFNAMESPACE.'exemplar', # TODO: also allow broader/narrower
+    }
 );
 
 1;

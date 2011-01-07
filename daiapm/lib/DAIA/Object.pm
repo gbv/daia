@@ -31,9 +31,9 @@ at Moose and stop reading now.
 In a nutshell C<DAIA::Object> handles all method calls via AUTOLOAD.
 Each derived package must provide a C<%PROPERTIES> hash that defines
 an object's attributes. Each property is defined by a hash that must
-either contain a C<type> value pointing to a class name (typed property)
-or a C<filter> value containing a plain value ar a filter method (untyped
-property).
+either contain a C<type> value pointing to a class name (typed property),
+or a C<filter> value containing a plain value, or a filter method 
+(untyped property).
 
 =head1 METHDOS
 
@@ -227,69 +227,77 @@ The current version does not implement this method yet!
 sub rdfhash {
      my $self = shift;
 
-#     my $data = $self->struct;
-#     my $hashref;
+     my $class = ref($self); 
 
-     my $id = $self->{id} ? $self->{id} : "_:".refaddr($self);
-
-     my $type = ref($self); 
+     my $type = $class;
      $type =~ s/^DAIA:://;
-     $type = "http://purl.org/ontology/daia/$type";
 
-     return { $id => {
-         'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => [ {
-             type => 'uri', value => $type
-         } ]
-     } };
+     # DAIA::Message and DAIA::Error are not RDF resources
+     return { } if $type eq 'Message' or $type eq 'Error';
+
+     # TODO: what about DAIA::Response, which is an RDF graph?
+
+     my $hashref = { };
+
+     my $id = $self->rdfuri;
+
+#     my $data = $self->struct;
+
+# DAIA::Availability (and subclasses) is always a blank node.
+# In fact it is a daia:Service.
+
+# DAIA::Response has no type, but it may be the graph URI (?)
+
+     $hashref->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [ {
+         type => 'uri', value => $DAIA::Object::RDFNAMESPACE.$type
+     } ];
+
+     no strict 'refs'; ##no critic
+     my $PROPERTIES = \%{$class."::PROPERTIES"};
+
+     foreach my $prop (keys %$self) {
+        next if $prop eq 'id';
+        next if $prop eq 'version'; # TODO: catch this by $PROP->{predicate}
+
+        # print "$class P: $prop\n";
+        my $PROP = $PROPERTIES->{$prop} or next;
+        my $predicate = $PROP->{predicate} || "unknown:$prop"; # TODO
+        my $object = $self->{$prop};
+
+        if (ref $self->{$prop} eq 'ARRAY') {
+             # TODO: must be array of object, could also be something else!
+             $hashref->{$predicate} = [ map { $_->rdfhash } @{$object} ];
+        } elsif ( UNIVERSAL::isa( $object, "DAIA::Object" ) ) {
+             $hashref->{$predicate} = [ $object->rdfhash ];
+        } elsif ( UNIVERSAL::isa( $object, 'JSON::Boolean' ) ) {
+             $hashref->{$predicate} = [ {
+                 type => 'literal',
+                 value => ($object ? 'true' : 'false'),
+                 datatype => 'http://www.w3c.org/2001/XMLSchema#boolean'
+             } ];
+        } elsif( $prop eq 'label' and $self->{$prop} eq '' ) {
+            # ignore empty string label
+            # TODO: Test this. Also ignore empty 'content' ?
+        } else {
+             my $object =  { value => "$object", type => 'literal' };
+             my $rdftype = $PROP->{rdftype} || '';
+             if ( $rdftype eq 'resource' ) {
+                 $object->{type} = $rdftype;
+                 # TODO: datatype/language
+             } elsif ( $rdftype ne 'literal' ) {
+                 $object->{datatype} = $rdftype;
+             }
+             $hashref->{$predicate} = [ $object ];
+        }
+    }
+    
+    return { $id => $hashref }
 }
 
-=head2 serve ( [ [ format => ] $format | [ cgi => $CGI ] ] [ %more_options ] )
+=head2 serve
 
-Serialize the object and send it to STDOUT or a another stream with the 
-appropriate HTTP headers. This method is available for all DAIA objects but
-mostly used to serve a L<DAIA::Response>. The serialized object must already
-be encoded in UTF-8 (but it can contain Unicode strings).
-
-The serialization format can be specified with the first parameter as
-C<format> string (C<json> or C<xml>) or C<cgi> object. If no format is
-given, it is searched for in the L<CGI> query parameters. The default 
-format is C<xml>. Other possible options are:
-
-=over
-
-=item header
-
-Print HTTP headers (default). Use C<header =E<gt> 0> to disable headers.
-
-=head xmlheader
-
-Print the XML header of XML format is used. Enabled by default.
-
-=item xslt
-
-Add a link to the given XSLT stylesheet if XML format is used.
-
-=item pi
-
-Add one or more processing instructions if XML format is used.
-
-=item callback
-
-Add this JavaScript callback function in JSON format. If no callback
-function is specified, it is searched for in the CGI query parameters.
-You can disable callback support by setting C<callback =E<gt> undef>.
-
-=item to
-
-Serialize to a given stream (L<IO::Handle>, GLOB, or string reference)
-instead of STDOUT. You may also want to set C<exitif> if you use
-this option.
-
-=item exitif
-
-By setting this method to a true value you make it to exit the program.
-you provide a method, the method is called and the script exits if only
-if the return value is true.
+Serialize the object and send it to STDOUT with the appropriate HTTP headers.
+See L<DAIA/"DAIA OBJECTS"> for details.
 
 =cut
 
@@ -340,6 +348,18 @@ sub serve {
 
     $attr{'exitif'} = $attr{'exitif'}() if ref($attr{'exitif'}) eq 'CODE';
     exit if $attr{'exitif'};
+}
+
+=head2 rdfuri
+
+Returns the URI of this object, which is either an URI (the C<id> property),
+or a blank node identifier, that starts with "C<_:>".
+
+=cut
+
+sub rdfuri {
+     my $self = shift;
+     return $self->{id} ? $self->{id} : "_:".refaddr($self);
 }
 
 =head1 INTERNAL METHODS
@@ -586,6 +606,8 @@ sub _enable_utf8_layer {
 
 
 # some constants
+our $RDFNAMESPACE = 'http://purl.org/ontology/daia/';
+
 our %COMMON_PROPERTIES =( 
     id => {
         filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_uri($v) ? $v : undef; }
@@ -594,7 +616,9 @@ our %COMMON_PROPERTIES =(
 #        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; }
 #    },
     href => { 
-        filter => sub { my $v = "$_[0]"; is_web_uri($v) ? $v : undef; }
+        filter => sub { my $v = "$_[0]"; is_web_uri($v) ? $v : undef; },
+        predicate => 'http://xmlns.com/foaf/0.1/page',
+        rdftype => 'resource'
     },
     message => { 
         type => 'DAIA::Message',
