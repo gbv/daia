@@ -7,6 +7,7 @@
 
     Recent changes:
 
+      2011-01-26: link ids if they are URLs
       2010-11-30: fixed msg display in documents and added grouping
       2010-04-26: refactored
       2008-11-06: adopted schema version 0.4
@@ -504,6 +505,9 @@
   <!-- Show @id attribute or '?!' for missing id  -->
   <xsl:template name="id">
     <xsl:choose>
+      <xsl:when test="substring-before(@id,':') = 'http'">
+        <a href="{@id}"><xsl:value-of select="@id"/></a>
+      </xsl:when>
       <!-- minimal URI check -->
       <xsl:when test="substring-before(@id,':')">
         <xsl:value-of select="@id"/>
