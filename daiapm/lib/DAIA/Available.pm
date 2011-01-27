@@ -15,7 +15,7 @@ a C<DAIA::Unavailable> object is always C<1>.
 
 use strict;
 use base 'DAIA::Availability';
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 PROPERTIES
 
@@ -49,7 +49,8 @@ our %PROPERTIES = (
         filter => sub {
             return 'unknown' if lc("$_[0]") eq 'unknown';
             return DAIA::Availability::normalize_duration( $_[0] );
-        }
+        },
+        predicate => $DAIA::Object::RDFNAMESPACE.'delay',
     }
 );
 

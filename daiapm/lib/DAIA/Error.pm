@@ -50,11 +50,19 @@ An integer value error code. The default value is zero.
 
 our %PROPERTIES = (
     %DAIA::Message::PROPERTIES,
+    content => { 
+        default => '', 
+        filter => sub { "$_[0]" },  # stringify everything
+        predicate => 'http://purl.org/dc/terms/description',
+        rdflang => 'lang'
+    },
     errno => { 
         default => 0,
         filter => sub { 
             $_[0] =~ m/^-?\d+$/ ? $_[0] : 0  
-        } 
+        }, 
+        rdftype => 'http://www.w3c.org/2001/XMLSchema#integer',
+        predicate => 'http://purl.org/dc/terms/identifier'
     },
 );
 
@@ -84,6 +92,21 @@ sub _buildargs {
 
     return (%args);
 }
+
+=head1
+sub rdfhash {
+    my $self = shift;
+    my $rdf = { 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => [ {
+        'value' => $DAIA::Object::RDFNAMESPACE.'Error', 'type' => 'uri' }
+    ], 'dct:identifier' => [ {
+         value => $self->errno, type => 'literal'
+    ] } };
+    'dct:description'
+    
+
+    return { $self->rdfuri => $rdf };
+}
+=cut
 
 1;
 

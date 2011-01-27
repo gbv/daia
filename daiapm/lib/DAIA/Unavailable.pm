@@ -16,7 +16,7 @@ C<DAIA::Unavailable> object is always C<0>.
 
 use strict;
 use base 'DAIA::Availability';
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use DateTime;
 
@@ -71,7 +71,9 @@ our %PROPERTIES = (
                 $exp = $now->add_duration( $span );
             }
             return DAIA::Availability::date_or_datetime( $exp );
-        }
+        },
+        predicate => $DAIA::Object::RDFNAMESPACE.'expected',
+#        rdftype => 'http://www.w3c.org/2001/XMLSchema#date',
     },
 );
 

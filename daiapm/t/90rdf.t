@@ -25,30 +25,50 @@ sub literal {
     return \%o;
 }
 
+sub pdump { eval {
+    use Data::Dumper;
+    my $s = Dumper(shift);
+    $s =~ s/    / /g;
+    print $s."\n";
+} }
+
+#my $error = error();
+#my $a = unavailable(expected=>'2010-02-13');
+#pdump($a->rdfhash);
+
 # Item, with URI
 my $item = item( id => 'my:id' );
-is_deeply( $item->rdfhash, { 
-  'my:id' => {  iri('rdfs:type') => [ irihash('daia:Item') ] } } 
-);
+my $item_rdf = { 'my:id' => {  iri('rdfs:type') => [ irihash('daia:Item') ] } }; 
+is_deeply( $item->rdfhash, $item_rdf, 'empty item as rdf' );
 
 # Storage, without URI
-my $s = storage('foo');
-my $rdf = $s->rdfhash;
+my $storage = storage('foo');
+my $rdf = $storage->rdfhash;
 my $blank;
 is( scalar keys %$rdf, 1 );
 ($blank,$rdf) = each(%$rdf);
 like( $blank, qr/^_:storage\d+$/ );
 
-is_deeply( $rdf, { 
+my $storage_rdf = { 
    iri('rdfs:type') => [ irihash('daia:Storage') ],
    iri('dct:title') => [ literal("foo") ], 
-});
+};
+is_deeply( $rdf, $storage_rdf, 'storage as rdf' );
 
-# use Data::Dumper;
-#print Dumper($rdf);
+# institution and department should work like storage
+# TODO: limitation should be different with extended limitations
 
+$item->add( $storage );
+
+my ($k,$v) = each(%$storage_rdf);
+$item_rdf->{$blank} = $storage_rdf;
+$item_rdf->{"my:id"}->{"unknown:storage"} = [ irihash($blank) ];
+
+is_deeply( $item->rdfhash, $item_rdf, 'deep item as rdf' );
+
+__END__
+use Data::Dumper;
 my $d = DAIA::parse( "t/example.json" );
 isa_ok( $d, 'DAIA::Response' );
 #is( $d->institution->content, "贛語" );
-#print Dumper($d->rdfhash);
 

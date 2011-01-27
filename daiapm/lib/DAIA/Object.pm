@@ -214,48 +214,70 @@ sub json {
     }
 }
 
-=head3 rdfhash
+=head3 rdfhash ( [ nested => 1 ] )
 
 Returns the object as hashref representing an RDF structure. This hashref 
-structure is compatible with RDF/JSON and with the ARC2 library for PHP.
+structure is compatible with RDF/JSON and with the ARC2 library for PHP
 You can directly pass it the method C<add_hashref> of L<RDF::Trine::Model>.
+With C<< nested => 1 >> you get a nested structure that can better be
+used for analysing.
 
-The current version does not implement this method yet!
+The current version does not fully implement this method yet!
 
 =cut
 
+sub _rdfnode {
+    my $iri = shift;
+    return { value => $iri, type => ($iri =~ /^_:/) ? 'bnode' : 'uri' };
+}
+
 sub rdfhash {
-     my $self = shift;
+    my ($self,%opt) = shift;
+    my $flat = !$opt{nested};
 
-     my $class = ref($self); 
+    my $class = ref($self); 
+    my $type = $class;
+    $type =~ s/^DAIA:://;
 
-     my $type = $class;
-     $type =~ s/^DAIA:://;
+    # DAIA::Message and DAIA::Error are not RDF resources
+    return { } if $type eq 'Message';# or $type eq 'Error';
 
-     # DAIA::Message and DAIA::Error are not RDF resources
-     return { } if $type eq 'Message' or $type eq 'Error';
+    # TODO: what about DAIA::Response, which is an RDF graph?
 
-     # TODO: what about DAIA::Response, which is an RDF graph?
+    my $mydata = { };
+    my $model  = { };
 
-     my $hashref = { };
+    my $obj_filter = sub {
+        my $o = shift;
+        return $o->rdfhash unless $flat;
 
-     my $id = $self->rdfuri;
+        # merge triples into model
+        my $m = $o->rdfhash;
+        foreach my $s ( keys %$m ) {
+            $model->{$s} = { } unless $model->{$s};
+            foreach my $p ( keys %{ $m->{$s} } ) {
+                $model->{$s}->{$p} = [ ] unless $model->{$s}->{$p};
+                # actually we may get duplicate triples, but who cares...
+                push @{ $model->{$s}->{$p} }, @{ $m->{$s}->{$p} };
+            }
+        }
+        
+        return { type => 'uri', value => $o->rdfuri };
+    };
 
-#     my $data = $self->struct;
+    # DAIA::Availability (and subclasses) is always a blank node.
+    # In fact it is a daia:Service.
 
-# DAIA::Availability (and subclasses) is always a blank node.
-# In fact it is a daia:Service.
+    # DAIA::Response has no type, but it may be the graph URI (?)
 
-# DAIA::Response has no type, but it may be the graph URI (?)
-
-     $hashref->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [ {
+    $mydata->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [ {
          type => 'uri', value => $DAIA::Object::RDFNAMESPACE.$type
-     } ];
+    } ];
 
-     no strict 'refs'; ##no critic
-     my $PROPERTIES = \%{$class."::PROPERTIES"};
+    no strict 'refs'; ##no critic
+    my $PROPERTIES = \%{$class."::PROPERTIES"};
 
-     foreach my $prop (keys %$self) {
+    foreach my $prop (keys %$self) {
         next if $prop eq 'id';
         next if $prop eq 'version'; # TODO: catch this by $PROP->{predicate}
 
@@ -265,16 +287,20 @@ sub rdfhash {
         my $object = $self->{$prop};
 
         if (ref $self->{$prop} eq 'ARRAY') {
-             # TODO: must be array of object, could also be something else!
-             $hashref->{$predicate} = [ map { $_->rdfhash } @{$object} ];
+             # TODO: must be array of object, could also be array of something else (?)
+             $mydata->{$predicate} = [ 
+                 map { $obj_filter->($_) } @{$object} 
+             ];
         } elsif ( UNIVERSAL::isa( $object, "DAIA::Object" ) ) {
-             $hashref->{$predicate} = [ $object->rdfhash ];
+             $mydata->{$predicate} = [ $obj_filter->($object) ];
         } elsif ( UNIVERSAL::isa( $object, 'JSON::Boolean' ) ) {
-             $hashref->{$predicate} = [ {
+             $mydata->{$predicate} = [ {
                  type => 'literal',
                  value => ($object ? 'true' : 'false'),
                  datatype => 'http://www.w3c.org/2001/XMLSchema#boolean'
              } ];
+        } elsif( $prop eq 'lang' ) {
+            # ignore
         } elsif( $prop eq 'label' and $self->{$prop} eq '' ) {
             # ignore empty string label
             # TODO: Test this. Also ignore empty 'content' ?
@@ -282,16 +308,22 @@ sub rdfhash {
              my $object =  { value => "$object", type => 'literal' };
              my $rdftype = $PROP->{rdftype} || '';
              if ( $rdftype eq 'resource' ) {
-                 $object->{type} = $rdftype;
+                 $object->{type} = 'uri';
                  # TODO: datatype/language
-             } elsif ( $rdftype ne 'literal' ) {
-                 $object->{datatype} = $rdftype if $rdftype;
-             }
-             $hashref->{$predicate} = [ $object ];
+             } #elsif ( $rdftype eq 'literal' ) {
+                 if ($rdftype and $rdftype ne 'literal') {
+                     $object->{datatype} = $rdftype;
+                 } elsif ($PROP->{rdflang}) {
+                     $object->{language} = $self->{lang} if $self->{lang};
+                 }
+             #}
+             $mydata->{$predicate} = [ $object ];
         }
     }
     
-    return { $id => $hashref }
+    $model->{ $self->rdfuri } = $mydata;
+
+    return $model;
 }
 
 =head2 serve
@@ -630,7 +662,8 @@ our %COMMON_PROPERTIES =(
     },
     error => {
         type => 'DAIA::Error',
-        repeatable => 1
+        repeatable => 1,
+        predicate => $DAIA::Object::RDFNAMESPACE.'hasError'
     }
 );
 

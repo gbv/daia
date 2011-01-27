@@ -109,6 +109,7 @@ our %PROPERTIES = (
     limitation => {
         type => 'DAIA::Limitation',
         repeatable => 1,
+        property => $DAIA::Object::RDFNAMESPACE.'limitedBy'
     }
 );
 

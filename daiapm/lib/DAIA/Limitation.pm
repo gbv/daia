@@ -8,7 +8,7 @@ DAIA::Limitation - Information about specific limitations of availability
 
 use strict;
 use base 'DAIA::Entity';
-our $VERSION = '0.27';
+our $VERSION = '0.30';
 our %PROPERTIES = %DAIA::Entity::PROPERTIES;
 
 1;
