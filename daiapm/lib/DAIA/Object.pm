@@ -285,7 +285,7 @@ sub rdfhash {
                  $object->{type} = $rdftype;
                  # TODO: datatype/language
              } elsif ( $rdftype ne 'literal' ) {
-                 $object->{datatype} = $rdftype;
+                 $object->{datatype} = $rdftype if $rdftype;
              }
              $hashref->{$predicate} = [ $object ];
         }
@@ -359,7 +359,10 @@ or a blank node identifier, that starts with "C<_:>".
 
 sub rdfuri {
      my $self = shift;
-     return $self->{id} ? $self->{id} : "_:".refaddr($self);
+     return $self->{id} if $self->{id};
+     my $id = lc(ref($self)).refaddr($self);
+     $id =~ s/.*::/_:/;
+     return $id;
 }
 
 =head1 INTERNAL METHODS
