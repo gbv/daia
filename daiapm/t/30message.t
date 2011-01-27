@@ -10,10 +10,7 @@ isa_ok( $msg, 'DAIA::Message' );
 
 my $content = "Hallo!";
 my $lang = "de";
-my $errno = -1;
 
-
-### without error code or errno = undef
 my $m1 = DAIA::Message->new( content => $content, lang => $lang );
 is_deeply( $m1->struct, { content => $content, lang => $lang } );
 
@@ -35,31 +32,10 @@ $msg->lang( $lang );
 is_deeply( $msg, $m1 );
 
 
-### with error code
-my $m2 = DAIA::Message->new( content => $content, lang => $lang, errno => $errno );
-
-$msg = message( $lang => $content, errno => $errno );
-is_deeply( $msg, $m2 );
-
-$msg = message();
-$msg->content( $content );
-$msg->lang( $lang );
-is_deeply( $msg, $m1 );
-
-$msg->errno( -1  );
-is_deeply( $msg, $m2 );
-
-$msg->errno( undef ); # remove
-is_deeply( $msg, $m1 );
-
-$msg = message( $lang => $content, $errno );
-is_deeply( $msg, $m2 );
-
-is( $m2->content, $content );
-is( $m2->lang, $lang );
-is( $m2->errno, $errno );
-
 ### change the default language
+
+$m1 = DAIA::Message->new( content => $content, lang => 'fr' );
+my $m2 = DAIA::Message->new( $m1 );
 
 is( $DAIA::Message::DEFAULT_LANG, 'en' );
 
@@ -68,7 +44,7 @@ $msg = message( $content );
 is_deeply( $msg, $m1 );
 
 $m2->lang('en');
-$msg = message( $content, errno => $errno );
+$msg = message( $content );
 is_deeply( $msg, $m2 );
 
 $DAIA::Message::DEFAULT_LANG = 'de';
@@ -76,27 +52,6 @@ $m1->lang('de');
 $msg = message( $content );
 is_deeply( $msg, $m1 );
 
-
-#### explicit errors
-
-@constructors = (
-  error(),  message( errno => 0 ),
-  error(7), message( errno => 7 ),
-  error(2, 'foo' ), message( 'foo', errno => 2 ),
-  error(2, 'es' => 'foo' ), message( 'es' => 'foo', errno => 2 ),
-  error(3, 'foo', lang => 'fr' ), message( 'fr' => 'foo', errno => 3 ),
-);
-while (@constructors) {
-    my $e = shift @constructors;
-    my $m = shift @constructors;
-    is_deeply( $e, $m, 'error' );
-}
-
-# TODO
-# my $item = item();
-# $item->addError( 9, 'bla' );
-# my @msgs = $item->message;
-# is_deeply( \@msgs, [error(9,'bla')], 'addError' );
 
 #### message accessors
 
@@ -167,11 +122,3 @@ foreach my $h ( @holders ) {
 eval { message( lang => '123', content => 'hello' ); };
 ok( $@, 'invalid language tag' );
 
-# errno
-$msg = message( 'hej', errno => 7 );
-is( $msg->errno, 7, 'errno' );
-eval { $msg->errno( 'x' ); };
-ok( $@, 'invalid errno' );
-
-$msg->errno( undef );
-is_deeply( $msg->struct, { content => 'hej', lang => 'de' } );

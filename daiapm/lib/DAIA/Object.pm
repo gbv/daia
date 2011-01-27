@@ -471,8 +471,9 @@ sub AUTOLOAD {
 
     } else { 
         # set an untyped value (never repeatable, stringified unless filtered)
-
-        if( $opt->{filter} ) {
+        if( $opt->{fixed} ) {
+            $value = $opt->{fixed};
+        } elsif( $opt->{filter} ) {
             $value = $opt->{filter}( @_ );
             croak "$class->$property did not pass value constraint: " . join(',',@_)
                 unless defined $value;
@@ -624,6 +625,10 @@ our %COMMON_PROPERTIES =(
         type => 'DAIA::Message',
         repeatable => 1
     },
+    error => {
+        type => 'DAIA::Error',
+        repeatable => 1
+    }
 );
 
 1;

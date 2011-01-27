@@ -7,7 +7,7 @@ DAIA - Document Availability Information API
 =cut
 
 use strict;
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 DESCRIPTION
 
@@ -158,6 +158,7 @@ use DAIA::Availability;
 use DAIA::Available;
 use DAIA::Unavailable;
 use DAIA::Message;
+use DAIA::Error;
 use DAIA::Entity;
 use DAIA::Institution;
 use DAIA::Department;
@@ -213,8 +214,9 @@ sub limitation   { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::L
 
 sub error { 
     local $Carp::CarpLevel = $Carp::CarpLevel + 1; 
-    my $errno = @_ ? shift : 0;
-    return DAIA::Message->new( @_ ? (@_, errno => $errno) : (errno => $errno) );
+    #my $errno = @_ ? shift : 0;
+    #return DAIA::Message->new( @_ ? (@_, errno => $errno) : (errno => $errno) );
+    return DAIA::Error->new( @_ );
 }
 
 =head2 serve( [ [ format => ] $format ] [ %options ] )

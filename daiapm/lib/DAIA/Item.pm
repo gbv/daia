@@ -65,6 +65,7 @@ our %PROPERTIES = (
     id          => $DAIA::Object::COMMON_PROPERTIES{id},
     href        => $DAIA::Object::COMMON_PROPERTIES{href},
     message     => $DAIA::Object::COMMON_PROPERTIES{message},
+    error       => $DAIA::Object::COMMON_PROPERTIES{error},
     fragment    => { # xs:boolean
         filter => sub {
             return unless defined $_[0];

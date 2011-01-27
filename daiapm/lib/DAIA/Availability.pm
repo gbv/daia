@@ -105,6 +105,7 @@ our %PROPERTIES = (
     },
     href    => $DAIA::Object::COMMON_PROPERTIES{href},
     message => $DAIA::Object::COMMON_PROPERTIES{message},
+    error   => $DAIA::Object::COMMON_PROPERTIES{error},
     limitation => {
         type => 'DAIA::Limitation',
         repeatable => 1,

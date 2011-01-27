@@ -70,6 +70,7 @@ our %PROPERTIES = (
         rdftype   => 'http://www.w3c.org/2001/XMLSchema#dateTime'
     },
     message => $DAIA::Object::COMMON_PROPERTIES{message},
+    error   => $DAIA::Object::COMMON_PROPERTIES{error},
     institution => { 
         type => 'DAIA::Institution',
     },

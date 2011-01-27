@@ -12,9 +12,8 @@ Bugfix
 Additional functionality
 * add inferencing (same id = same object policy)
 * add support of logging with Log4Perl
-* implement DAIA::Error as object so you can also use
-** ->error, ->addError, ->provideError
 * add 'limited' property to a response (or just open world assumption?)
+* ->provideXXX(...)?
 
 Additional methods
 * validating as method (move code from daia.pl)
