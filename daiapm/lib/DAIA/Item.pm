@@ -78,7 +78,8 @@ our %PROPERTIES = (
         filter => sub { # label can be specified as array or as element
             my $v = (ref($_[0]) eq 'ARRAY') ? $_[0]->[0] : $_[0]; 
             return "$v";
-        }
+        },
+        predicate => $DAIA::Object::RDFNAMESPACE.'label'
     },
     department  => { type => 'DAIA::Department' },
     storage     => { type => 'DAIA::Storage' },

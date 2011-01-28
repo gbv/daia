@@ -104,6 +104,13 @@ sub _buildargs {
     return @_;
 }
 
+sub rdfhash {
+    my $self = shift;
+    my $rdf = { type => 'literal', value => $self->{content} };
+    $rdf->{language} = $self->{lang} if $self->{lang};
+    return $rdf;
+}
+
 =head1 FUNCTIONS
 
 =head2 is_language_tag ( $tag )

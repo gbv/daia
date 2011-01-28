@@ -49,8 +49,8 @@ our %PROPERTIES = (
     message => $DAIA::Object::COMMON_PROPERTIES{message},
     error   => $DAIA::Object::COMMON_PROPERTIES{error},
     item    => { 
-        type     => 'DAIA::Item', repeatable => 1,
-        property => $DAIA::Object::RDFNAMESPACE.'exemplar', # TODO: also allow broader/narrower
+        type      => 'DAIA::Item', repeatable => 1,
+        predicate => $DAIA::Object::RDFNAMESPACE.'exemplar', # TODO: also allow broader/narrower
     }
 );
 

@@ -232,8 +232,8 @@ sub _rdfnode {
 }
 
 sub rdfhash {
-    my ($self,%opt) = shift;
-    my $flat = !$opt{nested};
+    my ($self,%opt) = @_;
+    my $flat = not delete $opt{nested};
 
     my $class = ref($self); 
     my $type = $class;
@@ -242,17 +242,36 @@ sub rdfhash {
     # DAIA::Message and DAIA::Error are not RDF resources
     return { } if $type eq 'Message';# or $type eq 'Error';
 
-    # TODO: what about DAIA::Response, which is an RDF graph?
-
     my $mydata = { };
     my $model  = { };
 
+    # some entailment
+    my %know;
+    if ( $type eq 'Response' ) {
+        $know{institution} = $self->institution->rdfuri
+            if $self->institution;
+#print "KNOW: ".%know."\n";
+    } elsif ( $type eq 'Document' ) {
+#print "KNOW: ".%know."\n";
+        %know = %opt; # cascade
+    } elsif ( $type eq 'Item' ) {
+        %know = %opt; # cascade
+    } elsif ( $type eq 'Department' ) {
+        if ( $opt{institution} ) {
+            $mydata->{ 'http://purl.org/dc/terms/isPartOf' } = [ { 
+                type => 'uri', value => $opt{institution}
+            } ];
+        }
+    } 
+    # TODO: what about DAIA::Response, which is an RDF graph?
+
+
     my $obj_filter = sub {
         my $o = shift;
-        return $o->rdfhash unless $flat;
+        my $m = $o->rdfhash( @_ );
+        return $m if not $flat or $m->{type};
 
         # merge triples into model
-        my $m = $o->rdfhash;
         foreach my $s ( keys %$m ) {
             $model->{$s} = { } unless $model->{$s};
             foreach my $p ( keys %{ $m->{$s} } ) {
@@ -289,10 +308,10 @@ sub rdfhash {
         if (ref $self->{$prop} eq 'ARRAY') {
              # TODO: must be array of object, could also be array of something else (?)
              $mydata->{$predicate} = [ 
-                 map { $obj_filter->($_) } @{$object} 
+                 map { $obj_filter->($_, %know) } @{$object} 
              ];
         } elsif ( UNIVERSAL::isa( $object, "DAIA::Object" ) ) {
-             $mydata->{$predicate} = [ $obj_filter->($object) ];
+             $mydata->{$predicate} = [ $obj_filter->($object, %know) ];
         } elsif ( UNIVERSAL::isa( $object, 'JSON::Boolean' ) ) {
              $mydata->{$predicate} = [ {
                  type => 'literal',
@@ -321,6 +340,8 @@ sub rdfhash {
         }
     }
     
+    # TODO: entail
+
     $model->{ $self->rdfuri } = $mydata;
 
     return $model;
@@ -658,7 +679,8 @@ our %COMMON_PROPERTIES =(
     },
     message => { 
         type => 'DAIA::Message',
-        repeatable => 1
+        repeatable => 1,
+        predicate => 'http://purl.org/dc/terms/description',
     },
     error => {
         type => 'DAIA::Error',

@@ -59,7 +59,8 @@ probably won't be available in the future.
 our %PROPERTIES = (
     %DAIA::Availability::PROPERTIES,
     queue => { 
-        filter => sub { return $_[0] =~ /^[0-9]+$/ ? $_[0] : undef }
+        filter => sub { return $_[0] =~ /^[0-9]+$/ ? $_[0] : undef },
+        predicate => $DAIA::Object::RDFNAMESPACE.'queue'
     },
     expected => { 
         filter => sub { # TODO: move this to function in DAIA::Availability (?)

@@ -14,6 +14,8 @@ Additional functionality
 * add support of logging with Log4Perl
 * add 'limited' property to a response (or just open world assumption?)
 * ->provideXXX(...)?
+* extenden limitation with from, until, embargo 
+  (see http://scholar.google.com/intl/en/scholar/institutional_holdings.xml)
 
 Additional methods
 * validating as method (move code from daia.pl)

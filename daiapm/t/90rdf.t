@@ -66,6 +66,16 @@ $item_rdf->{"my:id"}->{"unknown:storage"} = [ irihash($blank) ];
 
 is_deeply( $item->rdfhash, $item_rdf, 'deep item as rdf' );
 
+my $response = response();
+my $doc = document( id => 'my:doc1' );
+$item = item( id => 'my:id' );
+$item->addMessage( en => 'Hi!' );
+$item->department( 'dep' );
+$doc->addItem( $item );
+$response->addDocument( $doc );
+$response->institution( 'foo' );
+#pdump( $response->rdfhash );
+
 __END__
 use Data::Dumper;
 my $d = DAIA::parse( "t/example.json" );

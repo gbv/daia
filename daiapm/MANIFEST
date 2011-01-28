@@ -8,6 +8,7 @@ lib/DAIA/Institution.pm
 lib/DAIA/Item.pm
 lib/DAIA/Limitation.pm
 lib/DAIA/Message.pm
+lib/DAIA/Error.pm
 lib/DAIA/Object.pm
 lib/DAIA/Response.pm
 lib/DAIA/Storage.pm
@@ -17,6 +18,7 @@ t/10object.t
 t/15daia.t
 t/20entities.t
 t/30message.t
+t/35error.t
 t/40availability.t
 t/45datetime.t
 t/50item.t
@@ -24,6 +26,7 @@ t/60document.t
 t/70response.t
 t/80xml.t
 t/85json.t
+t/90rdf.t
 t/example.json
 t/example.xml
 t/example2.xml
