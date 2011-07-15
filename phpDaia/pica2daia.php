@@ -214,7 +214,7 @@ class DAIA_PICA extends DAIA {
                 		//else {
                 			$label = substr($field, 1);
                 		}
-                		$item->setLabel($label);
+                		$item->setLabel(urldecode($label));
                 	}
                 	// d contains encoded general availabilty
                 	if (substr($field, 0, 1) === 'd') {
@@ -416,8 +416,11 @@ class DAIA_PICA extends DAIA {
                   	$item->setAvailability('interloan', false);
                     $item->getAvailability('interloan')->setExpected('unknown');
                 }
-                $href = $this->reservationUrl . $item->id;
-                $item->href = $href;
+                // only show reservation link if reservation is active
+                if ($this->reservationUrl) {
+                    $href = $this->reservationUrl . $item->id;
+                    $item->href = $href;
+                }
                 break;
             case 'nur Lesesaalnutzung': 
                 $item->setAvailability('presentation', true);
