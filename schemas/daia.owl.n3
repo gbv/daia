@@ -3,19 +3,19 @@
 #################################################################
 
 @prefix : <http://purl.org/ontology/daia/> .
-@prefix service: <http://purl.org/ontology/daia/Service/> .
+@prefix service: <http://purl.org/ontology/daia/service/> .
 
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix bibo: <http://purl.org/ontology/bibo/> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix frbr: <http://purl.org/vocab/frbr/core#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
 @prefix ns: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
 @prefix skos: <http://www.w3.org/2008/05/skos#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix cld: <http://purl.org/cld/terms/> .
 
 @base <http://purl.org/ontology/daia/> .
 
@@ -26,37 +26,11 @@
 <http://purl.org/ontology/daia/> a owl:Ontology ;
     dct:title "Document Availability Information Ontology (DAIA)" ;
     dct:description """The Document Availability Information Ontology (DAIA) describes the current availability of documents in libraries and similar institutions. Availability can be expressed in terms of specific services."""@en ;
-    owl:versionInfo "Beta version 2010-05-06" .
+    owl:versionInfo "Beta version 2011-10-19" .
 
 #################################################################
 # DAIA Classes
 #################################################################
-
-###  http://purl.org/ontology/daia/Department
-
-:Department a owl:Class ;
-    rdfs:label "Department"@en ;
-    rdfs:subClassOf :Institution ;
-    rdfs:comment "A Department is a subdivision of an Institution."@en ;
-    skos:scopeNote "A name or title can be expressed with dct:title."@en ;
-    skos:scopeNote "A link to a page with more information can be added with foaf:page."@en ;
-    rdfs:seeAlso dct:title ;
-    rdfs:seeAlso foaf:page ;
-    ns:moreinfo "Maybe there should be another property to express a link to a specific item at a specific department. This class may also be defined more specific as aiiso:Department."@en .
-
-###  http://purl.org/ontology/daia/Document
-
-:Document a owl:Class ;
-    rdfs:label "Document"@en ;
-    owl:equivalentClass bibo:Document ;
-    owl:equivalentClass foaf:Document ;
-    rdfs:comment "A Document"@en ;
-    skos:scopeNote "Messages can be added with dct:description."@en ;
-    skos:scopeNote "A name or title can be expressed with dct:title"@en ;
-    skos:scopeNote "A link to a document about the document can be added with foaf:page."@en ;
-    rdfs:seeAlso dct:title ;
-    rdfs:seeAlso dct:description ;
-    rdfs:seeAlso foaf:page .
 
 ###  http://purl.org/ontology/daia/Error
 
@@ -67,25 +41,6 @@
     rdfs:seeAlso dct:identifier ;
     rdfs:seeAlso dct:description .
 
-###  http://purl.org/ontology/daia/Institution
-
-:Institution a owl:Class ;
-    rdfs:label "Institution"@en ;
-    owl:equivalentClass foaf:Organization ;
-    rdfs:comment "An Institution can be any kind of organization such as a library or a company."@en ;
-    skos:scopeNote "A name or title can be expressed with dct:title"@en ;
-    skos:scopeNote "A link to a page with more information can be added with foaf:page."@en ;
-    rdfs:seeAlso dct:title ;
-    rdfs:seeAlso foaf:page .
-
-###  http://purl.org/ontology/daia/Item
-
-:Item a owl:Class ;
-    rdfs:label "Item"@en ;
-    owl:equivalentClass frbr:Item ;
-    rdfs:comment "An Item is a single instance of a Document. Availability information is directly connected to single items."@en ;
-    skos:scopeNote "Messages can be added with dct:description."@en ;
-    rdfs:seeAlso dct:description .
 
 ###  http://purl.org/ontology/daia/Limitation
 
@@ -93,9 +48,9 @@
     rdfs:label "Limitation"@en ;
     rdfs:comment "A Limitation is something that limits the the availability of an Item."@en ;
     skos:scopeNote "A description of the limitation can be added with dct:description."@en ;
-    skos:scopeNote "A link to a page with more information can be added with foaf:page."@en ;
+    skos:scopeNote "A link to a page with more information can be added with foaf:page and with foaf:primaryTopicOf"@en ;
     rdfs:seeAlso dct:title ;
-    rdfs:seeAlso foaf:page ;
+    rdfs:seeAlso foaf:page, foaf:primaryTopicOf ;
     rdfs:seeAlso dct:description .
 
 ###  http://purl.org/ontology/daia/Response
@@ -111,49 +66,51 @@
 
 :Service a owl:Class ;
     rdfs:label "Service"@en ;
-    rdfs:comment "A Service is something that is provided by an Institution on an Item, for instance the service of loaning."@en ;
+    rdfs:comment "A Service is something that is provided by an Institution, typically related to an Item, for instance the service of loaning the Item."@en ;
     skos:scopeNote "The property dct:coverage may be used to refer to a scope of this service - but this is outside of the core purpose of DAIA"@en ;
+    skos:scopeNote "Do not mix types of services (like 'loaning'), which are subclasses of Service, and specific instances of services (like loaning a particular book)!"@en ;
     rdfs:seeAlso dct:coverage ;
     skos:scopeNote "Messages can be added with dct:description."@en ;
-    skos:scopeNote "There should always be a service connected to a availability status. By default this should be this general 'unknown' service type."@en ;
-    rdfs:seeAlso dct:description, :availableFor, :unavailableFor .
+    rdfs:seeAlso dct:description .
 
 ###  http://purl.org/ontology/daia/Storage
 
 :Storage a owl:Class ;
     rdfs:label "Storage"@en ;
-    rdfs:comment "A location where an item can be stored."@en ;
-    rdfs:subClassOf dct:Location ;
-    skos:scopeNote "The name or title of this location can be expressed with dct:title"@en ;
-    skos:scopeNote "A link to a page with more information about the storage can be added with foaf:page. However there should be another property to express a link to a specific item at a specific storage."@en ;
-    rdfs:seeAlso dct:title .
+    rdfs:comment "A place where instances of frbr:Item are stored."@en ;
+    rdfs:subClassOf geo:SpatialThing ;
+    skos:scopeNote "Items are related to storages with geo:location. Non-physical items have no locations but access services."@en ;
+    skos:scopeNote "The name or title of this location can be expressed with foaf:name and dct:title"@en ;
+    skos:scopeNote "A link to a page with more information about the storage can be added with foaf:page and foaf:primaryTopicOf. However there should be another property to express a link to a specific item at a specific storage."@en ;
+    rdfs:seeAlso dct:title, foaf:name, foaf:page, foaf:primaryTopicOf, dct:Location .
 
 #################################################################
 # DAIA Services
 #################################################################
 
-###  http://purl.org/ontology/daia/Service/Loan
+###  http://purl.org/ontology/daia/service/Loan
 service:Loan a owl:Class ;
     rdfs:label "loan service"@en ;
     rdfs:comment "Use outside of the holding institution (by lending or online access)"@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/Service/Presentation
+###  http://purl.org/ontology/daia/service/Presentation
 service:Presentation a owl:Class ;
     rdfs:label "presentation service"@en ;
     rdfs:comment "Use within the holding institution (in their rooms, in their intranet etc.)"@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/Service/Interloan
+###  http://purl.org/ontology/daia/service/Interloan
 service:Interloan a owl:Class ;
     rdfs:label "interloan service"@en ;
     rdfs:comment "Use mediated by another institution."@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/Service/Openaccess
+###  http://purl.org/ontology/daia/service/Openaccess
 service:Openaccess a owl:Class ;
     rdfs:label "open access service"@en ;
-    rdfs:comment "Use within an institution (in their rooms, in their intranet etc.)"@en ;
+    rdfs:comment "can be accessed freely on the Web"@en ;
+    skos:scopeNote "this does not imply free reuse, for instance distribution and and modification. A specific license should be used for details."@en ;
     rdfs:subClassOf :Service .    
 
 #################################################################
@@ -165,11 +122,10 @@ service:Openaccess a owl:Class ;
 :exemplar a owl:ObjectProperty ;
     rdfs:label "has exemplar"@en ;
     rdfs:comment "Relates a Document to an Item that is an exemplar of the Document. This property is similar to frbr:exemplar but does not refer to the class frbr:Manifestation."@en ;
-    rdfs:domain :Document ;
-    rdfs:range :Item ;
+    rdfs:domain bibo:Document ;
+    rdfs:range frbr:Item ;
     owl:inverseOf :exemplarOf ;
-    rdfs:seeAlso :narrowerExemplar ;
-    rdfs:seeAlso :broaderExemplar ;
+    rdfs:seeAlso :extractOf ;
     rdfs:seeAlso frbr:exemplarOf ;
     rdfs:seeAlso frbr:embodimentOf .
 
@@ -178,63 +134,32 @@ service:Openaccess a owl:Class ;
 :exemplarOf a owl:ObjectProperty ;
     rdfs:label "is examplar of"@en ;
     rdfs:comment "Relates an Item to the Document that is exemplified by the Item."@en ;
-    rdfs:range :Document ;
-    rdfs:domain :Item ;
-    rdfs:seeAlso :narrowerExemplarOf ;
-    rdfs:seeAlso :broaderExemplarOf ;
+    rdfs:range bibo:Document ;
+    rdfs:domain frbr:Item ;
+    rdfs:seeAlso :extractOf ;
     rdfs:seeAlso frbr:exemplar ;
     rdfs:seeAlso frbr:embodiment ;
     owl:inverseOf :exemplar .
 
-###  http://purl.org/ontology/daia/narrowerExemplar
+###  http://purl.org/ontology/daia/extract
 
-:narrowerExemplar a owl:ObjectProperty ;
-    rdfs:label "has narrower exemplar"@en ;
+:extract a owl:ObjectProperty ;
+    rdfs:label "extract"@en ;
     rdfs:comment "Relates a Document to an Item that is an exemplar of a part of the Document."@en ;
-    rdfs:domain :Document ;
-    rdfs:range :Item ;
+    rdfs:domain bibo:Document ;
+    rdfs:range frbr:Item ;
     rdfs:seeAlso dct:hasPart ;
-    rdfs:seeAlso :exemplar ;
-    rdfs:seeAlso :broaderExemplar ;
-    owl:inverseOf :narrowerExemplarOf ;
-    skos:scopeNote "This property implies that the item is an exemplar of another document which itself part if the related document." ; 
-    skos:scopeNote "{ ?x daia:narrowerExemplar ?y } => { ?y daia:exemplarOf [ dcterms:isPartOf ?x ] }" ; 
-    rdfs:seeAlso bibo:DocumentPart, bibo:Collection .
+    rdfs:seeAlso :exemplar .
 
-###  http://purl.org/ontology/daia/narrowerExemplarOf
+###  http://purl.org/ontology/daia/extractOf
 
-:narrowerExemplarOf a owl:ObjectProperty ;
-    rdfs:label "is narrower exemplar of"@en ;
+:extractOf a owl:ObjectProperty ;
+    rdfs:label "extract of"@en ;
     rdfs:comment "Relates an Item to a Document which is partly exemplified by the Item."@en ;
-    rdfs:range :Document ;
-    rdfs:domain :Item ;
-    owl:inverseOf :narrowerExemplar ;
+    rdfs:range bibo:Document ;
+    rdfs:domain frbr:Item ;
+    owl:inverseOf :extract ;
     rdfs:seeAlso :exemplarOf .
-
-###  http://purl.org/ontology/daia/broaderExemplar
-
-:broaderExemplar a owl:ObjectProperty ;
-    rdfs:label "has broader exemplar"@en ;
-    rdfs:comment "Relates a Document to an Item that contains an exemplar of more then the Document."@en ;
-    rdfs:domain :Document ;
-    rdfs:range :Item ;
-    rdfs:seeAlso dct:hasPart ;
-    rdfs:seeAlso :exemplar ;
-    rdfs:seeAlso :narrowerExemplar ;
-    owl:inverseOf :broaderExemplarOf ;
-    skos:scopeNote "This property implies that the item is an exemplar of another document which contains the related document as part." ; 
-    skos:scopeNote "{ ?doc daia:broaderExemplar ?item } => { ?item daia:exemplarOf [ dcterms:hasPart ?doc ] }" ; 
-    rdfs:seeAlso bibo:DocumentPart, bibo:Collection .
-
-###  http://purl.org/ontology/daia/broaderExemplarOf
-
-:broaderExemplarOf a owl:ObjectProperty ;
-    rdfs:label "is broader exemplar of"@en ;
-    rdfs:comment "Relates an Item to a Document which contains more than what is exemplified by the Item."@en ;
-    rdfs:range :Document ;
-    rdfs:domain :Item ;
-    owl:inverseOf :broaderExemplar ;
-    rdfs:seeAlso :exemplarOf, :narrowerExemplarOf .
 
 ###  http://purl.org/ontology/daia/limits
 :limits a owl:ObjectProperty ;
@@ -258,7 +183,7 @@ service:Openaccess a owl:Class ;
 :availableFor a owl:ObjectProperty ;
     rdfs:label "available for"@en ;
     rdfs:comment """Relates an Item to a Service which the Item is available for. This property is disjoint with the unavailable property; however an Item can be available and unavailable for two different Services of the same class at the same time."""@en ;
-    rdfs:domain :Item ;
+    rdfs:domain frbr:Item ;
     rdfs:range :Service ;
     owl:propertyDisjointWith :unavailableFor .
 
@@ -268,7 +193,7 @@ service:Openaccess a owl:Class ;
     rdfs:label "available of"@en ;
     rdfs:comment "Relates an available Service to the Item which this Service refers to"@en ;
     rdfs:domain :Service ;
-    rdfs:range :Item ;
+    rdfs:range frbr:Item ;
     owl:inverseOf :availableFor .
 
 ###  http://purl.org/ontology/daia/unavailableFor
@@ -276,16 +201,16 @@ service:Openaccess a owl:Class ;
 :unavailableFor a owl:ObjectProperty ;
     rdfs:label "not available for"@en ;
     rdfs:comment "Relates an Item to a Service which the Item is not available for. This property is disjoint with the available property; however an Item can be available and unavailable for two different Services of the same class at the same time."@en ;  
-    rdfs:domain :Item ;
+    rdfs:domain frbr:Item ;
     rdfs:range :Service .
 
 ###  http://purl.org/ontology/daia/unavailableOf
 
 :unavailableOf a owl:ObjectProperty ;
     rdfs:label "available of"@en ;
-    rdfs:comment "Relates a unavailable Service to the Item which this Service refers to."@en ;
+    rdfs:comment "Relates a unavailable Service to the Item which this Service refers to"@en ;
     rdfs:domain :Service ;
-    rdfs:range :Item ;
+    rdfs:range frbr:Item ;
     owl:inverseOf :availableFor .
 
 ###  http://purl.org/ontology/daia/hasError
@@ -318,48 +243,43 @@ service:Openaccess a owl:Class ;
     rdfs:range :Response ;
     owl:inverseOf :contains .
 
+###  http://purl.org/ontology/daia/collectedBy
+:collectedBy a owl:ObjectProperty ;
+    rdfs:label "collected by"@en ;
+    rdfs:comment "Relates a Document to an Institution which helds an iten of the Document."@en ;
+    rdfs:domain bibo:Document ;
+    rdfs:range foaf:Organization ;
+    owl:inverseOf :inCollection .
 
-###  http://purl.org/ontology/daia/inCatalogOf
-:inCatalogOf a owl:ObjectProperty ;
-    rdfs:label "in catalog of"@en ;
-    rdfs:comment "Relates a Document to an Institution which has a record about the Document."@en ;
-    rdfs:domain :Document ;
-    rdfs:range :Institution ;
-    owl:inverseOf :hasInCatalog ;
-    rdfs:seeAlso cld:catalogueOrIndex .
-
-###  http://purl.org/ontology/daia/hasInCatalog
-:hasInCatalog a owl:ObjectProperty ;
-    rdfs:label "has in catalog"@en ;
-    rdfs:comment "Relates an Institution to a Document which the Institution has in catalog record about."@en ;
-    rdfs:domain :Institution ;
-    rdfs:range :Document ; 
-    owl:inverseOf :inCatalogOf ;
-    rdfs:seeAlso cld:catalogueOrIndex .
+###  http://purl.org/ontology/daia/inCollection
+:inCollection a owl:ObjectProperty ;
+    rdfs:label "in collection"@en ;
+    rdfs:comment "Relates an Institution to a Document which the Institution helds an item of."@en ;
+    rdfs:domain foaf:Organization ;
+    rdfs:range bibo:Document ; 
+    owl:inverseOf :collectedBy .
 
 ###  http://purl.org/ontology/daia/holds
 :holds a owl:ObjectProperty ;
     rdfs:label "holds"@en ;
     rdfs:comment "Relates an Institution to an Item which the Institution holds."@en ;
-    skos:scopeNote "Holding does not necessarily imply owning but beeing able to provide a service."@en ;
-    rdfs:domain :Institution ;
-    rdfs:range :Item ;
-    owl:inverseOf :heldBy ;
-    rdfs:seeAlso bibo:owns .
+    rdfs:domain foaf:Organization ;
+    rdfs:range frbr:Item ;
+    owl:inverseOf :heldBy .
 
 ###  http://purl.org/ontology/daia/heldBy
 :heldBy a owl:ObjectProperty ;
     rdfs:label "held by"@en ;
     rdfs:comment "Relates an Item to an Institution that holds the Item."@en ;
-    rdfs:domain :Item ;
-    rdfs:range :Institution ; 
+    rdfs:domain frbr:Item ;
+    rdfs:range foaf:Organization ; 
     owl:inverseOf :holds .
 
 ###  http://purl.org/ontology/daia/provides
 :provides a owl:ObjectProperty ;
     rdfs:label "provides"@en ;
     rdfs:comment "Relates an Institution to a Service that is provided by the Institution."@en ;
-    rdfs:domain :Institution ;
+    rdfs:domain foaf:Organization ;
     rdfs:range :Service ;
     owl:inverseOf :providedBy .
 
@@ -368,7 +288,7 @@ service:Openaccess a owl:Class ;
     rdfs:label "provided by"@en ;
     rdfs:comment "Relates a Service to an Institution that provides the Service."@en ;
     rdfs:domain :Service ;
-    rdfs:range :Institution ;
+    rdfs:range foaf:Organization ;
     owl:inverseOf :provides .
 
 #################################################################
@@ -460,22 +380,36 @@ dct:description rdfs:type rdfs:Property .
 
 ###  http://purl.org/dc/terms/hasPart
 dct:hasPart rdfs:type rdfs:Property ;
-    skos:scopeNote "This property can be inferred from a daia:narrowerExemplar property."@en .
+    skos:scopeNote "This property can be inferred from a daia:extract property."@en .
 
 ###  http://purl.org/dc/terms/identifier
 dct:identifier rdfs:type rdfs:Property .
 #    skos:scopeNote "Identifiers are used in DAIA as superclass of daia:label and to express error codes."@en .
-
-###  http://purl.org/dc/terms/spatial
-dct:spatial rdfs:type rdfs:Property ;
-    rdfs:range dct:Location .
 
 #################################################################
 # Bibliographic Ontology Classes
 #################################################################
 
 ###  http://purl.org/ontology/bibo/Document
-bibo:Document a owl:Class .
+bibo:Document a owl:Class ; 
+    rdfs:label "Document"@en ;
+    owl:equivalentClass foaf:Document ;
+    rdfs:comment "A Document"@en ;
+    skos:scopeNote "Messages can be added with dct:description."@en ;
+    skos:scopeNote "A name or title can be expressed with dct:title"@en ;
+    skos:scopeNote "A link to a document about the document can be added with foaf:page and with foaf:primaryTopicOf."@en ;
+    rdfs:seeAlso dct:title ;
+    rdfs:seeAlso dct:description ;
+    rdfs:seeAlso foaf:page, foaf:primaryTopicOf .
+
+#################################################################
+# GEO Classes and Properties
+#################################################################
+
+geo:SpatialThing a owl:Class .
+geo:location a owl:ObjectProperty ;
+		rdfs:comment "The relation between something and the point, or other geometrical thing in space, where it is."@en ;
+		rdfs:range geo:SpatialThing .
 
 #################################################################
 # FOAF Classes
@@ -485,14 +419,26 @@ bibo:Document a owl:Class .
 foaf:Document a owl:Class .
 
 ###  http://xmlns.com/foaf/0.1/Organization
-foaf:Organization a owl:Class .
+foaf:Organization a owl:Class ; 
+    rdfs:comment "Used for any kind of organization such as a library or a company, both Institution and Department."@en ;
+    skos:scopeNote "A name or title can be expressed with dct:title"@en ;
+    skos:scopeNote "A link to a page with more information can be added with foaf:page and with foaf:primaryTopicOf."@en ;
+    rdfs:seeAlso dct:title ;
+    rdfs:seeAlso foaf:page, foaf:primaryTopicOf .
+
+foaf:page a rdfs:Property .
+
+foaf:primaryTopicOf a rdfs:Property .
 
 #################################################################
 # FRBR Classes
 #################################################################
 
 ###  http://purl.org/vocab/frbr/core#Item
-frbr:Item a owl:Class .
+frbr:Item a owl:Class ; 
+    rdfs:comment "An Item is a single instance of a Document. Availability information is directly connected to single items."@en ;
+    skos:scopeNote "Messages can be added with dct:description."@en ;
+    rdfs:seeAlso dct:description .
 
 #################################################################
 # XML Schema Datatypes
