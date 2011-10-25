@@ -16,6 +16,9 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix org: <http://www.w3.org/ns/org#> .
 
 @base <http://purl.org/ontology/daia/> .
 
@@ -71,6 +74,7 @@
     skos:scopeNote "Do not mix types of services (like 'loaning'), which are subclasses of Service, and specific instances of services (like loaning a particular book)!"@en ;
     rdfs:seeAlso dct:coverage ;
     skos:scopeNote "Messages can be added with dct:description."@en ;
+    rdfs:subClassOf dcmitype:Service ;
     rdfs:seeAlso dct:description .
 
 ###  http://purl.org/ontology/daia/Storage
@@ -78,11 +82,12 @@
 :Storage a owl:Class ;
     rdfs:label "Storage"@en ;
     rdfs:comment "A place where instances of frbr:Item are stored."@en ;
-    rdfs:subClassOf geo:SpatialThing ;
-    skos:scopeNote "Items are related to storages with geo:location. Non-physical items have no locations but access services."@en ;
+    rdfs:subClassOf org:Site ;
+    skos:scopeNote "Physical items can be related to storages with geo:location. Most non-physical items have no locations but access services."@en ;
     skos:scopeNote "The name or title of this location can be expressed with foaf:name and dct:title"@en ;
     skos:scopeNote "A link to a page with more information about the storage can be added with foaf:page and foaf:primaryTopicOf. However there should be another property to express a link to a specific item at a specific storage."@en ;
-    rdfs:seeAlso dct:title, foaf:name, foaf:page, foaf:primaryTopicOf, dct:Location .
+    skos:ScopeNote "Most instances of this class are also dct:Location and geo:SpatialThing" ;
+    rdfs:seeAlso dct:title, foaf:name, foaf:page, foaf:primaryTopicOf, dct:Location, geo:SpatialThing .
 
 #################################################################
 # DAIA Services
@@ -247,7 +252,9 @@ service:Openaccess a owl:Class ;
 :collectedBy a owl:ObjectProperty ;
     rdfs:label "collected by"@en ;
     rdfs:comment "Relates a Document to an Institution which helds an iten of the Document."@en ;
+    skos:scopeNote "This property implies the existence of a dcmitype:Collection and a cdtype:CatalogueOrIndex that need not to be modeled explicitly."@en ;
     rdfs:domain bibo:Document ;
+    rdfs:seeAlso dcmitype:Collection ;
     rdfs:range foaf:Organization ;
     owl:inverseOf :inCollection .
 
@@ -255,8 +262,10 @@ service:Openaccess a owl:Class ;
 :inCollection a owl:ObjectProperty ;
     rdfs:label "in collection"@en ;
     rdfs:comment "Relates an Institution to a Document which the Institution helds an item of."@en ;
+    skos:scopeNote "This property implies the existence of a dcmitype:Collection and a cdtype:CatalogueOrIndex that need not to be modeled explicitly."@en ;
     rdfs:domain foaf:Organization ;
     rdfs:range bibo:Document ; 
+    rdfs:seeAlso dcmitype:Collection ;
     owl:inverseOf :collectedBy .
 
 ###  http://purl.org/ontology/daia/holds
