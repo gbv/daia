@@ -7,6 +7,7 @@
 
     Recent changes:
 
+      2011-09-28: show empty documents and href in institution and document
       2011-01-26: link ids if they are URLs
       2010-11-30: fixed msg display in documents and added grouping
       2010-04-26: refactored
@@ -185,10 +186,17 @@
         </b>
         <xsl:text> of document </xsl:text>
         <xsl:apply-templates select="." mode="about"/>
+        <xsl:if test="@href">
+          &#xA0;(<a href="{@href}">link</a>)
+        </xsl:if>
         <xsl:text>.</xsl:text>
       </xsl:if>
     </p>
     <xsl:if test="not(d:item)">
+      <xsl:apply-templates select="." mode="about"/>
+      <xsl:if test="@href">
+        &#xA0;(<a href="{@href}">link</a>)
+      </xsl:if>
       <xsl:apply-templates select="d:message"/>
     </xsl:if>
   </xsl:template>
@@ -428,7 +436,12 @@
   <!-- print information about an institution -->
   <xsl:template match="d:institution">
     <h2>Institution</h2>
-    <p><xsl:call-template name="content-with-optional-href"/></p>
+    <p>
+        <xsl:call-template name="content-with-optional-href"/>
+        <xsl:if test="@href and @id">
+          &#xA0;(<a href="{@href}">link</a>)
+        </xsl:if>
+    </p>
   </xsl:template>
 
 
