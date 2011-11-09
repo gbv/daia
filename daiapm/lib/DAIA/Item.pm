@@ -62,6 +62,7 @@ that can (currently or in general) not be performed with this item.
 =cut
 
 our %PROPERTIES = (
+    rdftype     => 'http://purl.org/vocab/frbr/core#Item',
     id          => $DAIA::Object::COMMON_PROPERTIES{id},
     href        => $DAIA::Object::COMMON_PROPERTIES{href},
     message     => $DAIA::Object::COMMON_PROPERTIES{message},

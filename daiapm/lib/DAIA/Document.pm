@@ -45,6 +45,7 @@ our %PROPERTIES = (
         filter => $DAIA::Object::COMMON_PROPERTIES{id}->{filter},
         default => sub { croak 'DAIA::Document->id is required' }
     },
+    rdftype => 'http://purl.org/ontology/bibo/Document',
     href    => $DAIA::Object::COMMON_PROPERTIES{href},
     message => $DAIA::Object::COMMON_PROPERTIES{message},
     error   => $DAIA::Object::COMMON_PROPERTIES{error},

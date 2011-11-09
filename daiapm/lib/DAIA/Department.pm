@@ -1,4 +1,4 @@
-package DAIA::Department;
+﻿package DAIA::Department;
 
 =head1 NAME
 
@@ -8,8 +8,10 @@ DAIA::Department - Information about a department in a L<DAIA::Institution>
 
 use strict;
 use base 'DAIA::Entity';
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our %PROPERTIES = %DAIA::Entity::PROPERTIES;
+
+$PROPERTIES{rdftype} = 'http://www.w3.org/ns/org#';
 
 1;
 
@@ -23,7 +25,7 @@ Jakob Voss C<< <jakob.voss@gbv.de> >>
 
 =head1 LICENSE
 
-Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
+Copyright (C) 2009-2011 by Verbundzentrale Goettingen (VZG) and Jakob Voss
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or, at

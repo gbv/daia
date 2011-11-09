@@ -265,7 +265,6 @@ sub rdfhash {
     } 
     # TODO: what about DAIA::Response, which is an RDF graph?
 
-
     my $obj_filter = sub {
         my $o = shift;
         my $m = $o->rdfhash( @_ );
@@ -289,12 +288,13 @@ sub rdfhash {
 
     # DAIA::Response has no type, but it may be the graph URI (?)
 
-    $mydata->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [ {
-         type => 'uri', value => $DAIA::Object::RDFNAMESPACE.$type
-    } ];
-
     no strict 'refs'; ##no critic
     my $PROPERTIES = \%{$class."::PROPERTIES"};
+
+    $mydata->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [ {
+        type  => 'uri', 
+        value => ( $PROPERTIES->{'rdftype'} || $DAIA::Object::RDFNAMESPACE.$type )
+    } ];
 
     foreach my $prop (keys %$self) {
         next if $prop eq 'id';

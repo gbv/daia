@@ -6,9 +6,10 @@ use Test::More qw( no_plan );
 use DAIA;
 
 my %NS = (
-  'rdfs' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-  'daia' => 'http://purl.org/ontology/daia/',
-  'dct'  => 'http://purl.org/dc/terms/',
+  rdfs    => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+  daia    => 'http://purl.org/ontology/daia/',
+  dcterms => 'http://purl.org/dc/terms/',
+  frbr    => 'http://purl.org/vocab/frbr/core#',
 );
 sub iri {
     my $uri = shift;
@@ -38,7 +39,7 @@ sub pdump { eval {
 
 # Item, with URI
 my $item = item( id => 'my:id' );
-my $item_rdf = { 'my:id' => {  iri('rdfs:type') => [ irihash('daia:Item') ] } }; 
+my $item_rdf = { 'my:id' => {  iri('rdfs:type') => [ irihash('frbr:Item') ] } }; 
 is_deeply( $item->rdfhash, $item_rdf, 'empty item as rdf' );
 
 # Storage, without URI
@@ -51,7 +52,7 @@ like( $blank, qr/^_:storage\d+$/ );
 
 my $storage_rdf = { 
    iri('rdfs:type') => [ irihash('daia:Storage') ],
-   iri('dct:title') => [ literal("foo") ], 
+   iri('dcterms:title') => [ literal("foo") ], 
 };
 is_deeply( $rdf, $storage_rdf, 'storage as rdf' );
 
@@ -74,7 +75,7 @@ $item->department( 'dep' );
 $doc->addItem( $item );
 $response->addDocument( $doc );
 $response->institution( 'foo' );
-#pdump( $response->rdfhash );
+pdump( $response->rdfhash );
 
 __END__
 use Data::Dumper;
