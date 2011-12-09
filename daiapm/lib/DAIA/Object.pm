@@ -230,6 +230,8 @@ sub rdfhash {
     my $flat = not delete $opt{nested};
 
     my $class = ref($self); 
+    my @myprop = grep { $_ !~ /^(id|version)/ } keys %$self;
+
     my $type = $class;
     $type =~ s/^DAIA:://;
 
@@ -244,6 +246,7 @@ sub rdfhash {
     if ( $type eq 'Response' ) {
         $know{institution} = $self->institution->rdfuri
             if $self->institution;
+#    } elsif ( $type eq 'Unavailable' ) { # isa...
 #print "KNOW: ".%know."\n";
     } elsif ( $type eq 'Document' ) {
 #print "KNOW: ".%know."\n";
@@ -290,13 +293,12 @@ sub rdfhash {
         value => ( $PROPERTIES->{'rdftype'} || $DAIA::Object::RDFNAMESPACE.$type )
     } ];
 
-    foreach my $prop (keys %$self) {
-        next if $prop eq 'id';
-        next if $prop eq 'version'; # TODO: catch this by $PROP->{predicate}
+    foreach my $prop (@myprop) {
 
-        # print "$class P: $prop\n";
         my $PROP = $PROPERTIES->{$prop} or next;
         my $predicate = $PROP->{predicate} || "unknown:$prop"; # TODO
+#        print STDERR "$prop\n" unless $PROP->{predicate};
+
         my $object = $self->{$prop};
 
         if (ref $self->{$prop} eq 'ARRAY') {
@@ -314,9 +316,8 @@ sub rdfhash {
              } ];
         } elsif( $prop eq 'lang' ) {
             # ignore
-        } elsif( $prop eq 'label' and $self->{$prop} eq '' ) {
+         } elsif( "$object" eq "" ) {
             # ignore empty string label
-            # TODO: Test this. Also ignore empty 'content' ?
         } else {
              my $object =  { value => "$object", type => 'literal' };
              my $rdftype = $PROP->{rdftype} || '';

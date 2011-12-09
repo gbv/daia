@@ -6,7 +6,7 @@ use base 'DAIA::Entity';
 
 our %PROPERTIES = %DAIA::Entity::PROPERTIES;
 
-$PROPERTIES{rdftype} = 'http://www.w3.org/ns/org#';
+$PROPERTIES{rdftype} = 'http://www.w3.org/ns/org#Organization';
 
 1;
 
