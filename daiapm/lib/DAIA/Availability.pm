@@ -1,14 +1,9 @@
 package DAIA::Availability;
-
-=head1 NAME
-
-DAIA::Availability - Abstract base class of availability information
-
-=cut
+#ABSTRACT: Abstract base class of availability information
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.30';
+
 use Carp::Clan;
 use Data::Validate::URI qw(is_uri);
 use DateTime::Duration;
@@ -343,15 +338,3 @@ sub date_or_datetime {
 }
 
 1;
-
-=head1 AUTHOR
-
-Jakob Voss C<< <jakob.voss@gbv.de> >>
-
-=head1 LICENSE
-
-Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself, either Perl version 5.8.8 or, at
-your option, any later version of Perl 5 you may have available.

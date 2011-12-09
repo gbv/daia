@@ -1,14 +1,9 @@
 ﻿package DAIA::Institution;
-
-=head1 NAME
-
-DAIA::Institution - Organization that may hold items and provide services
-
-=cut
+#ABSTRACT: Organization that may hold items and provide services
 
 use strict;
 use base 'DAIA::Entity';
-our $VERSION = '0.28';
+
 our %PROPERTIES = %DAIA::Entity::PROPERTIES;
 
 $PROPERTIES{rdftype} = 'http://www.w3.org/ns/org#';
@@ -18,15 +13,3 @@ $PROPERTIES{rdftype} = 'http://www.w3.org/ns/org#';
 =head1 PROPERTIES AND METHODS
 
 See L<DAIA::Entity> for a desciption of all properties and methods.
-
-=head1 AUTHOR
-
-Jakob Voss C<< <jakob.voss@gbv.de> >>
-
-=head1 LICENSE
-
-Copyright (C) 2009-2011 by Verbundzentrale Goettingen (VZG) and Jakob Voss
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself, either Perl version 5.8.8 or, at
-your option, any later version of Perl 5 you may have available.

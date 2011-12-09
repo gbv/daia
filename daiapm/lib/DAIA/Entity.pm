@@ -1,15 +1,9 @@
 package DAIA::Entity;
-
-=head1 NAME
-
-DAIA::Entity - Abstract base class of Department, Institution, Storage, and Limitation
-
-=cut
+#ABSTRACT: Abstract base class of Department, Institution, Storage, and Limitation
 
 use strict;
 use Data::Validate::URI qw(is_uri is_web_uri);
 use base 'DAIA::Object';
-our $VERSION = '0.30';
 
 =head1 PROPERTIES
 
@@ -56,16 +50,3 @@ sub _buildargs {
 }
 
 1;
-
-=head1 AUTHOR
-
-Jakob Voss C<< <jakob.voss@gbv.de> >>
-
-=head1 LICENSE
-
-Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself, either Perl version 5.8.8 or, at
-your option, any later version of Perl 5 you may have available.
-

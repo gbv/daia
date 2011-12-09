@@ -1,8 +1,5 @@
 package DAIA::Available;
-
-=head1 NAME
-
-DAIA::Available - Information about a service that is currently unavailable
+#ABSTRACT: Information about a service that is currently unavailable
 
 =head1 DESCRIPTION
 
@@ -15,7 +12,6 @@ a C<DAIA::Unavailable> object is always C<1>.
 
 use strict;
 use base 'DAIA::Availability';
-our $VERSION = '0.29';
 
 =head1 PROPERTIES
 

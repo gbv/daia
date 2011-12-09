@@ -1,14 +1,9 @@
 package DAIA::Response;
-
-=head1 NAME
-
-DAIA::Response - DAIA information root element
-
-=cut
+#ABSTRACT: DAIA information root element
 
 use strict;
 use base 'DAIA::Object';
-our $VERSION = '0.30';
+
 use POSIX qw(strftime);
 
 =head1 SYNOPSIS
@@ -122,14 +117,4 @@ sub check_valid_id {
     return undef;
 }
 
-=head1 AUTHOR
-
-Jakob Voss C<< <jakob.voss@gbv.de> >>
-
-=head1 LICENSE
-
-Copyright (C) 2009-2010 by Verbundzentrale Goettingen (VZG) and Jakob Voss
-
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself, either Perl version 5.8.8 or, at
-your option, any later version of Perl 5 you may have available.
+1;
