@@ -1,9 +1,65 @@
+use strict;
+use warnings;
 package DAIA::Document;
 #ABSTRACT: Information about a single document
 
-use strict;
 use base 'DAIA::Object';
-use Carp qw(croak);
+use Carp 'croak';
+
+our %PROPERTIES = (
+    id      => { 
+        filter => $DAIA::Object::COMMON_PROPERTIES{id}->{filter},
+        default => sub { croak 'DAIA::Document->id is required' }
+    },
+    href    => $DAIA::Object::COMMON_PROPERTIES{href},
+    message => $DAIA::Object::COMMON_PROPERTIES{message},
+    error   => $DAIA::Object::COMMON_PROPERTIES{error},
+    item    => { 
+        type      => 'DAIA::Item', repeatable => 1,
+    }
+);
+
+sub rdftype { 'http://purl.org/ontology/bibo/Document' }
+
+sub rdfhash {
+    my $self = shift;
+
+    my $me = { 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => [{
+        type => 'uri', value => $self->rdftype
+    }] };
+
+    $me->{'http://xmlns.com/foaf/0.1/page'} = [{
+        value => $self->{href}, type => "uri"
+    }] if $self->{href};
+
+    $me->{'http://purl.org/dc/terms/description'} = [
+        map { $_->rdfhash } @{$self->{message}}
+    ] if $self->{message};
+
+    $me->{'http://purl.org/dc/terms/description'} = [
+        map { $_->rdfhash } @{$self->{error}}
+    ] if $self->{error};
+
+    my $rdf = { };
+    if ($self->{item}) {
+        foreach my $item (@{$self->{item}}) {
+            my $r = $item->rdfhash;
+            $rdf->{$_} = $r->{$_} for keys %$r;
+        }
+        # TODO: exemplar / partial / broader
+        # daia:extractOf / daia:partOf
+        $me->{'http://purl.org/ontology/daia/exemplar'} = [ map {
+            my $iri = $_->rdfuri;
+            { value => $iri, type => ($iri =~ /^_:/) ? 'bnode' : 'uri' }
+        } @{$self->{item}} ];
+    }
+    
+    $rdf->{ $self->rdfuri } = $me;
+
+    return $rdf;
+}
+ 
+1;
 
 =head1 PROPERTIES
 
@@ -29,27 +85,6 @@ the C<message> accessor, with C<addMessage>, and with C<provideMessage>.
 
 An optional list of L<DAIA::Item> objects with instances/copies/holdings 
 of this document.
-
-=back
-
-=cut
-
-our %PROPERTIES = (
-    id      => { 
-        filter => $DAIA::Object::COMMON_PROPERTIES{id}->{filter},
-        default => sub { croak 'DAIA::Document->id is required' }
-    },
-    rdftype => 'http://purl.org/ontology/bibo/Document',
-    href    => $DAIA::Object::COMMON_PROPERTIES{href},
-    message => $DAIA::Object::COMMON_PROPERTIES{message},
-    error   => $DAIA::Object::COMMON_PROPERTIES{error},
-    item    => { 
-        type      => 'DAIA::Item', repeatable => 1,
-        predicate => $DAIA::Object::RDFNAMESPACE.'exemplar', # TODO: also allow broader/narrower
-    }
-);
-
-1;
 
 =head1 METHODS
 

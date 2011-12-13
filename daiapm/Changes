@@ -1,6 +1,7 @@
-0.35 2011-??-??
+0.35 2011-12-13
       - split messages and error
       - moved to dist::Zilla
+      - started to implement DAIA/RDF
 0.31 2011-01-06
       - fixed service URIs (http://purl.org/ontology/daia/Service/*)
       - fixed parsing from URL

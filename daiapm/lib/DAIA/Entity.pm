@@ -33,11 +33,9 @@ our %PROPERTIES = (
     content => { 
         default => '', 
         filter => sub { defined $_[0] ? "$_[0]" : "" },
-        predicate => 'http://purl.org/dc/terms/title'
     },
     href => {
         filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; },
-        predicate => 'http://xmlns.com/foaf/0.1/page'
     },
     id => {
         filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_uri($v) ? $v : undef; }
@@ -47,6 +45,28 @@ our %PROPERTIES = (
 sub _buildargs { 
     shift;
     return @_ % 2 ? (content => @_) : @_;
+}
+
+sub rdfhash {
+    my $self = shift;
+
+    # plain literal
+    return { type => 'literal', value => $self->{content} } 
+        unless $self->{id} or $self->{href};
+
+    my $me = { 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => [{
+        type => 'uri', value => $self->rdftype
+    }] } if $self->rdftype ;
+
+    $me->{'http://www.w3.org/2000/01/rdf-schema#label'} = [{
+        value => $self->{content}, type => 'literal'
+    }] if $self->{content};
+
+    $me->{'http://xmlns.com/foaf/0.1/page'} = [{
+        value => $self->{href}, type => 'uri'
+    }] if $self->{href};
+    
+    return { $self->rdfuri => $me };
 }
 
 1;

@@ -101,7 +101,7 @@ sub _buildargs {
 sub rdfhash {
     my $self = shift;
     my $rdf = { type => 'literal', value => $self->{content} };
-    $rdf->{language} = $self->{lang} if $self->{lang};
+    $rdf->{lang} = $self->{lang} if $self->{lang};
     return $rdf;
 }
 

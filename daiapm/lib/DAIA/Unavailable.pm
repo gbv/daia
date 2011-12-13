@@ -56,7 +56,6 @@ our %PROPERTIES = (
     %DAIA::Availability::PROPERTIES,
     queue => { 
         filter => sub { return $_[0] =~ /^[0-9]+$/ ? $_[0] : undef },
-        predicate => $DAIA::Object::RDFNAMESPACE.'queue'
     },
     expected => { 
         filter => sub { # TODO: move this to function in DAIA::Availability (?)
@@ -69,8 +68,6 @@ our %PROPERTIES = (
             }
             return DAIA::Availability::date_or_datetime( $exp );
         },
-        predicate => $DAIA::Object::RDFNAMESPACE.'expected',
-#        rdftype => 'http://www.w3c.org/2001/XMLSchema#date',
     },
 );
 

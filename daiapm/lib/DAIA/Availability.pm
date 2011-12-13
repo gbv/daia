@@ -104,16 +104,15 @@ our %PROPERTIES = (
     limitation => {
         type => 'DAIA::Limitation',
         repeatable => 1,
-        predicate  => $DAIA::Object::RDFNAMESPACE.'limitedBy'
     }
 );
 
 # known services
 our %SERVICES = (
-    'presentation' => $DAIA::Object::RDFNAMESPACE.'Service/Presentation',
-    'loan'         => $DAIA::Object::RDFNAMESPACE.'Service/Loan',
-    'interloan'    => $DAIA::Object::RDFNAMESPACE.'Service/Interloan',
-    'openaccess'   => $DAIA::Object::RDFNAMESPACE.'Service/Openaccess',
+    'presentation' => 'http://purl.org/ontology/daia/Service/Presentation',
+    'loan'         => 'http://purl.org/ontology/daia/Service/Loan',
+    'interloan'    => 'http://purl.org/ontology/daia/Service/Interloan',
+    'openaccess'   => 'http://purl.org/ontology/daia/Service/Openaccess',
 );
 
 our %SECIVRES = (
@@ -215,6 +214,54 @@ sub status {
     }
 
     return $status;
+}
+
+sub rdfhash {
+    my $self = shift;
+    my $me = { };
+
+    my $servicetype = $DAIA::Availability::SERVICES{ $self->{service} } 
+        || $self->{service};
+
+    $me->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [{
+        value => $servicetype, type  => "uri"
+    }] if $servicetype;
+
+    $me->{'http://xmlns.com/foaf/0.1/page'} = [{
+        value => $self->{href}, type => "uri"
+    }] if $self->{href};
+
+    $me->{'http://purl.org/dc/terms/description'} = [
+        map { $_->rdfhash } @{$self->{message}}
+    ] if $self->{message};
+
+    $me->{'http://purl.org/ontology/daia/expected'} = [{
+        value => $self->{expected}, type => 'literal',
+        # xsd:date or xsd:dateTime to 'unknown'
+    }] if $self->{expected};
+
+    $me->{'http://purl.org/ontology/daia/delay'} = [{
+        value => $self->{delay}, type => 'literal',
+        # TODO: how to treat delay = "unknown"?
+        # datatype => 'http://www.w3.org/2001/XMLSchema#duration',
+    }] if $self->{delay};
+
+    $me->{'http://purl.org/ontology/daia/delay'} = [{
+        value => $self->{queue}, type => 'literal',
+        datatype => 'http://www.w3.org/2001/XMLSchema#integer',
+    }] if defined $self->{queue};
+
+    if ($self->{limitation}) {
+        # TODO
+        # some limitations may be literal, some may be uri/blank
+        # 'limitedBy'
+    }
+    
+    my $rdf = { };
+
+    $rdf->{ $self->rdfuri } = $me;
+
+    return $rdf;
 }
 
 =head1 FUNCTIONS

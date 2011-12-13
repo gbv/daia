@@ -1,13 +1,15 @@
+use strict;
+use warnings;
 package DAIA::Storage;
 #ABSTRACT: Information about the place where an item is stored
 
-use strict;
 use base 'DAIA::Entity';
-
 our %PROPERTIES = %DAIA::Entity::PROPERTIES;
+
+sub rdftype { 'http://purl.org/ontology/daia/Storage' }
 
 1;
 
-=head1 PROPERTIES AND METHODS
+=head1 DESCRIPTION
 
-See L<DAIA::Entity> for a desciption of all properties and methods.
+See L<DAIA::Entity> which DAIA::Storage is a subclass of.

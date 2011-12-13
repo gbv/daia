@@ -1,14 +1,15 @@
-﻿package DAIA::Department;
+﻿use strict;
+use warnings;
+package DAIA::Department;
 #ABSTRACT: Information about a department in a L<DAIA::Institution>
 
-use strict;
 use base 'DAIA::Entity';
 our %PROPERTIES = %DAIA::Entity::PROPERTIES;
 
-$PROPERTIES{rdftype} = 'http://www.w3.org/ns/org#Organization';
+sub rdftype { 'http://www.w3.org/ns/org#Organization' }
 
 1;
 
-=head1 PROPERTIES AND METHODS
+=head1 DESCRIPTION
 
-See L<DAIA::Entity> for a desciption of all properties and methods.
+See L<DAIA::Entity> which DAIA::Department is a subclass of.

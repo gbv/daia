@@ -61,8 +61,6 @@ our %PROPERTIES = (
     timestamp => {
         default   => sub { strftime("%Y-%m-%dT%H:%M:%SZ", gmtime); },
         filter    => sub { $_[0] }, # TODO: check format 
-        predicate => $DAIA::Object::RDFNAMESPACE.'timestamp',
-        rdftype   => 'http://www.w3c.org/2001/XMLSchema#dateTime'
     },
     message => $DAIA::Object::COMMON_PROPERTIES{message},
     error   => $DAIA::Object::COMMON_PROPERTIES{error},
@@ -91,6 +89,65 @@ available for other DAIA objects. See L<DAIA::Object/serve> for a description.
 
 In most cases, a simple call of C<$response-E<gt>serve> will be the last
 statement of a DAIA server implementation.
+
+=cut
+
+sub rdfhash {
+    my $self = shift;
+
+    my $me = {
+        'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' => [{
+            type => 'uri', value => 'http://purl.org/ontology/daia/Response'
+        }]
+    };
+    $me->{'http://purl.org/ontology/daia/timestamp'} = [{
+            type => 'literal', value => $self->{timestamp},
+            datatype => 'http://www.w3c.org/2001/XMLSchema#dateTime'
+    }];# if $self->{timestamp};
+
+    $me->{'http://purl.org/dc/terms/description'} = [
+        map { $_->rdfhash } @{$self->{message}}
+    ] if $self->{message};
+
+    my $rdf = { $self->rdfuri => $me };
+    my $inst = $self->{institution};
+    my @doc  = @{$self->{document}} if $self->{document};
+
+    my @see = grep { defined $_ } $inst, @doc;
+    foreach my $s (@see) {
+        my $r = $s->rdfhash; # TODO: pass (institution => $inst->rdfuri)
+        $rdf->{$_} = $r->{$_} for keys %$r;
+    }
+
+    $me->{'http://www.w3.org/2000/01/rdf-schema#seeAlso'} = [
+        map { { type => 'uri', value => $_->rdfuri } } @see
+    ] if @see;
+
+    foreach my $doc (@doc) {
+        $rdf->{ $doc->rdfuri }->{'http://purl.org/ontology/daia/collectedBy'} = [{
+            type => "uri", value => $inst->rdfuri
+        }];
+    }
+
+    # TODO: add connections
+    # department <- subOrgOf / parOf institution
+    # service <- providedBy institution
+    
+    # # item <- heldBy
+    # TODO: if no inst given, try to use department instead
+    if ($self->document and $self->institution) {
+        my @items = map { $_->item ? @{$_->{item}} : () } @{$self->{document}};
+        my $by = $self->{institution}->rdfuri;
+        $by = { value => $by, type => ($by =~ /^_:/) ? 'bnode' : 'uri' };
+        foreach my $item (@items) {
+            $rdf->{ $item->rdfuri }->{'http://purl.org/ontology/daia/heldBy'} ||= [$by];
+        }
+    }
+
+    # delete $rdf->{ $self->rdfuri };
+
+    return $rdf;
+}
 
 =head2 check_valid_id ( $id )
 

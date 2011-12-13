@@ -56,7 +56,6 @@ that can (currently or in general) not be performed with this item.
 =cut
 
 our %PROPERTIES = (
-    rdftype     => 'http://purl.org/vocab/frbr/core#Item',
     id          => $DAIA::Object::COMMON_PROPERTIES{id},
     href        => $DAIA::Object::COMMON_PROPERTIES{href},
     message     => $DAIA::Object::COMMON_PROPERTIES{message},
@@ -74,11 +73,10 @@ our %PROPERTIES = (
             my $v = (ref($_[0]) eq 'ARRAY') ? $_[0]->[0] : $_[0]; 
             return "$v";
         },
-        predicate => $DAIA::Object::RDFNAMESPACE.'label'
     },
     department  => { type => 'DAIA::Department' },
     storage     => { type => 'DAIA::Storage' },
-    available   => { type => 'DAIA::Available', repeatable => 1 },
+    available   => { type => 'DAIA::Available', repeatable => 1 }, 
     unavailable => { type => 'DAIA::Unavailable', repeatable => 1 },
 );
 
@@ -163,6 +161,70 @@ sub services {
     }
 
     return %services;
+}
+
+sub rdfhash {
+    my $self = shift;
+    my $me = { };
+
+    $me->{'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'} = [{
+        type => 'uri', value => 'http://purl.org/vocab/frbr/core#Item',
+    }];
+
+    $me->{'http://xmlns.com/foaf/0.1/page'} = [{
+        value => $self->{href}, type => "uri"
+    }] if $self->{href};
+
+    $me->{'http://purl.org/dc/terms/description'} = [
+        map { $_->rdfhash } @{$self->{message}}
+    ] if $self->{message};
+
+    $me->{'http://purl.org/ontology/daia/label'} = [{
+        type => 'literal', value => $self->{label}
+    }] if $self->{label};
+
+    my $rdf = { };
+
+    # TODO: fragment/broader
+    # department  => { type => 'DAIA::Department' }
+    
+    if ($self->{storage}) {
+        my $storage = $self->{storage}->rdfhash;
+        if ( $storage->{type} ) { # plain literal
+            $me->{'http://purl.org/dc/terms/spatial'} = [$storage];
+        } else {
+            my ($uri => $data) = %$storage;
+            $rdf->{$uri} = $data;
+            $me->{'http://purl.org/dc/terms/spatial'} = [{
+                type => 'uri', value => $uri
+            }];
+        }
+        my $r = $self->{storage}->rdfhash;
+    }
+
+    if ($self->{available}) {
+        foreach my $s ( @{$self->{available}} ) {
+            my $r = $s->rdfhash;
+            $rdf->{$_} = $r->{$_} for keys %$r;
+        }
+        $me->{'http://purl.org/ontology/daia/availableFor'} = [
+            map { { type => 'uri', value => $_->rdfuri } } @{$self->{available}}
+        ];
+        # TODO: providedBy
+    }
+    if ($self->{unavailable}) {
+        foreach my $s ( @{$self->{unavailable}} ) {
+            my $r = $s->rdfhash;
+            $rdf->{$_} = $r->{$_} for keys %$r;
+        }
+        $me->{'http://purl.org/ontology/daia/unavailableFor'} = [
+            map { { type => 'uri', value => $_->rdfuri } } @{$self->{unavailable}}
+        ];
+        # TODO: providedBy
+    }
+
+    $rdf->{ $self->rdfuri } = $me;
+    return $rdf;
 }
 
 1;

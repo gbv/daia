@@ -7,7 +7,7 @@ use IO::File;
 use DAIA;
 
 # Support XML Schema Validating
-my $schemafile = "clients/daia.xsd";
+my $schemafile = "t/daia.xsd";
 my $validate = sub { };
 eval { require XML::LibXML; };
 if ($@) {
@@ -65,6 +65,7 @@ $item = item(
   ]
 );
 my $data = join("",<DATA>);
+chomp $data;
 is ( $item->xml( xmlns => 1 ), $data, 'xml example' );
 
 $validate->( $item->xml( xmlns => 1 ) );
