@@ -3,7 +3,7 @@
 #################################################################
 
 @prefix : <http://purl.org/ontology/daia/> .
-@prefix daiaserv: <http://purl.org/ontology/daia/service/> .
+@prefix daiaserv: <http://purl.org/ontology/daia/Service/> .
 
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix bibo: <http://purl.org/ontology/bibo/> .
@@ -29,21 +29,11 @@
 <http://purl.org/ontology/daia/> a owl:Ontology ;
     dct:title "Document Availability Information Ontology (DAIA)" ;
     dct:description """The Document Availability Information Ontology (DAIA) describes the current availability of documents in libraries and similar institutions. Availability can be expressed in terms of specific services."""@en ;
-    owl:versionInfo "Beta version 2011-11-08" .
+    owl:versionInfo "Beta version 2011-12-13" .
 
 #################################################################
 # DAIA Classes
 #################################################################
-
-###  http://purl.org/ontology/daia/Error
-
-:Error a owl:Class ;
-    rdfs:label "Error"@en ;
-    rdfs:comment "An Error is some obstacle that limits the completeness of a DAIA Response, Document, Item, or Service."@en ;
-    skos:scopeNote "An error message can be related to an Error by dct:description and an error code by dct:identifier."@en ;
-    rdfs:seeAlso dct:identifier ;
-    rdfs:seeAlso dct:description .
-
 
 ###  http://purl.org/ontology/daia/Limitation
 
@@ -93,25 +83,25 @@
 # DAIA Services
 #################################################################
 
-###  http://purl.org/ontology/daia/service/Loan
+###  http://purl.org/ontology/daia/Service/Loan
 daiaserv:Loan a owl:Class ;
     rdfs:label "loan service"@en ;
     rdfs:comment "Use outside of the holding institution (by lending or online access)"@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/service/Presentation
+###  http://purl.org/ontology/daia/Service/Presentation
 daiaserv:Presentation a owl:Class ;
     rdfs:label "presentation service"@en ;
     rdfs:comment "Use within the holding institution (in their rooms, in their intranet etc.)"@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/service/Interloan
+###  http://purl.org/ontology/daia/Service/Interloan
 daiaserv:Interloan a owl:Class ;
     rdfs:label "interloan service"@en ;
     rdfs:comment "Use mediated by another institution."@en ;
     rdfs:subClassOf :Service .
 
-###  http://purl.org/ontology/daia/service/Openaccess
+###  http://purl.org/ontology/daia/Service/Openaccess
 daiaserv:Openaccess a owl:Class ;
     rdfs:label "open access service"@en ;
     rdfs:comment "can be accessed freely on the Web"@en ;
@@ -219,22 +209,6 @@ daiaserv:Openaccess a owl:Class ;
     rdfs:domain :Service ;
     rdfs:range frbr:Item ;
     owl:inverseOf :availableFor .
-
-###  http://purl.org/ontology/daia/hasError
-
-:hasError a owl:ObjectProperty ;
-    rdfs:label "has error"@en ;
-    rdfs:comment "Relates a Response, Document, Item, or Service (or some other object) to an Error. In general this means that the information about the object is incomplete."@en ;
-    rdfs:range :Error ;
-    owl:inverseOf :errorIn .
-
-###  http://purl.org/ontology/daia/hasError
-
-:errorIn a owl:ObjectProperty ;
-    rdfs:label "has error"@en ;
-    rdfs:comment "Relates an Error to a Response, Document, Item, or Service."@en ;
-    rdfs:domain :Error ;
-    owl:inverseOf :hasError .
 
 ###  http://purl.org/ontology/daia/contains
 :contains a owl:ObjectProperty ;
