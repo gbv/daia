@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 package DAIA::Object;
 #ABSTRACT: Abstract base class of all DAIA classes
 
@@ -256,7 +258,7 @@ sub serve {
     }
     #_enable_utf8_layer($to); # TODO: this does not work
     if (! $attr{noutf8} ) {
-        eval{ binmode $to, ':utf8'  };
+        eval{ binmode $to, ':encoding(UTF-8)'  };
     }
 
     if ( defined $format and $format eq 'json' ) {
@@ -522,7 +524,7 @@ sub _hidden_prop {
 
 =head2 _enable_utf8_layer
 
-Enable :utf8 layer for a given filehandle unless it or some
+Enable :encoding(UTF-8) layer for a given filehandle unless it or some
 other encoding has already been enabled.
 
 =cut
@@ -533,12 +535,9 @@ sub _enable_utf8_layer {
     foreach my $layer ( PerlIO::get_layers( $fh ) ) {
         return if $layer =~ /^encoding|^utf8/;
     }
-    binmode $fh, ':utf8';
+    binmode $fh, ':encoding(UTF-8)';
 }
 
-
-# some constants
-our $RDFNAMESPACE = 'http://purl.org/ontology/daia/';
 
 our %COMMON_PROPERTIES =( 
     id => {
@@ -557,11 +556,6 @@ our %COMMON_PROPERTIES =(
         repeatable => 1,
         predicate => 'http://purl.org/dc/terms/description',
     },
-    error => {
-        type => 'DAIA::Error',
-        repeatable => 1,
-        predicate => $DAIA::Object::RDFNAMESPACE.'hasError'
-    }
 );
 
 1;

@@ -114,7 +114,7 @@
           URI.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute default="false" name="fragment" type="xs:boolean">
+      <xs:attribute name="part" type="partType">
         <xs:annotation>
           <xs:documentation>Indicates that the availability information is only valid for a part if
             the requested item. You should avoid this flag but giving partial information is better
@@ -127,6 +127,16 @@
         </xs:annotation>
       </xs:attribute>
   </xs:complexType>
+
+  <!-- part type -->
+  <xs:simpleType name="partType">
+    <xs:annotation>
+      <xs:documentation>Either 'broader' or 'narrower'</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value='^(broader|narrower)$' />
+    </xs:restriction>
+  </xs:simpleType>
 
   <!-- avaialability type -->
   <xs:complexType name="availability">

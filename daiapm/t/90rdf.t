@@ -28,7 +28,6 @@ sub pdump { eval {
     print $s."\n";
 } }
 
-#my $error = error();
 #my $a = unavailable(expected=>'2010-02-13');
 #pdump($a->rdfhash);
 

@@ -29,7 +29,7 @@
 <http://purl.org/ontology/daia/> a owl:Ontology ;
     dct:title "Document Availability Information Ontology (DAIA)" ;
     dct:description """The Document Availability Information Ontology (DAIA) describes the current availability of documents in libraries and similar institutions. Availability can be expressed in terms of specific services."""@en ;
-    owl:versionInfo "Beta version 2011-12-13" .
+    owl:versionInfo "Beta version 2011-12-15" .
 
 #################################################################
 # DAIA Classes
@@ -53,6 +53,7 @@
     ns:term_status "stable" ;    
     rdfs:comment "A Respone contains information about document availability for a specific time and institution."@en ;
     skos:scopeNote "Messages can be added with dct:description."@en ;
+    skos:scopeNote "rdfs:seeAlso is used to link to documents and institutions."@en ;
     rdfs:seeAlso dct:description .
 
 ###  http://purl.org/ontology/daia/Service
@@ -120,7 +121,7 @@ daiaserv:Openaccess a owl:Class ;
     rdfs:domain bibo:Document ;
     rdfs:range frbr:Item ;
     owl:inverseOf :exemplarOf ;
-    rdfs:seeAlso :extractOf ;
+    rdfs:seeAlso :broaderExemplar, :narrowerExemplar ;
     rdfs:seeAlso frbr:exemplarOf ;
     rdfs:seeAlso frbr:embodimentOf .
 
@@ -131,32 +132,54 @@ daiaserv:Openaccess a owl:Class ;
     rdfs:comment "Relates an Item to the Document that is exemplified by the Item."@en ;
     rdfs:range bibo:Document ;
     rdfs:domain frbr:Item ;
-    rdfs:seeAlso :extractOf ;
+    rdfs:seeAlso :broaderExemplarOf, :narrowerExemplarOf ;
     rdfs:seeAlso frbr:exemplar ;
     rdfs:seeAlso frbr:embodiment ;
     owl:inverseOf :exemplar .
 
-###  http://purl.org/ontology/daia/extract
+###  http://purl.org/ontology/daia/narrowerExemplar
 
-:extract a owl:ObjectProperty ;
-    rdfs:label "extract"@en ;
+:narrowerExemplar a owl:ObjectProperty ;
+    rdfs:label "narrower exemplar"@en ;
     rdfs:comment "Relates a Document to an Item that is an exemplar of a part of the Document."@en ;
-    skos:scopeNote "{ ?d daia:extract ?i } => { ?d dct:hasPart [ daia:exemplar ?i ] }" ;
+    skos:scopeNote "{ ?d daia:narrowerExemplar ?i } => { ?d dct:hasPart [ daia:exemplar ?i ] }" ;
     rdfs:domain bibo:Document ;
     rdfs:range frbr:Item ;
-    rdfs:seeAlso dct:hasPart ;
-    rdfs:seeAlso :exemplar .
+    rdfs:seeAlso dct:hasPart, :broaderExemplar, :exemplar ;
+    owl:inverseOf :narrowerExemplarOf .
 
-###  http://purl.org/ontology/daia/extractOf
+###  http://purl.org/ontology/daia/narrowerExemplarOf
 
-:extractOf a owl:ObjectProperty ;
-    rdfs:label "extract of"@en ;
+:narrowerExemplar a owl:ObjectProperty ;
+    rdfs:label "narrower exemplar of"@en ;
     rdfs:comment "Relates an Item to a Document which is partly exemplified by the Item."@en ;
-    skos:scopeNote "{ ?i daia:extractOf ?d } => { ?i daia:exemplarOf [ dct:isPartOf ?d ] }" ;
+    skos:scopeNote "{ ?i daia:narrowerExemplarOf ?d } => { ?i daia:exemplarOf [ dct:isPartOf ?d ] }" ;
     rdfs:range bibo:Document ;
     rdfs:domain frbr:Item ;
-    owl:inverseOf :extract ;
-    rdfs:seeAlso :exemplarOf .
+    owl:inverseOf :narrowerExemplar ;
+    rdfs:seeAlso :exemplarOf, :broaderExemplarOf .
+
+###  http://purl.org/ontology/daia/broaderExemplar
+
+:broaderExemplar a owl:ObjectProperty ;
+    rdfs:label "broader exemplar"@en ;
+    rdfs:comment "Relates a Document to an Item that contains an exemplar of the Document as part."@en ;
+    skos:scopeNote "{ ?d daia:broaderExemplar ?i } => { ?i dct:hasPart [ daia:exemplarOf ?d ] }" ;
+    rdfs:domain bibo:Document ;
+    rdfs:range frbr:Item ;
+    rdfs:seeAlso dct:hasPart, :broaderExemplar, :exemplar ;
+    owl:inverseOf :broaderExemplarOf .
+
+###  http://purl.org/ontology/daia/broaderExemplarOf
+
+:broaderExemplar a owl:ObjectProperty ;
+    rdfs:label "broader exemplar of"@en ;
+    rdfs:comment "Relates an Item to a Document which is partly exemplified by the Item."@en ;
+    skos:scopeNote "{ ?i daia:broaderExemplarOf ?d } => { ?i dct:hasPart [ daia:exemplarOf ?d ] }" ;
+    rdfs:range bibo:Document ;
+    rdfs:domain frbr:Item ;
+    owl:inverseOf :broaderExemplar ;
+    rdfs:seeAlso :exemplarOf, :broaderExemplarOf .
 
 ###  http://purl.org/ontology/daia/limits
 :limits a owl:ObjectProperty ;
@@ -209,20 +232,6 @@ daiaserv:Openaccess a owl:Class ;
     rdfs:domain :Service ;
     rdfs:range frbr:Item ;
     owl:inverseOf :availableFor .
-
-###  http://purl.org/ontology/daia/contains
-:contains a owl:ObjectProperty ;
-    rdfs:label "described in response"@en ;
-    rdfs:comment "Relates a Response to a Document, Item, Service, or other resource."@en ;
-    rdfs:domain :Response ;
-    rdfs:seeAlso dct:references .
-
-###  http://purl.org/ontology/daia/response
-:response a owl:ObjectProperty ;
-    rdfs:label "in response"@en ;
-    rdfs:comment "Relates a Document, Item, Service or other resource to a Response."@en ;
-    rdfs:range :Response ;
-    owl:inverseOf :contains .
 
 ###  http://purl.org/ontology/daia/collectedBy
 :collectedBy a owl:ObjectProperty ;
@@ -367,7 +376,7 @@ dct:description rdfs:type rdfs:Property .
 
 ###  http://purl.org/dc/terms/hasPart
 dct:hasPart rdfs:type rdfs:Property ;
-    skos:scopeNote "This property can be inferred from a daia:extract property."@en .
+    skos:scopeNote "This property can be inferred from a daia:narrowerExemplar or daia:broaderExemplar property."@en .
 
 ###  http://purl.org/dc/terms/identifier
 dct:identifier rdfs:type rdfs:Property .

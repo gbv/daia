@@ -1,5 +1,21 @@
+use strict;
+use warnings;
 package DAIA::Available;
 #ABSTRACT: Information about a service that is currently unavailable
+
+use base 'DAIA::Availability';
+
+our %PROPERTIES = (
+    %DAIA::Availability::PROPERTIES,
+    delay => { 
+        filter => sub {
+            return 'unknown' if lc("$_[0]") eq 'unknown';
+            return DAIA::Availability::normalize_duration( $_[0] );
+        },
+    }
+);
+
+1;
 
 =head1 DESCRIPTION
 
@@ -7,11 +23,6 @@ This class is derived from L<DAIA::Availability> - see that class for details.
 In addition there is the property C<delay> that holds an XML Schema duration
 value or the special value C<unknown>.  Obviously the C<status> property of
 a C<DAIA::Unavailable> object is always C<1>.
-
-=cut
-
-use strict;
-use base 'DAIA::Availability';
 
 =head1 PROPERTIES
 
@@ -36,17 +47,3 @@ delay as L<DateTime::Duration> object, use the C<parse_duration>
 function that can be exported on request.
 
 =back
-
-=cut
-
-our %PROPERTIES = (
-    %DAIA::Availability::PROPERTIES,
-    delay => { 
-        filter => sub {
-            return 'unknown' if lc("$_[0]") eq 'unknown';
-            return DAIA::Availability::normalize_duration( $_[0] );
-        },
-    }
-);
-
-1;

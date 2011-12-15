@@ -122,3 +122,19 @@ foreach my $h ( @holders ) {
 eval { message( lang => '123', content => 'hello' ); };
 ok( $@, 'invalid language tag' );
 
+# errors
+my $err = DAIA::Message->new( content => 'Hallo', lang => 'de-at', errno => 0 );
+is_deeply( $err->struct, { errno => 0, content => 'Hallo', lang => 'de-at' } );
+
+like( $err->xml, qr{<message.*errno}, 'error in DAIA/XML' );
+
+$err->errno( undef );
+is_deeply( $err->struct, { content => 'Hallo', lang => 'de-at' } );
+
+my $item = item();
+$item->addMessage( 'bla', errno => 9 );
+like( $item->xml, qr{<message.*errno}m, 'error in DAIA/XML' );
+
+($err) = $item->message;
+is_deeply( $err->struct, { errno => 9, content => 'bla', lang => 'de' } );
+

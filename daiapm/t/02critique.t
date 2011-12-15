@@ -11,9 +11,8 @@ if ( not $ENV{TEST_AUTHOR} ) {
     plan( skip_all => $msg );
 }
 
-eval { require Test::Perl::Critic; };
-
-if ( $EVAL_ERROR ) {
+eval "use Test::Perl::Critic";
+if ( $@ ) {
    my $msg = 'Test::Perl::Critic required to criticise code';
    plan( skip_all => $msg );
 }
@@ -21,4 +20,3 @@ if ( $EVAL_ERROR ) {
 Test::Perl::Critic->import( );
 # Test::Perl::Critic->import( -profile => 't/perlcriticrc' );
 all_critic_ok('lib');
-

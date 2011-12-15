@@ -1,7 +1,7 @@
+use strict;
+use warnings;
 package DAIA;
 #ABSTRACT: Document Availability Information API
-
-use strict;
 
 =head1 DESCRIPTION
 
@@ -50,12 +50,11 @@ implemented as object of class L<DAIA::Response>.
 =back
 
 Additional L<DAIA objects|/"DAIA OBJECTS"> include B<institutions>
-(L<DAIA::Institution>), B<departments> (L<DAIA::Department>), 
-storages (L<DAIA::Storage>), messages (L<DAIA::Message>), and 
-errors (L<DAIA::Message>). All these objects provide standard methods
-for creation, modification, and serialization. This package also
-L<exports functions|/"FUNCTIONS"> as shorthand for object constructors,
-for instance the following two result in the same:
+(L<DAIA::Institution>), B<departments> (L<DAIA::Department>), storages
+(L<DAIA::Storage>), messages and errors (L<DAIA::Message>).  All these objects
+provide standard methods for creation, modification, and serialization. This
+package also L<exports functions|/"FUNCTIONS"> as shorthand for object
+constructors, for instance the following two result in the same:
 
   item( id => $id );
   DAIA::Item->new( id => $id );
@@ -137,7 +136,7 @@ our %EXPORT_TAGS = (
 );
 our @EXPORT_OK = qw(is_uri parse guess);
 Exporter::export_ok_tags;
-$EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve', 'error'];
+$EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve'];
 Exporter::export_tags('all');
 
 use Carp; # use Carp::Clan; # qw(^DAIA::);
@@ -152,7 +151,6 @@ use DAIA::Availability;
 use DAIA::Available;
 use DAIA::Unavailable;
 use DAIA::Message;
-use DAIA::Error;
 use DAIA::Entity;
 use DAIA::Institution;
 use DAIA::Department;
@@ -185,7 +183,7 @@ C<institution>, C<department>, C<storage>, C<limitation>
 
 =back
 
-Additional functions are C<message> and C<error> as object constructors,
+Additional functions are C<message> as object constructor,
 and C<serve>. The other functions below are not exported by default.
 You can call them as method or as function, for instance:
 
@@ -205,13 +203,6 @@ sub institution  { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::I
 sub department   { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Department->new( @_ ) }
 sub storage      { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Storage->new( @_ ) }
 sub limitation   { local $Carp::CarpLevel = $Carp::CarpLevel + 1; return DAIA::Limitation->new( @_ ) }
-
-sub error { 
-    local $Carp::CarpLevel = $Carp::CarpLevel + 1; 
-    #my $errno = @_ ? shift : 0;
-    #return DAIA::Message->new( @_ ? (@_, errno => $errno) : (errno => $errno) );
-    return DAIA::Error->new( @_ );
-}
 
 =head2 serve( [ [ format => ] $format ] [ %options ] )
 
@@ -293,13 +284,13 @@ sub parse {
             $from = get($file) or croak "Failed to fetch $file via HTTP"; 
         } else {
             if ( ! (ref($file) eq 'GLOB' or UNIVERSAL::isa( $file, 'IO::Handle') ) ) {
-                $file = do { IO::File->new($file, '<:utf8') or croak("Failed to open file $file") };
+                $file = do { IO::File->new($file, '<:encoding(UTF-8)') or croak("Failed to open file $file") };
             }
-            # Enable :utf8 layer unless it or some other encoding has already been enabled
+            # Enable :encoding(UTF-8) layer unless it or some other encoding has already been enabled
             # foreach my $layer ( PerlIO::get_layers( $file ) ) {
             #    return if $layer =~ /^encoding|^utf8/;
             #}
-            binmode $file, ':utf8';
+            binmode $file, ':encoding(UTF-8)';
             $from = do { local $/; <$file> };
         }
         croak "DAIA serialization is empty" unless $from;
@@ -429,9 +420,9 @@ On request the function can be exported into the default namespace.
 =head1 DAIA OBJECTS
 
 All objects (documents, items, availability status, institutions, departments,
-limitations, storages, messages, errors) are implemented as subclass of
-L<DAIA::Object>, which is just another Perl meta-class framework.
-All objects have the following methods:
+limitations, storages, messages) are implemented as subclass of
+L<DAIA::Object>, which is just another Perl meta-class framework.  All objects
+have the following methods:
 
 =head2 item
 

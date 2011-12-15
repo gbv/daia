@@ -19,7 +19,7 @@ is_deeply( $item, $item2, 'add nothing' );
 $item->add(undef);
 is_deeply( $item, $item2, 'add undef = nothing' );
 
-$item = item()->fragment(0)->message( ["foo","bar"] );
+$item = item()->part('broader')->message( ["foo","bar"] );
 
 $item = DAIA::parse( '{ "item" : { "id" : "my:id" } }' );
 isa_ok( $item, "DAIA::Item" );

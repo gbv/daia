@@ -1,63 +1,9 @@
-package DAIA::Message;
-#ABSTRACT: An optional information text
-
 use strict;
+use warnings;
+package DAIA::Message;
+#ABSTRACT: An optional information or error message
+
 use base 'DAIA::Object';
-
-=head1 DESCRIPTION
-
-Messages can occurr as property of L<DAIA::Response>, L<DAIA::Document>,
-L<DAIA::Item>, and L<DAIA::Availability> objects.
-
-=head1 PROPERTIES
-
-=over
-
-=item content
-
-The message as plain Unicode string. The default value
-is the empty string.
-
-=item lang
-
-A mandatory RFC 3066 language code. The default value is defined in 
-C<$DAIA::Message::DEFAULT_LANG> and set to C<'en'>.
-
-=item errno
-
-This property is always C<undef> no matter what you set it to.
-
-=back
-
-The C<message> function is a shortcut for the DAIA::Message constructor:
-
-  $msg = DAIA::Message->new( ... );
-  $msg = message( ... );
-
-The constructor understands several abbreviated ways to define a message:
-
-  $msg = message( $content [, lang => $lang ] )
-  $msg = message( $lang => $content )
-  $msg = message( $lang => $content )
-
-To set or get all messages of an object, you use the C<messages> accessor.
-You can pass an array reference or an array:
-
-  $messages = $document->message;  # returns an array reference
-
-  $document->message( [ $msg1, $msg2 ] );
-  $document->message( [ $msg ] );
-  $document->message( $msg1, $msg2);
-  $document->message( $msg );
-
-To append a message you can use the C<add> or the C<addMessage> method:
-
-  $document->add( $msg );         # $msg must be a DAIA::Message
-  $document->addMessage( ... );   # ... is passed to message constructor
-
-  $document += $msg;              # same as $document->add( $msg );
-
-=cut
 
 our $DEFAULT_LANG = 'en';
 
@@ -74,7 +20,10 @@ our %PROPERTIES = (
     },
     errno => {
         default => undef,
-        fixed   => undef,
+        filter => sub { 
+            return unless defined $_[0];
+            $_[0] =~ m/^-?\d+$/ ? $_[0] : 0  
+        }, 
     }
 );
 
@@ -105,6 +54,65 @@ sub rdfhash {
     return $rdf;
 }
 
+sub is_language_tag {
+    my($tag) = lc($_[0]);
+    return $tag =~ /^[a-z]{1,8}(-[a-z0-9]{1,8})*$/;
+}
+
+1;
+
+=head1 DESCRIPTION
+
+Messages can occurr as property of L<DAIA::Response>, L<DAIA::Document>,
+L<DAIA::Item>, and L<DAIA::Availability> objects.
+
+=head1 PROPERTIES
+
+=over
+
+=item content
+
+The message as plain Unicode string. The default value
+is the empty string.
+
+=item lang
+
+A mandatory RFC 3066 language code. The default value is defined in 
+C<$DAIA::Message::DEFAULT_LANG> and set to C<'en'>.
+
+=item errno
+
+By default this property is set to C<undef>. You can set it to any integer
+for error messages.
+
+=back
+
+The C<message> function is a shortcut for the DAIA::Message constructor:
+
+  $msg = DAIA::Message->new( ... );
+  $msg = message( ... );
+
+The constructor understands several abbreviated ways to define a message:
+
+  $msg = message( $content [, lang => $lang ] )
+  $msg = message( $lang => $content )
+  $msg = message( $lang => $content )
+
+To set or get all messages of an object, you use the C<messages> accessor.
+You can pass an array reference or an array:
+
+  $messages = $document->message;  # returns an array reference
+
+  $document->message( [ $msg1, $msg2 ] );
+  $document->message( [ $msg ] );
+  $document->message( $msg1, $msg2);
+  $document->message( $msg );
+
+To append a message you can use the C<add> or the C<addMessage> method:
+
+  $document->add( $msg );         # $msg must be a DAIA::Message
+  $document->addMessage( ... );   # ... is passed to message constructor
+
 =head1 FUNCTIONS
 
 =head2 is_language_tag ( $tag )
@@ -114,10 +122,3 @@ follows XML Schema type C<xs:language> instead of RFC 3066. For true RFC 3066
 support have a look at L<I18N::LangTags>.
 
 =cut
-
-sub is_language_tag {
-    my($tag) = lc($_[0]);
-    return $tag =~ /^[a-z]{1,8}(-[a-z0-9]{1,8})*$/;
-}
-
-1;

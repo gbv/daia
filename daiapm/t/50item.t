@@ -56,31 +56,19 @@ $item->message( message('hey'), 'ho' );
 my @msg = $item->message; @msg = map { $_->struct } @msg;
 is_deeply( \@msg, $mm[0], 'multiple messages' );
 
-
-# fragment (xs:boolean)
-use JSON;
-
+# part
 $item = item();
-my @true = ( 1, 'true', $JSON::true, 42 );
-foreach my $t (@true) {
-    $item->fragment(undef);
-    $item->fragment($t);
-    ok( $item->fragment, 'fragment true' );
+ok( $item !~ /part/m, 'no part by default' );
+foreach my $p (qw(broader narrower)) {
+    $item->part($p);
+    is( $item->part, $p, "part=$p" );
+    like( $item->json, qr/{\s*"part"\s*:\s*"$p"\s*}/m );
+    like( $item->xml, qr/<item\s+part\s*=\s*"$p"\s*\/>/m );
 }
-like( $item->json, qr/{\s*"fragment"\s*:\s*true\s*}/m );
-like( $item->xml, qr/<item\s+fragment\s*=\s*"true"\s*\/>/m );
-
-my @false = ( 0, 'false', $JSON::false, 'FALSE' );
-foreach my $t (@false) {
-    $item->fragment(undef);
-    $item->fragment($t);
-    ok( ! $item->fragment, 'fragment false' );
-}
-like( $item->json, qr/{\s*"fragment"\s*:\s*false\s*}/m );
-like( $item->xml, qr/<item\s+fragment\s*=\s*"false"\s*\/>/m );
+$item->part(undef);
+ok( $item !~ /part/m, 'part unset' );
 
 # label
-$item->fragment( undef );
 $item->label( "hi" );
 is( $item->label, "hi" );
 $item->label( "" );

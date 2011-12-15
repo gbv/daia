@@ -1,5 +1,31 @@
+use strict;
+use warnings;
 package DAIA::Unavailable;
 #ABSTRACT: Information about a service that is currently unavailable
+
+use base 'DAIA::Availability';
+use DateTime;
+
+our %PROPERTIES = (
+    %DAIA::Availability::PROPERTIES,
+    queue => { 
+        filter => sub { return $_[0] =~ /^[0-9]+$/ ? $_[0] : undef },
+    },
+    expected => { 
+        filter => sub { # TODO: move this to function in DAIA::Availability (?)
+            return 'unknown' if lc("$_[0]") eq 'unknown';
+            my $exp = $_[0];
+            if ($exp =~ /^P/ or UNIVERSAL::isa( $exp, 'DateTime::Duration' )) {
+                my $span = DAIA::Availability::parse_duration( $exp );
+                my $now = DateTime->from_epoch( epoch => time() );
+                $exp = $now->add_duration( $span );
+            }
+            return DAIA::Availability::date_or_datetime( $exp );
+        },
+    },
+);
+
+1;
 
 =head1 DESCRIPTION
 
@@ -8,13 +34,6 @@ It is derived from L<DAIA::Availability> so see that class for details and
 examples. In addition an instance of this class can have the properties
 C<expected> and C<queue>. Obviously the C<status> property of a
 C<DAIA::Unavailable> object is always C<0>.
-
-=cut
-
-use strict;
-use base 'DAIA::Availability';
-
-use DateTime;
 
 =head1 PROPERTIES
 
@@ -49,26 +68,3 @@ or the special value "unknown". If no period (nor "unknown") is given, the servi
 probably won't be available in the future.
 
 =back
-
-=cut
-
-our %PROPERTIES = (
-    %DAIA::Availability::PROPERTIES,
-    queue => { 
-        filter => sub { return $_[0] =~ /^[0-9]+$/ ? $_[0] : undef },
-    },
-    expected => { 
-        filter => sub { # TODO: move this to function in DAIA::Availability (?)
-            return 'unknown' if lc("$_[0]") eq 'unknown';
-            my $exp = $_[0];
-            if ($exp =~ /^P/ or UNIVERSAL::isa( $exp, 'DateTime::Duration' )) {
-                my $span = DAIA::Availability::parse_duration( $exp );
-                my $now = DateTime->from_epoch( epoch => time() );
-                $exp = $now->add_duration( $span );
-            }
-            return DAIA::Availability::date_or_datetime( $exp );
-        },
-    },
-);
-
-1;
