@@ -1,6 +1,7 @@
-0.36 2011-12-15
+0.4  2011-12-15
       - removed DAIA::Error class
       - support broader/narrower items
+      - support more RDF serialization formats
 0.35 2011-12-13
       - split messages and error
       - moved to dist::Zilla

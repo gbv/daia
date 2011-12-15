@@ -185,7 +185,6 @@ sub rdfhash {
 
     my $rdf = { };
 
-    # TODO: part (broader/narrower)
     # TODO: department
     
     if ($self->{storage}) {

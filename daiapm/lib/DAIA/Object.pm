@@ -222,10 +222,51 @@ sub rdfhash {
     return { };
 }
 
+=head2 serialize ( $format )
+
+Serialize in some required format (C<xml>, C<json>, C<rdfjson> plus possibly
+more RDF serialization forms). A list of supported formats is returned by
+C<DAIA::formats>.
+
+=cut
+
+sub serialize {
+    my ($self, $format) = @_;
+    return unless $format and grep { $_ eq $format } DAIA->formats;
+
+    my $content = ''; 
+
+    if ($format eq 'xml') {
+        $content = $self->xml(xmnls => 1);
+    } elsif ($format eq 'json') {
+        $content = $self->json;
+    } elsif ($format eq 'rdfjson') {
+        $content = JSON->new->pretty->encode($self->rdfhash());
+    } elsif ( $DAIA::TRINE_SERIALIZER ) {
+        my %opt;
+        # NOTE: RDF/XML dumps all namespaces, so avoid it
+        $opt{namespaces} = $DAIA::RDF_NS if $DAIA::RDF_NS and $format ne 'rdfxml';
+        my $ser;
+        if ( $DAIA::GRAPHVIZ and $DAIA::TRINE_MODEL and $format =~ /^(dot|svg)$/ ) {
+            $ser = $DAIA::GRAPHVIZ->new( as => $format, %opt );
+        } else {
+            $ser = eval { $DAIA::TRINE_SERIALIZER->new( $format, %opt ); };
+        }
+        if ($ser) {
+            # NOTE: We could get rid of RDF::Trine::Model if hashref converted directly to iterator
+            my $model = $DAIA::TRINE_MODEL->temporary_model;
+            $model->add_hashref( $self->rdfhash );
+            $content = $ser->serialize_model_to_string( $model );
+        }
+    }
+
+    return $content;
+}
+
 =head2 serve
 
 Serialize the object and send it to STDOUT with the appropriate HTTP headers.
-See L<DAIA/"DAIA OBJECTS"> for details.
+See L<DAIA/"DAIA OBJECTS"> for details. This method is deprecated.
 
 =cut
 
@@ -261,6 +302,7 @@ sub serve {
         eval{ binmode $to, ':encoding(UTF-8)'  };
     }
 
+    # TODO: user serialize($format) instead
     if ( defined $format and $format eq 'json' ) {
         print $to CGI::header( '-type' => "application/javascript; charset=utf-8" ) if $header;
         if (not exists $attr{callback}) {

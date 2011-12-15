@@ -9,7 +9,7 @@ use DAIA;
 # Support XML Schema Validating
 my $schemafile = "t/daia.xsd";
 my $validate = sub { };
-eval { require XML::LibXML; };
+eval "use XML::LibXML";
 if ($@) {
     diag("XML::LibXML not installed - validating will be skipped: $@");
 } else {

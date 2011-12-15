@@ -15,6 +15,9 @@ is( guess($json), 'json', 'guessed DAIA/JSON' );
 
 is( DAIA->guess($xml), 'xml', 'guessed DAIA/XML' );
 
+my @f = DAIA->formats;
+ok( scalar (grep { $_ eq 'xml' } @f), 'DAIA->formats' );
+
 __END__
 use Data::Dumper;
 

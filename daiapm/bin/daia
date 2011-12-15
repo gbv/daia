@@ -5,79 +5,88 @@
 use strict;
 use warnings;
 
-use utf8;
-use Encode;
-use CGI qw(:standard);
+use DAIA;
 use LWP::Simple qw(get);
 use Data::Dumper;
 use JSON;
-use DAIA;
+use Getopt::Long;
+use Pod::Usage;
 
-# set parameters
-my $url = param('url');
-$url = shift @ARGV unless $url;
-$url ||= "";
+my %formats = DAIA->formats;
+my ($help,$man,$input,$output,$debug,$callback,$version);
 
-my $debug = param('debug') || 0;
-$Carp::Verbose = 1 if ($debug);
+GetOptions(
+    'help|?'     => \$help,
+    'man'        => \$man,
+    'output:s'   => \$output,
+    'input:s'    => \$input,
+    'debug'      => \$debug,
+    'version'    => \$version,
+    'callback:s' => \$callback
+);
+pod2usage(-verbose => 2) if defined $man;
+pod2usage(-verbose => 1) if defined $help;
 
-# TODO: add proxy-parameter to append other parameters to and reuse as URL
-
-my $data = param('data'); # icoming raw data is UTF-8
-eval{ $data = Encode::decode_utf8( $data ); };
-
-my $informat  = lc(param('in'));
-my $outformat = lc(param('out')) || 'json';
-
-if ($outformat !~ /^(xml|json|rdf|dump)$/) {
-    print STDERR "Unsupported output format!\n";
+if ($version) {
+    print "This is DAIA version ". $DAIA::VERSION . " with the following output formats:\n";
+    print join "\n", map({ "  $_" } keys %formats), '';
     exit;
 }
 
-my $callback = param('callback') || ""; 
-$callback = "" unless $callback =~ /^[a-z][a-z0-9._\[\]]*$/i;
+$Carp::Verbose = 1 if $debug;
+$output ||= 'json';
+$callback = "" unless $callback and $callback =~ /^[a-z][a-z0-9._\[\]]*$/i;
 
-my ($error, $daia, @daiaobjs, $eurl);
+pod2usage(-message => "Unsupported output format $output")
+    unless grep { $_ eq $output } keys %formats;
 
-my $xsd = "daia.xsd"; # TODO: search somewhere else
+# TODO: support validating
+# my $xsd = "daia.xsd";
 
-if( $url !~ /^\s*http[s]?:\/\// and not $data ) {
-    $url =~ s#^file://##;
-    $url = \*STDIN if $url eq '-';
-    if (not defined $url or $url =~ /^-(\?|h|-help)$/) {
-        print join("",<DATA>)."\n";
-        exit;
+my $url = \*STDIN;
+
+if (@ARGV) {
+    if ($ARGV[0] =~ /^\s*http[s]?:\/\//) {
+        $url = shift @ARGV;
+    } elsif ($ARGV[0] eq '-') {
+        shift @ARGV;
+        pod2usage( -message => 'cannot read from STDIN plus other sources' ) if @ARGV;
+    } else {
+        $url = undef;
     }
-} else {
-    $eurl = $url; # url_encode
-    $eurl =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 }
 
-# parse DAIA
-if ( $data ) {
-    @daiaobjs = eval { DAIA->parse( data => $data, format => $informat ) };
-} elsif( $url ) {
-    @daiaobjs = eval { DAIA->parse( file => $url, format => $informat ) };
-}
-if ($@) {
-    $error = $@;
-    $error =~ s/DAIA::([A-Z]+::)?[a-z_]+\(\)://ig unless $debug;
-    $error =~ s/ at .* line.*//g unless $debug;
+binmode STDOUT, "utf8";
+
+my @daiaobjs;
+
+if( $url and not @ARGV ) {
+    @daiaobjs = eval { DAIA->parse( file => $url, format => $input ) };
+    goto OUTPUT;
 }
 
-if ( $error ) {
-    print STDERR "$error\n";
-} else {
-    binmode STDOUT, "utf8";
+while (@ARGV) {
+    my $id = shift @ARGV;
+
+    if ($url) { $id = $url . ($url =~ /\?/ ? '&' : '?') . "id=$id"; }
+    @daiaobjs = eval { DAIA->parse( file => $id, format => $input ) };
+
+OUTPUT:
+    if ($@) {
+        unless ($debug) {
+            $@ =~ s/DAIA::([A-Z]+::)?[a-z_]+\(\)://ig;
+            $@ =~ s/ at .* line.*//g;
+        }
+        print STDERR "$@\n";
+        exit 1;
+    }
     foreach my $daia (@daiaobjs) {
-        if ($outformat eq 'xml') {
-            print $daia->xml(xmlns => 1);
-        } elsif($outformat eq 'rdf') {
-            print JSON->new->pretty->encode($daia->rdfhash());
-        } elsif($outformat eq 'dump') {
+        if ($output eq 'xml') {
+            print $daia->xml(xmlns => 1,header=>1);
+        } elsif ($output eq 'dump') {
             print Dumper($daia);
-        } elsif($outformat eq 'json') {
-            print $daia->json;
+        } else {
+            print $daia->serialize($output);
         }
     }
     print "\n";
@@ -85,42 +94,44 @@ if ( $error ) {
 
 =head1 DESCRIPTION
 
-You can pass either an URL which will be queried, or a string of serialized
-DAIA. The serialization format (JSON or XML) can be specified or it will get
-guessed. You can use this as a proxy to convert serialization format or just
-show the result in HTML - in this case you can also validate DAIA/XML against
-the XML Schema.
+This command line client can be used to query and transform DAIA. You can pass
+either an URL and and identifier or a file or DAIA format is read from STDIN.
+The serialization input format (JSON or XML) can be specified or it will be
+guessed. 
 
-=head1 USAGE
+=head1 SYNOPSIS
+
+daia [<OPTIONS>] [ <FILES> | <URL> [<IDS>] ]
+
+ Options:
+   -help            brief help message
+   -?|-h|-help      show this help
+   -man             full documentation
+   -input FORMAT    set input format (json or xml)
+   -output FORMAT   set output format
+      json             DAIA/JSON (default)
+      xml              DAIA/XML
+      rdfjson          DAIA/RDF as RDF/JSON
+      dump             Perl dump format (only for debugging)
+      ...              see -version for a full list
+  -callback        add callback method (if out=json)
+  -debug           enable debugging mode
+  -version         show CPAN module version and list output formats
+
+=head1 EXAMPLES
 
 To get usage information call this script with C<-?>, C<-h> or C<--help> as 
 only parameter. Options can be passed as C<key=value> pairs and the first 
 parameter is treated as filename or URL to read from (use '-' for STDIN as
 set by default).
 
-  daia input.xml  out=json  # convert to DAIA/JSON (default)
-  daia input.json out=xml   # convert to DAIA/XML
+  daia -o json input.xml   # convert to DAIA/JSON (default)
+  daia -o xml  input.json  # convert to DAIA/XML
+  daia -o xml http://example.org/ id1 id2 id3
+  daia http://example.org/?id=123
 
 =head1 SEE ALSO
 
 See L<Plack::App::DAIA> and L<Plack::App::DAIA::Validator> for DAIA server
 implementations. 
 
-=cut
-
-__DATA__
-usage: daia [<URL-or-FILE>] [<OPTIONS>]
-
-Options are passed as key=value pairs. If no 'url' option is set, the
-first parameter is used instead. By default reads from STDIN (url=-).
-
-  data=...          use given string instead of URL or file
-  out=...           set output format 
-      json            DAIA/JSON (default)
-      xml             DAIA/XML
-      rdf             DAIA/RDF as RDF/JSON
-      dump            Perl Dump format
-  in=...            set input format (json or xml)
-  callback=...      use callback method (if out=json)
-  debug=0|1         disable|enable debug information
-  -?|-h|--help      show this help

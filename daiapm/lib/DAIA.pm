@@ -3,6 +3,55 @@ use warnings;
 package DAIA;
 #ABSTRACT: Document Availability Information API
 
+# we do not want depend on the following modules
+our ($TRINE_MODEL, $TRINE_SERIALIZER, $RDF_NS, $GRAPHVIZ);
+BEGIN {
+    # optionally use RDF::Trine::Serializer
+    $TRINE_MODEL = 'RDF::Trine::Model';
+    $TRINE_SERIALIZER = 'RDF::Trine::Serializer';
+    eval "use $TRINE_MODEL; use $TRINE_SERIALIZER";
+    if ($@) {
+        $TRINE_MODEL = undef;
+        $TRINE_SERIALIZER = undef;
+    }
+    # optionally use RDF::NS
+    eval "use RDF::NS";
+    $RDF_NS = eval "RDF::NS->new('any')" unless $@;
+    # optionally use RDF::Trine::Exporter::GraphViz
+    eval "use RDF::Trine::Exporter::GraphViz";
+    $GRAPHVIZ = 'RDF::Trine::Exporter::GraphViz' unless $@;
+}
+
+use base 'Exporter';
+our %EXPORT_TAGS = (
+    core => [qw(response document item available unavailable availability)],
+    entities => [qw(institution department storage limitation)],
+);
+our @EXPORT_OK = qw(is_uri parse guess);
+Exporter::export_ok_tags;
+$EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve'];
+Exporter::export_tags('all');
+
+use Carp; # use Carp::Clan; # qw(^DAIA::);
+use IO::File;
+use LWP::Simple qw(get);
+use XML::Simple; # only for parsing (may be changed)
+
+use DAIA::Response;
+use DAIA::Document;
+use DAIA::Item;
+use DAIA::Availability;
+use DAIA::Available;
+use DAIA::Unavailable;
+use DAIA::Message;
+use DAIA::Entity;
+use DAIA::Institution;
+use DAIA::Department;
+use DAIA::Storage;
+use DAIA::Limitation;
+
+use Data::Validate::URI qw(is_uri);
+
 =head1 DESCRIPTION
 
 The Document Availability Information API (DAIA) defines a model of information
@@ -129,35 +178,6 @@ Some more hints are L<listed below|/"DAIA Server hints">.
 
 =cut
 
-use base 'Exporter';
-our %EXPORT_TAGS = (
-    core => [qw(response document item available unavailable availability)],
-    entities => [qw(institution department storage limitation)],
-);
-our @EXPORT_OK = qw(is_uri parse guess);
-Exporter::export_ok_tags;
-$EXPORT_TAGS{all} = [@EXPORT_OK, 'message', 'serve'];
-Exporter::export_tags('all');
-
-use Carp; # use Carp::Clan; # qw(^DAIA::);
-use IO::File;
-use LWP::Simple qw(get);
-use XML::Simple; # only for parsing (may be changed)
-
-use DAIA::Response;
-use DAIA::Document;
-use DAIA::Item;
-use DAIA::Availability;
-use DAIA::Available;
-use DAIA::Unavailable;
-use DAIA::Message;
-use DAIA::Entity;
-use DAIA::Institution;
-use DAIA::Department;
-use DAIA::Storage;
-use DAIA::Limitation;
-
-use Data::Validate::URI qw(is_uri);
 
 =head1 FUNCTIONS
 
@@ -409,6 +429,33 @@ sub guess {
     return 'xml' if $data =~ m{^\s*\<.*?\>\s*$}s;
     return 'json' if $data =~ m{^\s*\{.*?\}\s*$}s;
     return '';
+}
+
+=head2 formats
+
+Return a has with allowed serialization formats and their mime types.
+
+=cut
+
+sub formats {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+    my %formats = (
+        xml  => 'application/xml; charset=utf-8',
+        json => 'application/javascript; charset=utf-8',
+        rdfjson => 'application/javascript; charset=utf-8',
+    );
+
+    if ($TRINE_SERIALIZER) {
+        $formats{'rdfxml'} = 'application/rdf+xml; charset=utf-8',;
+        $formats{'turtle'} = 'text/turtle; charset=utf-8';
+        $formats{'ntriples'} = 'text/plain';
+    }
+    if ($GRAPHVIZ) {
+        $formats{'svg'} = 'image/svg+xml';
+        $formats{'dot'} = 'text/plain; charset=utf-8';
+    }
+
+    return %formats;
 }
 
 =head2 is_uri ( $value )
