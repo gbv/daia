@@ -76,21 +76,42 @@ my $object;
 $object = DAIA::parse_xml( $data );
 is_deeply( $object, $item, 'parsed xml' );
 
-$object = DAIA->parse_xml( "<message lang='de' xmlns='http://ws.gbv.de/daia/'>Hallo</message>" );
-is_deeply( $object, message( 'de' => 'Hallo' ), 'ignore xmlns' );
+my %tests = (
+    'parse message' => [
+        "<message lang='de'>Hallo</message>"
+         => message( 'de' => 'Hallo' )
+    ],
+    'ignore xmlns' => [
+        "<message lang='de' xmlns='http://ws.gbv.de/daia/'>Hallo</message>" 
+        => message( 'de' => 'Hallo' )
+    ],
+    'use xmlns' => [
+        "<d:message lang='de' xmlns:d='http://ws.gbv.de/daia/'>Hallo</d:message>"
+        => message( 'de' => 'Hallo' )
+    ],
+    "label" => [
+        "<item><label>&gt;</label></item>"
+        => item( label => ">" )
+    ],
+    "label attribute (undocumented)" => [
+        "<item label='&gt;' />"
+        => item( label => ">" )
+    ],
+    "empty label" => [
+        "<item><label></label></item>"
+        => item( )
+    ],
+);
 
-$from =  "<d:message lang='de' xmlns:d='http://ws.gbv.de/daia/'>Hallo</d:message>";
-$object = DAIA::parse_xml( $from );
-is_deeply( $object, message( 'de' => 'Hallo' ), 'use xmlns' );
+while (my ($message, $list) = each(%tests)) {
+    my $object = DAIA->parse_xml($list->[0]);
+    is_deeply( $object, $list->[1], $message );
+}
 
-$object = DAIA->parse_xml( "<message lang='de'>Hallo</message>" );
-isa_ok( $object, "DAIA::Message" );
 
 $object = eval { DAIA::parse_xml( "<message><foo /></message>" ); };
 ok( $@, "detect errors in XML" );
 
-$object = DAIA->parse_xml("<item label='&gt;' />");
-is_deeply( $object->struct, { label => ">" }, "label attribute (undocumented)" );
 
 my $msg = new DAIA::Message("hi");
 $xml = "";

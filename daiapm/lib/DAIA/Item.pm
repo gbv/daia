@@ -21,7 +21,10 @@ our %PROPERTIES = (
     label       => {
         default => '',
         filter => sub { # label can be specified as array or as element
-            my $v = (ref($_[0]) eq 'ARRAY') ? $_[0]->[0] : $_[0]; 
+            my $v = $_[0];
+            if (ref($v)) {
+                $v = (ref($v) eq 'ARRAY') ? $v->[0] : ''; 
+            }
             return "$v";
         },
     },

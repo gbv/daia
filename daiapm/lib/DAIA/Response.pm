@@ -57,10 +57,12 @@ sub rdfhash {
         map { { type => 'uri', value => $_->rdfuri } } @see
     ] if @see;
 
-    foreach my $doc (@doc) {
-        $rdf->{ $doc->rdfuri }->{'http://purl.org/ontology/daia/collectedBy'} = [{
-            type => "uri", value => $inst->rdfuri
-        }];
+    if ($inst) {
+        foreach my $doc (@doc) {
+            $rdf->{ $doc->rdfuri }->{'http://purl.org/ontology/daia/collectedBy'} = [{
+                type => "uri", value => $inst->rdfuri
+            }];
+        }
     }
 
     # TODO: add connections

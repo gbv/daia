@@ -36,6 +36,11 @@ my $item = item( id => 'my:id' );
 my $item_rdf = { 'my:id' => {  iri('rdfs:type') => [ irihash('frbr:Item') ] } }; 
 is_deeply( $item->rdfhash, $item_rdf, 'empty item as rdf' );
 
+# Response without institution
+my $daia = DAIA::Response->new();
+$daia->document(id =>'x:y');
+ok( $daia->rdfhash->{'x:y'}, "response with document" );
+
 done_testing;
 __END__
 
