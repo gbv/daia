@@ -1,3 +1,7 @@
+0.41 2012-01-09
+      - fixed dependencies
+0.41 2012-01-06
+      - fixed bugs on empty label and missing institution
 0.4  2011-12-15
       - removed DAIA::Error class
       - support broader/narrower items

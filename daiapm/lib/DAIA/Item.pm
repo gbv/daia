@@ -48,8 +48,8 @@ A link to the item or to additional information about it.
 
 =item message
 
-An optional list of L<DAIA::Message> objects. You can set message(s) with
-the C<message> accessor, with C<addMessage>, and with C<provideMessage>.
+An optional list of L<DAIA::Message> objects. You can get/set message(s) with
+the C<message> accessor.
 
 =item part
 
@@ -79,9 +79,6 @@ be performed with this item.
 
 An optional list of L<DAIA::Unavailable> objects with unavailable services 
 that can (currently or in general) not be performed with this item.
-
-=cut
-
 
 =head1 METHODS
 

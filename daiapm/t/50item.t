@@ -104,3 +104,8 @@ sub test_services {
     is_deeply( \%c, \%p );
 }
 
+# put item to response
+my $d = DAIA::Response->new;
+$d->item( $item );
+is_deeply( $d->item, $item );
+

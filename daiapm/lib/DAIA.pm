@@ -36,6 +36,7 @@ use Carp; # use Carp::Clan; # qw(^DAIA::);
 use IO::File;
 use LWP::Simple qw(get);
 use XML::Simple; # only for parsing (may be changed)
+use XML::SAX;    # needed for namespace-aware parsing
 
 use DAIA::Response;
 use DAIA::Document;
@@ -286,7 +287,7 @@ sub parse {
     my ($from, %param) = (@_ % 2) ? (@_) : (undef,@_);
     $from = $param{from} unless defined $from;
     $from = $param{data} unless defined $from;
-    my $format = lc($param{format});
+    my $format = lc( $param{format} || '' );
     my $file = $param{file};
     $file = $from if defined $from and $from =~ /^http(s)?:\/\//;
     if (not defined $file and defined $from and not defined $param{data}) {

@@ -80,7 +80,7 @@ Must be an URI but should be an URL.
 =item message
 
 An optional list of L<DAIA::Message> objects. You can set message(s) with
-the C<message> accessor, with C<addMessage>, and with C<provideMessage>.
+the C<message> accessor.
 
 =item item
 

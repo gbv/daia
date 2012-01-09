@@ -6,6 +6,7 @@ package DAIA::Response;
 use base 'DAIA::Object';
 
 use POSIX qw(strftime);
+use Carp::Clan;
 
 our %PROPERTIES = (
     version => {
@@ -24,7 +25,25 @@ our %PROPERTIES = (
         type => 'DAIA::Document',
         repeatable => 1
     },
+    item => { 
+        type => 'DAIA::Item',
+        repeatable => 1
+    },
 );
+
+sub item {
+    my $self = shift;
+    croak "DAIA response cannot have both, documents and item" if @_ and $self->{document};
+    $DAIA::Object::AUTOLOAD = 'DAIA::Response::item';
+    return $self->AUTOLOAD(@_);
+}
+
+sub document {
+    my $self = shift;
+    croak "DAIA response cannot have both, documents and item" if @_ and $self->{item};
+    $DAIA::Object::AUTOLOAD = 'DAIA::Response::document';
+    return $self->AUTOLOAD(@_);
+}
 
 sub rdfhash {
     my $self = shift;
@@ -126,8 +145,13 @@ sub check_valid_id {
 
 =item document
 
-a list of L<DAIA::Document> objects. You can get/set document(s) with 
-the C<document> accessor, with C<addDocument>, and with C<provideDocument>.
+a list of L<DAIA::Document> objects. You can get/set document(s) with the
+C<document> accessor. A response can only have either documents or items!
+
+=item item
+
+a list of L<DAIA::Item> objects. You can get/set item(s) with the
+C<document> accessor. A response can only have either items or documents!
 
 =item institution
 
@@ -137,7 +161,7 @@ items services and availabilities described in this response.
 =item message
 
 a list of L<DAIA::Message> objects. You can set message(s) with the 
-C<message> accessor, with C<addMessage>, and with C<provideMessage>.
+C<message> accessor.
 
 =item timestamp
 

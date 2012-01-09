@@ -8,8 +8,7 @@ use Carp::Clan;
 use CGI; # TODO: allow other kind of CGI
 use Data::Validate::URI qw(is_uri is_web_uri);
 use IO::Scalar;
-use Scalar::Util qw(refaddr);
-use UNIVERSAL 'isa';
+use Scalar::Util qw(refaddr reftype);
 use JSON;
 
 our $AUTOLOAD;
@@ -140,7 +139,7 @@ sub xml {
 
     my $xmlns = $param{xmlns} || ($param{xslt} or $param{header});
     my $pi = $param{pi} || [ ];
-    $pi = [$pi] unless isa($pi,'ARRAY');
+    $pi = [$pi] unless (reftype($pi) || '') eq 'ARRAY';
 
     push @$pi, 'xml-stylesheet type="text/xsl" href="' . xml_escape_value($param{xslt}) . '"'
         if $param{xslt};
@@ -371,6 +370,8 @@ sub AUTOLOAD {
 
     my $opt = $PROPERTIES->{$property};
 
+    # TODO: conflicting properties?
+    
     if ( $method =~ /^add/ ) {
         croak "$class->$property is not repeatable or has no type"
             unless $opt->{repeatable} and $opt->{type};
@@ -580,14 +581,10 @@ sub _enable_utf8_layer {
     binmode $fh, ':encoding(UTF-8)';
 }
 
-
 our %COMMON_PROPERTIES =( 
     id => {
         filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_uri($v) ? $v : undef; }
     },
-#    href => {
-#        filter => sub { my $v = "$_[0]"; $v =~ s/^\s+|\s$//g; is_web_uri($v) ? $v : undef; }
-#    },
     href => { 
         filter => sub { my $v = "$_[0]"; is_web_uri($v) ? $v : undef; },
         predicate => 'http://xmlns.com/foaf/0.1/page',
