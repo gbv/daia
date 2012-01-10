@@ -19,8 +19,9 @@ The icons are meant to represent the four DAIA services as defined in
 the DAIA format description:
 
 - presentation - item can be accessed locally
-- loan         - item can be loaned (taken home)
+- loan         - item can be borrowed (taken home)
 - openaccess   - item can be accessed online without restriction
+- online       - iten can be accessed online anywhere with registration
 - interloan    - item can be accessed via another institution
 
 In addition the following icons are used
@@ -66,6 +67,10 @@ In detail DAIA core icons are based on the following PICOL icons:
 - daia_presentation:  home and imprint
 - daia_loan:          home and dropbox
 - daia_interloan:     home and filter
-- daia_openaccess:    globe
+- daia_online:        globe
 - daia_queue:         group
 - dotted_document:    document_text
+
+The Open Access icon is based on works of the Public Library of
+Science (http://www.plos.org/) and considered to be public domain.
+
