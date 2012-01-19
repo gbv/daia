@@ -12,28 +12,39 @@ conforming to the Open Publication Distribution System (OPDS).
   -->
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
+  <!-- URL to the resulting feed -->
+  <xsl:param name="self"/>
+
   <xsl:template match="/daia:daia">
     <feed>
         <title>TODO</title> <!-- TODO: just copy dc:title -->
         <id>TODO</id>
 
         <updated><xsl:value-of select="/*/@timestamp"/></updated>
-        <link rel="self" 
-            type="application/atom+xml;profile=opds-catalog;kind=acquisition"
-            href="http://example.com/TODO" />
+        <xsl:if test="$self">
+            <link rel="self" href="{$self}"
+                type="application/atom+xml;profile=opds-catalog;kind=acquisition" />
+        </xsl:if>
 
         <xsl:apply-templates select="daia:institution"/>
         <xsl:apply-templates select="daia:document"/>
     </feed>
   </xsl:template>
 
+  <!-- The institution can be seen as 'author' of the feed -->
   <xsl:template match="daia:institution">
-    <author>
-      <name><xsl:value-of select="."/></name>
-      <xsl:if test="@id">
-        <uri><xsl:value-of select="@id"/></uri>
-      </xsl:if>
-    </author>
+    <xsl:variable name="name" select="normalize-space(.)"/>
+    <xsl:variable name="url"  select="normalize-space(@id)"/>
+    <xsl:if test="$name or $url">
+      <author>
+        <xsl:if test="$name">
+          <name><xsl:value-of select="$name"/></name>
+        </xsl:if>
+        <xsl:if test="$url">
+          <uri><xsl:value-of select="$url"/></uri>
+        </xsl:if>
+      </author>
+    </xsl:if>
   </xsl:template>
  
   <xsl:template match="daia:document">
@@ -41,17 +52,14 @@ conforming to the Open Publication Distribution System (OPDS).
         <title>TODO</title>
         <id><xsl:value-of select="@id"/></id>
 
-        <!-- TODO: date of original document or date of last check or date of availability? -->
-        <!--updated>1970-01-01T00:00:00</updated-->
+        <!-- when the entry itself was updated -->
         <updated><xsl:value-of select="/*/@timestamp"/></updated>
 
-        <!-- We could add
-             <dc:issued>original date</dc:issued> 
-        -->
+        <!-- We could add <dc:issued>original date</dc:issued> --> 
 
         <!-- TODO: every element MUST have a link, so sort out if not given! -->
         <xsl:if test="@href">
-          <link href="{@href}" type="text/html" />
+          <link href="{@href}" type="text/html"/>
         </xsl:if>
         
         <xsl:apply-templates select="daia:item/daia:available" />
@@ -83,7 +91,9 @@ conforming to the Open Publication Distribution System (OPDS).
     <!-- TODO: maybe opds:indirectAcquisition is a better choice? -->
     <xsl:choose>
       <xsl:when test="$service = 'http://purl.org/ontology/daia/Service/Loan'">
-        <link href="{@href}" rel="http://opds-spec.org/acquisition/borrow"/>
+        <link href="{@href}" rel="http://opds-spec.org/acquisition/borrow">
+          <opds:indirectAcquisition/> <!-- TOOD: type? -->
+        </link>
       </xsl:when>
       <xsl:when test="$service = 'http://purl.org/ontology/daia/Service/Interloan'">
         <!-- ignore interloan -->
