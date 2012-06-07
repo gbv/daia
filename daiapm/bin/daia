@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use DAIA;
-use LWP::Simple qw(get);
 use Data::Dumper;
 use JSON;
 use Getopt::Long;
@@ -104,7 +103,6 @@ guessed.
 daia [<OPTIONS>] [ <FILES> | <URL> [<IDS>] ]
 
  Options:
-   -help            brief help message
    -?|-h|-help      show this help
    -man             full documentation
    -input FORMAT    set input format (json or xml)

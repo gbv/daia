@@ -134,7 +134,7 @@ sub check_valid_id {
   $r->institution( $institution );
   $institution = $r->institution;
 
-  my $documents = $r->document;
+  my @documents = $r->document;
 
   $r->timestamp;
   $r->version;

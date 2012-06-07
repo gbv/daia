@@ -182,7 +182,10 @@ sub struct {
         } elsif( $property eq 'label' and $self->{$property} eq '' ) {
             # ignore empty string label
         } else {
-            $struct->{$property} = $self->{$property};
+            # remove characters not allowed in XML 1.0
+            my $value = $self->{$property};
+            $value =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//go;
+            $struct->{$property} = $value;
         }
     }
     return $struct;
@@ -265,7 +268,9 @@ sub serialize {
 =head2 serve
 
 Serialize the object and send it to STDOUT with the appropriate HTTP headers.
-See L<DAIA/"DAIA OBJECTS"> for details. This method is deprecated.
+See L<DAIA/"DAIA OBJECTS"> for details. 
+
+This method is deprecated, please use L<Plack::App::DAIA> instead!
 
 =cut
 
@@ -286,7 +291,7 @@ sub serve {
     }
     $attr{exitif} = 0 unless exists $attr{exitif};
 
-    my $format = lc($attr{format});
+    my $format = lc($attr{format} || '');
     my $header = defined $attr{header} ? $attr{header} : 1;
     my $xslt = $attr{xslt};
     my $pi = $attr{pi};

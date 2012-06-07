@@ -138,3 +138,6 @@ like( $item->xml, qr{<message.*errno}m, 'error in DAIA/XML' );
 ($err) = $item->message;
 is_deeply( $err->struct, { errno => 9, content => 'bla', lang => 'de' } );
 
+$err = DAIA::Message->new( content => "\x01&", lang => 'en' );
+is $err->xml, '<message lang="en">&amp;</message>', "strip invalid characters";
+
