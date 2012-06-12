@@ -1,8 +1,13 @@
 The DAIA project is grouped into modules that can be used independently:
 
-phpDaia - PHP implementation
-daiapm  - DAIA perl module
-xslt    - XSLT client
+daiaphp     - DAIA for PHP 5.3
+hhelper     - A collection of helper functions for DaiaPHP and PicaRecord 
+daiapm      - DAIA perl module
+xslt        - X SLT client
+phpDaia-old - PHP implementation (outdated)
+
+daiaphp and hhelper are git submodules, which you must init/update with
+`git submodule init` and `git submodule update`.
 
 In practise you are more likely interested in only one of this modules.
 Packaged distributions may include shared parts of other modules so it

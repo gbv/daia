@@ -1,0 +1,6 @@
+[submodule "daiaphp"]
+	path = daiaphp
+	url = git://gitorious.org/php-daia/daiaphp.git
+[submodule "hhelper"]
+	path = hhelper
+	url = git://gitorious.org/php-daia/hhelper.git
