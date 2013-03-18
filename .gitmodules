@@ -1,0 +1,3 @@
+[submodule "makespec"]
+	path = makespec
+	url = git@github.com:jakobib/makespec.git
