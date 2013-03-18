@@ -3,34 +3,58 @@
   Uwe Reh (Hebis)
 % GIT_REVISION_DATE
 
+# Introduction
 
-**Abstract**
+The **Document Availability Information API (DAIA)** defines model of document
+availability, a set of exchangeable serializations of this model (in JSON, XML,
+and RDF), and an HTTP API to query document availability information encoded in
+any of these serializations. The DAIA data model basically consists of abstract
+documents, concrete document exemplifications (items), and document services,
+each with an availability status. 
 
-The Document Availability Information API (DAIA) defines a data model with
-serializations in JSON and XML to encode information about the current
-availability of documents. This document defines the serialization formats
-DAIA/JSON and DAIA/XML and a HTTP query API to query DAIA information.
+## Status of this document
+
+This document is a draft of what is going to be DAIA 1.0 specification. The
+specification is based on DAIA 0.5, as defined at
+<http://www.gbv.de/wikis/cls/DAIA_-_Document_Availability_Information_API>.
+
+Updates and sources can be found at <http://github.com/gbv/daiaspec>. The
+current version of this document was last modified at GIT_REVISION_DATE with
+revision GIT_REVISION_HASH.
 
 This document is publically available under the terms of the Creative-Commons
 Attribution-No Derivative ([CC-ND 3.0]) license
 
+## Conformance requirements
 
-# Introduction
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
 
-[[Datei:Daiamodel-extract.png|frame|right|Core components of the
-[http://ws.gbv.de/daia/daiamodel.pdf DAIA data model]]] 
+## Namespaces
 
-The **Document Availability Information API (DAIA)** defines a response format
-that encodes information about the current availability of documents. The
-general structure of a DAIA response is a tree of nested elements. A
-description of the data model is outlined at one page:
-<http://ws.gbv.de/daia/daiamodel.pdf>
+DAIA serializations in XML (DAIA/XML) and RDF (DAIA/RDF) are each formally
+described by a schema or ontology. The DAIA/XML Schema is identified by the XML
+namespace `http://ws.gbv.de/daia/`. The DAIA/RDF Ontology is identified by the
+URI <http://purl.org/ontology/daia/> which is also used URI namespace. The
+namespace prefix `daia` is recommeded for both DAIA/XML and DAIA/RDF.
 
-DAIA format structures can be encoded either in JSON (DAIA/JSON) or in XML
-(DAIA/XML). The current XML Schema is located at
-<http://purl.org/NET/DAIA/schema.xsd>. The XML namespace and URI for DAIA/XML
-is `http://ws.gbv.de/daia/`. The `version` attribute contains the current
-version of the schema (0.5).
+    @prefix daia: <http://purl.org/ontology/daia/> .
+    @base         <http://purl.org/ontology/daia/> .
+
+The following namspace prefixes are used to refer to related ontologies:
+
+    @prefix daiaservice: <http://purl.org/ontology/daia/Service/> . # WILL LIKELY BE CHANGED
+    @prefix dcterms: <http://purl.org/dc/terms/> . # dct:
+    @prefix bibo:    <http://purl.org/ontology/bibo/> .
+    @prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+    @prefix org:     <http://www.w3.org/ns/org#> .
+    @prefix owl:     <http://www.w3.org/2002/07/owl#> .
+    @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+    @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix vann:    <http://purl.org/vocab/vann/> .
+
+The current XML Schema is located at <http://purl.org/NET/DAIA/schema.xsd>. 
 
 
 # Structure and Encoding
@@ -96,14 +120,6 @@ it may be the empty string). DAIA uses the following XML Schema Datatypes:
 -   `xs:nonNegativeInteger` - must conform to the pattern
     `([+]?[0-9]+|-0)` in DAIA/XML. In DAIA/JSON it is a non-negative integer.
 -   `xs:anyURI` - must conform to the pattern of an URI.
-
-For examples in DAIA/RDF the following namespace prefixes are used:
-
--   `@prefix daia: <http://purl.org/ontology/daia/> .`
--   `@prefix daiaservice: <http://purl.org/ontology/daia/Service/> .`
--   `@prefix dcterms: <http://purl.org/dc/terms/> .`
--   `@prefix bibo: <http://purl.org/ontology/bibo/> .`
--   `@prefix foaf: <http://xmlns.com/foaf/0.1/> .`
 
 ## Root element
 
@@ -647,6 +663,10 @@ not* share the same base URL.
     [this Code4LibWiki page](http://wiki.code4lib.org/index.php/DAIA_extensions).
 -   See also the draft of a broader
     [Ontology](http://wiki.code4lib.org/index.php/Library_Ontology Library).
+
+## Relevant differences to DAIA 0.5
+
+...
 
 ## Integrity rules
 
