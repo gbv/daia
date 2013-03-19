@@ -105,21 +105,21 @@ strings, numbers, or boolean values. Unless a more specific limitation is
 defined with an XML Schema Datatype, the content must be an Unicode string (but
 it may be the empty string). DAIA uses the following XML Schema Datatypes:
 
--   `xs:boolean` - in DAIA/XML one of `true`, `false`,
-    `1`, `0`. In DAIA/JSON one of `true`, `false` (but literally instead of string).
--   `xs:language` - must conform to the pattern
-    `[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})\*`.
--   `xs:date` - must follow the form
-    `\d{4}[-](\d\d)[-](\d\d)((([+-])\d\d:\d\d)|Z)?`.
--   `xs:dateTime` - must follow the form
-    `\d{4}[-](\d\d)[-](\d\d)[T](\d\d)[:](\d\d)[:]\d\d([.]\d+)?((([+-])\d\d:\d\d)|Z)?`.
--   `xs:duration` - must follow the form `-PnYnMnDTnHnMnS`.
-    Empty parts can be omitted.
--   `xs:integer` - must conform to the pattern `[+-]?[0-9]+` in
-    DAIA/XML. In DAIA/JSON it is an integer.
--   `xs:nonNegativeInteger` - must conform to the pattern
-    `([+]?[0-9]+|-0)` in DAIA/XML. In DAIA/JSON it is a non-negative integer.
--   `xs:anyURI` - must conform to the pattern of an URI.
+- `xs:boolean` - in DAIA/XML one of `true`, `false`,
+  `1`, `0`. In DAIA/JSON one of `true`, `false` (but literally instead of string).
+- `xs:language` - must conform to the pattern
+  `[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})\*`.
+- `xs:date` - must follow the form
+  `\d{4}[-](\d\d)[-](\d\d)((([+-])\d\d:\d\d)|Z)?`.
+- `xs:dateTime` - must follow the form
+  `\d{4}[-](\d\d)[-](\d\d)[T](\d\d)[:](\d\d)[:]\d\d([.]\d+)?((([+-])\d\d:\d\d)|Z)?`.
+- `xs:duration` - must follow the form `-PnYnMnDTnHnMnS`.
+  Empty parts can be omitted.
+- `xs:integer` - must conform to the pattern `[+-]?[0-9]+` in
+  DAIA/XML. In DAIA/JSON it is an integer.
+- `xs:nonNegativeInteger` - must conform to the pattern
+  `([+]?[0-9]+|-0)` in DAIA/XML. In DAIA/JSON it is a non-negative integer.
+- `xs:anyURI` - must conform to the pattern of an URI.
 
 ## Root element
 
@@ -128,16 +128,16 @@ root element. In DAIA/XML the root element name is **`daia`**, in
 DAIA/JSON the root element is just an unnamed object. The attributes and
 child elements are as follows:
 
--   **`version`** (attribute) - the daia version number (currently `0.5`)
--   **`timestamp`** (attribute) - the time the document was generated. Type `xs:dateTime`.
--   **`message`**\* (element) - (error) message(s) about the whole response
--   **`institution`**? (element) - information about the
-    institution that grants or knows about services and their
-    availability
--   **`document`**\* (element) - a group of items that can be
-    refered to with one identifier. Please note that although the number
-    of document elements can be zero or greater one, one single document
-    entry should be considered as the default.
+- **`version`** (attribute) - the daia version number (currently `0.5`)
+- **`timestamp`** (attribute) - the time the document was generated. Type `xs:dateTime`.
+- **`message`**\* (element) - (error) message(s) about the whole response
+- **`institution`**? (element) - information about the
+  institution that grants or knows about services and their
+  availability
+- **`document`**\* (element) - a group of items that can be
+  refered to with one identifier. Please note that although the number
+  of document elements can be zero or greater one, one single document
+  entry should be considered as the default.
 
 In DAIA/XML you must further specifiy the XML namespace
 `http://ws.gbv.de/daia/` and may refer to the DAIA
@@ -145,8 +145,8 @@ XML Schema `http://ws.gbv.de/daia/daia.xsd` as
 shown in the following example. In DAIA/JSON you can include a fixed
 child element that points to the DAIA specification and namespace:
 
--   **`schema`** (attribute) - DAIA namespace string
-    `http://ws.gbv.de/daia/`
+- **`schema`** (attribute) - DAIA namespace string
+  `http://ws.gbv.de/daia/`
 
 **Example:** 
 
@@ -189,15 +189,15 @@ The `document` element describes a single document. Nevertheless,
 several *instances* of a documents (e.g. copies of a book) can exist. For the
 instances, have a look at the [item element](#item-element) below.
 
--   **`id`** (attribute) - each document needs an unique id to
-    query it (e.g. ISBN, ppn, etc.). Please consider that ids have to be
-    URIs. Type `xs:anyURI`.
--   **`href`**? (attribute) - a link to the document or to
-    additional information. Type `xs:anyURI`.
--   **`message`**\* (element) - (error) message(s) about the
-    document.
--   **`item`**\* (element) - an instance or copy of the queried
-    document (correspondends to the FRBR class of same name).
+- **`id`** (attribute) - each document needs an unique id to
+  query it (e.g. ISBN, ppn, etc.). Please consider that ids have to be
+  URIs. Type `xs:anyURI`.
+- **`href`**? (attribute) - a link to the document or to
+  additional information. Type `xs:anyURI`.
+- **`message`**\* (element) - (error) message(s) about the
+  document.
+- **`item`**\* (element) - an instance or copy of the queried
+  document (correspondends to the FRBR class of same name).
 
 In DAIA/XML messages and items can be mixed in any order.
 
@@ -238,25 +238,25 @@ The `item` node references a single
 instance (copy, URI, etc.) of a document. The availability information
 is of course connected to the item nodes.
 
--   **`id`**? (attribute) - again, each item (instance) may have
-    an unique ID (e.g., an individual call number for a book). Please
-    consider that ids have to be URIs. Type `xs:anyURI`.
--   **`href`**? (attribute) - a link to the item or to additional
-    information. Type `xs:anyURI`.
--   **`part`**? (attribute) - indicate that the item only contains
-    a part of the document (`part="narrower"`) or contains
-    more than the document (`part="broader"`)
--   **`message`**\* (element) - (error) message(s) about the item.
--   **`label`**? (element) - a label that helps to identify and/or
-    find the item (call number etc.)
--   **`department`**? (element) - an administrative sub-entitity
-    of the institution that is responsible for this item
--   **`storage`**? (element) - a physical location of the item
-    (stacks, floor etc.)
--   **`available`**\* (element) - information about an available
-    service with the item.
--   **`unavailable`**\* (element) - information about an
-    unavailable service with the item
+- **`id`**? (attribute) - again, each item (instance) may have
+  an unique ID (e.g., an individual call number for a book). Please
+  consider that ids have to be URIs. Type `xs:anyURI`.
+- **`href`**? (attribute) - a link to the item or to additional
+  information. Type `xs:anyURI`.
+- **`part`**? (attribute) - indicate that the item only contains
+  a part of the document (`part="narrower"`) or contains
+  more than the document (`part="broader"`)
+- **`message`**\* (element) - (error) message(s) about the item.
+- **`label`**? (element) - a label that helps to identify and/or
+  find the item (call number etc.)
+- **`department`**? (element) - an administrative sub-entitity
+  of the institution that is responsible for this item
+- **`storage`**? (element) - a physical location of the item
+  (stacks, floor etc.)
+- **`available`**\* (element) - information about an available
+  service with the item.
+- **`unavailable`**\* (element) - information about an
+  unavailable service with the item
 
 Multiple service status can be given for an item represented by
 different available/unavailable elements.
@@ -341,21 +341,21 @@ document:
 The structure of an `available`
 element is:
 
--   **`service`**? (attribute) - the specific service. The value
-    should be one of `presentation`, `loan`,
-    `openaccess`, `interloan` or an URI. Multiple services
-    are represented by multiple available/unavailable elements. Type
-    enumeration or `xs:anyURI`.
--   **`href`**? (attribute) - a link to perform, register or
-    reserve the service. Type `xs:anyURI`.
--   **`delay`**? (attribute) - a time period of estimated delay.
-    Use `unknown` or an ISO time period. If missing, then there
-    is probably no significant delay. Type `xs:duration` or the
-    string `unknown`.
--   **`message`**\* (element) - (error) message(s) about the
-    specific availability status of the item.
--   **`limitation`**\* (element) - more specific limitations of
-    the availability status.
+- **`service`**? (attribute) - the specific service. The value
+  should be one of `presentation`, `loan`,
+  `openaccess`, `interloan` or an URI. Multiple services
+  are represented by multiple available/unavailable elements. Type
+  enumeration or `xs:anyURI`.
+- **`href`**? (attribute) - a link to perform, register or
+  reserve the service. Type `xs:anyURI`.
+- **`delay`**? (attribute) - a time period of estimated delay.
+  Use `unknown` or an ISO time period. If missing, then there
+  is probably no significant delay. Type `xs:duration` or the
+  string `unknown`.
+- **`message`**\* (element) - (error) message(s) about the
+  specific availability status of the item.
+- **`limitation`**\* (element) - more specific limitations of
+  the availability status.
 
 In DAIA/XML messages and limitations can be mixed in any order.
 
@@ -420,18 +420,18 @@ The structure of an `unavailable`
 element is identical to the structure of the available element in most
 cases.
 
--   **`service}}?** (attribute) - see above
--   **`href`**? (attribute) - see above
--   **`expected`** (attribute) - A time period until the service
-    will be available again. Use `unknown` or an ISO time period.
-    If missing, then the service probably won't be available in the
-    future. Type `xs:date` or `xs:dateTime` or the string
-    `unknown`.
--   **`message`**\* (element) - see above
--   **`limitation`**\* (element) - more specific limitations of
-    the availability status
--   **`queue?`** (attribute) - the number of waiting requests for
-    this service. Type `xs:nonNegativeInteger`.
+- **`service}}?** (attribute) - see above
+- **`href`**? (attribute) - see above
+- **`expected`** (attribute) - A time period until the service
+  will be available again. Use `unknown` or an ISO time period.
+  If missing, then the service probably won't be available in the
+  future. Type `xs:date` or `xs:dateTime` or the string
+  `unknown`.
+- **`message`**\* (element) - see above
+- **`limitation`**\* (element) - more specific limitations of
+  the availability status
+- **`queue?`** (attribute) - the number of waiting requests for
+  this service. Type `xs:nonNegativeInteger`.
 
 If no `expected` element is given, it is not sure whether the item
 will ever be available, so this is not the same as setting it to
@@ -471,21 +471,21 @@ mixed in any order.
 Messages can occur at several places in a DAIA
 response. The structure of a `message` element is:
 
--   **`lang`** (attribute) - a [RFC 3066] language code. Type
-    `xs:language`.
--   **`content`** (string) - the message text, a simple string
-    without further formatting.
--   **`errno`**? (attribute) - an error code (integer value). Type
-    `xs:integer`.
+- **`lang`** (attribute) - a [RFC 3066] language code. Type
+  `xs:language`.
+- **`content`** (string) - the message text, a simple string
+  without further formatting.
+- **`errno`**? (attribute) - an error code (integer value). Type
+  `xs:integer`.
 
 **Notes:**
 
--   If `content` is an empty string, it should be removed in DAIA
-    encodings. Applications may treat a missing `content` as the
-    empty string.
--   Messages are not meant to be shown to end-users, but only used for
-    debugging. If you need a DAIA message to transport some relevant
-    information, you likely try to use DAIA for the wrong purpose.
+- If `content` is an empty string, it should be removed in DAIA
+  encodings. Applications may treat a missing `content` as the
+  empty string.
+- Messages are not meant to be shown to end-users, but only used for
+  debugging. If you need a DAIA message to transport some relevant
+  information, you likely try to use DAIA for the wrong purpose.
 
 **Example:**
 
@@ -543,11 +543,11 @@ The data structure of all these nodes is identical and discussed below.
 
 **Data structure**
 
--   **`id`**? - a (persistent) identifier for the entity. Type
-    `xs:anyURI`.
--   **`href`**? - a URI linking to the entity. Type
-    `xs:anyURI`.
--   **`content`**? - a simple message text describing the entity.
+- **`id`**? - a (persistent) identifier for the entity. Type
+  `xs:anyURI`.
+- **`href`**? - a URI linking to the entity. Type
+  `xs:anyURI`.
+- **`content`**? - a simple message text describing the entity.
 
 If `content` is an empty string, it should be removed in DAIA
 encodings. Applications may treat a missing `content` as the empty
@@ -584,6 +584,15 @@ All DAIA documents, given in DAIA/JSON or DAIA/XML can
 also be expressed in RDF. The DAIA ontology used for this purpose is
 called DAIA/RDF. The ontology is located at
 http://purl.org/ontology/daia/.
+
+DAIA ontology is based on the following RDF ontologies:
+
+* Bibliographic Ontology (bibo)
+* [Document Service Ontology](http://gbv.github.com/dso/) (DSO)
+* Schema.org Ontology. <http://schema.org/> .
+* FOAF
+* Organization ontology. <http://www.w3.org/TR/vocab-org/>.
+* ...
 
 # 4. Query API
 
@@ -626,43 +635,45 @@ not* share the same base URL.
 
 # References
 
--   **[DATATYPES]** [XML Schema Part 2: Datatypes Second Edition](http://www.w3.org/TR/xmlschema-2/).
-    W3C Recommendation 28 October 2004.
--   **[HTTP]** [Hypertext Transfer Protocol - HTTP/1.1](http://tools.ietf.org/html/rfc2616).
-    June 1999 (RFC 2616).
--   **[JSON]** [JavaScript Object Notation](http://www.json.org/). (RFC 4627)
--   **[URI]** [Uniform Resource Identifiers (URI): Generic Syntax](http://tools.ietf.org/html/rfc2396).
-    August 1998 (RFC 2396).
--   **[UNICODE]** [The Unicode Standard Version 5.0](http://www.unicode.org/versions/Unicode5.0.0/).
-    The Unicode Consortium, 2007.
--   **[XML]** [Extensible Markup Language (XML) 1.0 (Fifth Edition)](http://www.w3.org/TR/xml/).
-    W3C Recommendation 26 November 2008
--   **[XML-NS]** [Namespaces in XML 1.0 (Second Edition)](http://www.w3.org/TR/xml-names/).
-    W3C Recommendation 16 August 2006
+- **[DATATYPES]** [XML Schema Part 2: Datatypes Second Edition](http://www.w3.org/TR/xmlschema-2/).
+  W3C Recommendation 28 October 2004.
+- **[HTTP]** [Hypertext Transfer Protocol - HTTP/1.1](http://tools.ietf.org/html/rfc2616).
+  June 1999 (RFC 2616).
+- **[JSON]** [JavaScript Object Notation](http://www.json.org/). (RFC 4627)
+- **[URI]** [Uniform Resource Identifiers (URI): Generic Syntax](http://tools.ietf.org/html/rfc2396).
+  August 1998 (RFC 2396).
+- **[UNICODE]** [The Unicode Standard Version 5.0](http://www.unicode.org/versions/Unicode5.0.0/).
+  The Unicode Consortium, 2007.
+- **[XML]** [Extensible Markup Language (XML) 1.0 (Fifth Edition)](http://www.w3.org/TR/xml/).
+  W3C Recommendation 26 November 2008
+- **[XML-NS]** [Namespaces in XML 1.0 (Second Edition)](http://www.w3.org/TR/xml-names/).
+  W3C Recommendation 16 August 2006
 
 # Notes (Informative)
 
--   A [reference implementation in Perl](http://search.cpan.org/perldoc?DAIA) 
-    is available at CPAN. It includes a simple
-    [DAIA validator and converter](http://search.cpan.org/perldoc?daia).
-    A public installation of this validator is available at
-    <http://daia.gbv.de/validator/>.
--   All DAIA-related files are combined in a project at Sourceforge:
-    <http://sourceforge.net/projects/daia/>.
--   Date and Time values are from a subset of ISO 8601. Even in ISO 8601
-    there are many ways to specify data and time - so if you need to
-    interpret DAIA data and time values you should use a ISO 8601
-    library to handle all its particularities and to normalize data and
-    time values.
--   The basic structure of DAIA is unlikely to change. However until
-    DAIA 1.0 the following parts need to be finished: 
-    -  Definition of canonical DAIA
-    -  Inclusion of some additional obvious constraints like uniqueness of identifiers per document.
-    -  The DAIA/XML namespace (currently <http://ws.gbv.de/daia/>) may be changed to a more stable PURL.
--   For comments and public discussion about DAIA you can use
-    [this Code4LibWiki page](http://wiki.code4lib.org/index.php/DAIA_extensions).
--   See also the draft of a broader
-    [Ontology](http://wiki.code4lib.org/index.php/Library_Ontology Library).
+- A [reference implementation in Perl](http://search.cpan.org/perldoc?DAIA) 
+  is available at CPAN. It includes a simple
+  [DAIA validator and converter](http://search.cpan.org/perldoc?daia).
+  A public installation of this validator is available at
+  <http://daia.gbv.de/validator/>.
+- All DAIA-related files are combined in a project at Sourceforge:
+  <http://sourceforge.net/projects/daia/>.
+- Date and Time values are from a subset of ISO 8601. Even in ISO 8601
+  there are many ways to specify data and time - so if you need to
+  interpret DAIA data and time values you should use a ISO 8601
+  library to handle all its particularities and to normalize data and
+  time values.
+- The basic structure of DAIA is unlikely to change. However until
+  DAIA 1.0 the following parts need to be finished: 
+
+   -  Definition of canonical DAIA
+   -  Inclusion of some additional obvious constraints like uniqueness of identifiers per document.
+   -  The DAIA/XML namespace (currently <http://ws.gbv.de/daia/>) may be changed to a more stable PURL.
+
+- For comments and public discussion about DAIA you can use
+  [this Code4LibWiki page](http://wiki.code4lib.org/index.php/DAIA_extensions).
+- See also the draft of a broader
+  [Ontology](http://wiki.code4lib.org/index.php/Library_Ontology Library).
 
 ## Relevant differences to DAIA 0.5
 
