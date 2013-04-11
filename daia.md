@@ -1,8 +1,3 @@
-% Document Availability Information API (DAIA)
-% Jakob Voß (VZG)
-  Uwe Reh (Hebis)
-% GIT_REVISION_DATE
-
 # Introduction
 
 The **Document Availability Information API (DAIA)** defines model of document
@@ -14,9 +9,10 @@ availability status.
 
 ## Status of this document
 
-This document is a draft of what is going to be DAIA 1.0 specification. The
-specification is based on DAIA 0.5, as defined at
-<http://www.gbv.de/wikis/cls/DAIA_-_Document_Availability_Information_API>.
+This document is a draft of what is going to be DAIA 1.0 specification.
+
+The previous version 0.5 is available at <http://purl.org/NET/DAIA> and DAIA
+ontology at <http://uri.gbv.de/ontology/daia/>.
 
 The RDF ontology of DAIA/RDF is available in [Turtle](daia.ttl) and in
 [RDF/XML](daia.owl). Schema files for DAIA/XML will follow. All documentation
@@ -475,7 +471,6 @@ mixed in any order.
 
 **Example in DAIA/RDF**
 
-<<<<<<< .merge_file_xYV7Kh
 ~~~ {.turtle}
 [ ] daia:unavailableFor [
   a dso:Presentation ;
@@ -532,7 +527,6 @@ keys. Multiple messages are combined in a JSON array:
 
 **Example in DAIA/RDF**
 
-<<<<<<< .merge_file_xYV7Kh
 ~~~ {.turtle}
 [ ] daia:message [ 
   rdfs:value "request failed"@en .
@@ -708,7 +702,7 @@ Removed
 * <http://purl.org/ontology/daia/Response>
 * <http://purl.org/ontology/daia/timestamp>
 
-Moved to DSO
+Moved to [Document Service Ontology] (DSO)
 
 * <http://purl.org/ontology/daia/Service>
   moved to <http://purl.org/ontology/dso#DocumentService>
@@ -721,7 +715,7 @@ Moved to DSO
 * <http://purl.org/ontology/daia/Service/Presentation> 
   moved to <http://purl.org/ontology/dso#Presentation>
 
-Moved to SSSO
+Moved to [Simple Service Status Ontology] (SSSO)
 
 * <http://purl.org/ontology/daia/provides>
   moved to <http://purl.org/ontology/ssso#provides>
@@ -739,19 +733,21 @@ Moved to SSSO
   and <http://purl.org/ontology/daia/expected> 
   moved to <http://purl.org/ontology/ssso#delay>
 
-Moved to a Holdings ontology, not defined yet
+Maybe to be moved to a **Holdings ontology** (not defined yet)
 
-* daia:exemplar, daia:exemplarOf, daia:narrowerExemplar, daia:broaderExemplar ...
-  and daia:holds, daia:heldBy, daia:label
-* not sure about daia:collectedBy, daia:inCollection (?) to connect holding institution/agent 
+* daia:exemplar, daia:exemplarOf
+* daia:narrowerExemplar, daia:broaderExemplar, daia:narrowerExemplarOf, daia:broaderExemplarOf
+* daia:holds, daia:heldBy, 
+* daia:label
+
+Nur sure about:
+
+* daia:collectedBy, daia:inCollection (?) to connect holding institution/agent 
   and abstract document which holding is exemplar of.
+* daia:Storage maybe to be replaced by dct:Location, geo:SpatialThing or similar (?)
 
-Moved to another, existing ontology
-
-* daia:Storage to be replaced by dct:Location, geo:SpatialThing or similar (?)
-
-The remaining DAIA/RDF classes may be the core of DAIA ontology or 
-moved to DSO (?):
+The remaining DAIA/RDF classes and properties may be the **core of DAIA
+ontology** (or moved to another ontology, such as DSO?):
 
 * daia:perform
 * daia:availableOf, daia:availableFor ... 
@@ -764,4 +760,6 @@ ignored.
 
 [CC-ND 3.0]: http://creativecommons.org/licenses/by-nd/3.0/
 [RFC 3066]: http://tools.ietf.org/html/rfc3066
+[Document Service Ontology]: http://gbv.github.io/dso/dso.html 
+[Simple Service Status Ontology]: http://purl.org/ontology/ssso
 
