@@ -590,12 +590,13 @@ hyperlink to information about the specified entity.
 <limitation>3 day loan</limitation>
 ~~~
 
-# 3. DAIA/RDF
+# 3. DAIA Ontology
 
-All DAIA documents, given in DAIA/JSON or DAIA/XML can
-also be expressed in RDF. The DAIA ontology used for this purpose is
-called DAIA/RDF. The ontology is located at
-<http://purl.org/ontology/daia/>.
+All DAIA documents, given in DAIA/JSON or DAIA/XML can also be expressed in
+RDF. The ontology used for this purpose is also called DAIA/RDF. DAIA Ontology
+mainly consists of a set of classes and properties from related ontologies.
+
+## Overview
 
 DAIA ontology is based on the following RDF ontologies:
 
@@ -607,6 +608,83 @@ DAIA ontology is based on the following RDF ontologies:
   to refer to organizations and institutions.
 * DAIA should be aligned with [Schema.org Ontology](http://schema.org/).
 * ...
+
+## Namespaces
+
+The URI namespace of DAIA Ontology is <http://purl.org/ontology/daia#>. The
+namespace prefix `daia` is recommended. The URI of DAIA Ontology as as a whole
+is <http://purl.org/ontology/daia>.
+
+    @prefix daia: <http://purl.org/ontology/daia#> .
+    @base         <http://purl.org/ontology/daia> .
+
+The following namspace prefixes are used to refer to related ontologies:
+
+    @prefix dso:  <http://purl.org/ontology/dso#> .
+    @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix ssso: <http://purl.org/ontology/ssso#> .
+    @prefix vann: <http://purl.org/vocab/vann/> .
+
+In Turtle syntax, the ontology is defined as following:
+
+    <> a owl:Ontology ;
+        rdfs:label "Document Availability Information Ontology" ;
+        rdfs:label "DAIA" ;
+        vann:preferredNamespacePrefix "daia" .
+
+## Documents and Holdings
+
+...
+
+## Services and Limitations
+
+    ssso:ServiceEvent a owl:Class ;
+        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
+
+    dso:DocumentService a owl:Class ;
+        rdfs:subClassOf ssso:ServiceEvent ;
+        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
+
+    dso:Loan a owl:Class ;
+        rdfs:subClassOf dso:DocumentService ;
+        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
+
+    dso:Presentation a owl:Class ;
+        rdfs:subClassOf dso:DocumentService ;
+        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
+
+    dso:Interloan a owl:Class ;
+        rdfs:subClassOf dso:DocumentService ;
+        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
+
+    dso:OpenAccess a owl:Class ;
+        rdfs:subClassOf dso:DocumentService ;
+        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
+
+    ssso:Limitation a owl:Class ;
+        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
+
+    ssso:limits a owl:ObjectProperty ;
+        rdfs:domain ssso:ServiceLimitation ;
+        rdfs:range ssso:ServiceEvent ;
+        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
+
+    ssso:limitedBy a owl:ObjectProperty ;
+        rdfs:domain ssso:ServiceEvent ;
+        rdfs:range ssso:ServiceLimitation ;
+        owl:inverseOf ssso:limits ;
+        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
+
+## Storage
+
+A storage is a place where items are stored.
+
+    daia:Storage a owl:Class .
+
+## Availability
+
+...
 
 # 4. Query API
 
@@ -665,9 +743,6 @@ not* share the same base URL.
 - **[XML-NS]** [Namespaces in XML 1.0 (Second Edition)](http://www.w3.org/TR/xml-names/).
   W3C Recommendation 16 August 2006
 
-[Document Service Ontology]: http://gbv.github.com/dso/dso.html
-[Simple Service Status Ontology]: http://purl.org/ontology/ssso
-
 # Notes (Informative)
 
 - A [reference implementation in Perl](http://search.cpan.org/perldoc?DAIA) 
@@ -697,12 +772,12 @@ DAIA ontology have been moved to independent micro-ontologies, involving the
 change of URIs. In particular, DAIA services are now defined in the Document
 Service Ontology. The following URIs are deprecated:
 
-Removed
+Removed:
 
 * <http://purl.org/ontology/daia/Response>
 * <http://purl.org/ontology/daia/timestamp>
 
-Moved to [Document Service Ontology] (DSO)
+Moved to [Document Service Ontology] (DSO):
 
 * <http://purl.org/ontology/daia/Service>
   moved to <http://purl.org/ontology/dso#DocumentService>
@@ -715,7 +790,7 @@ Moved to [Document Service Ontology] (DSO)
 * <http://purl.org/ontology/daia/Service/Presentation> 
   moved to <http://purl.org/ontology/dso#Presentation>
 
-Moved to [Simple Service Status Ontology] (SSSO)
+Moved to [Simple Service Status Ontology] (SSSO):
 
 * <http://purl.org/ontology/daia/provides>
   moved to <http://purl.org/ontology/ssso#provides>
@@ -733,15 +808,28 @@ Moved to [Simple Service Status Ontology] (SSSO)
   and <http://purl.org/ontology/daia/expected> 
   moved to <http://purl.org/ontology/ssso#delay>
 
-Maybe to be moved to a **Holdings ontology** (not defined yet)
+Moved to [Holding Ontology]:
 
-* daia:exemplar, daia:exemplarOf
-* daia:narrowerExemplar, daia:broaderExemplar, daia:narrowerExemplarOf, daia:broaderExemplarOf
-* daia:holds, daia:heldBy, 
-* daia:label
+* <http://purl.org/ontology/daia/exemplar> 
+  moved to ...
+* <http://purl.org/ontology/daia/exemplarOf> 
+  moved to ...
+* <http://purl.org/ontology/daia/narrowerExemplar> 
+  moved to ...
+* <http://purl.org/ontology/daia/narrowerExemplarOf> 
+  moved to ...
+* <http://purl.org/ontology/daia/broaderExemplar> 
+  moved to ...
+* <http://purl.org/ontology/daia/broaderExemplarOf> 
+  moved to ...
+* <http://purl.org/ontology/daia/holds> 
+  moved to ...
+* <http://purl.org/ontology/daia/heldBy> 
+  moved to ...
 
 Nur sure about:
 
+* daia:label
 * daia:collectedBy, daia:inCollection (?) to connect holding institution/agent 
   and abstract document which holding is exemplar of.
 * daia:Storage maybe to be replaced by dct:Location, geo:SpatialThing or similar (?)
@@ -749,17 +837,29 @@ Nur sure about:
 The remaining DAIA/RDF classes and properties may be the **core of DAIA
 ontology** (or moved to another ontology, such as DSO?):
 
-* daia:perform
-* daia:availableOf, daia:availableFor ... 
+* daia:perform, daia:baseURL ...
+
+* <http://purl.org/ontology/daia/availableOf> changed to
+  <http://purl.org/ontology/daia#availableOf>.
+
+* <http://purl.org/ontology/daia/availableFor> changed to
+  <http://purl.org/ontology/daia#availableFor>.
+
+* <http://purl.org/ontology/daia/unavailableOf> changed to
+  <http://purl.org/ontology/daia#unavailableOf>.
+
+* <http://purl.org/ontology/daia/unavailableFor> changed to
+  <http://purl.org/ontology/daia#unavailableFor>.
 
 ## Integrity rules
 
 If department and institution have same id, the department SHOULD be
 ignored.
 
-
 [CC-ND 3.0]: http://creativecommons.org/licenses/by-nd/3.0/
 [RFC 3066]: http://tools.ietf.org/html/rfc3066
-[Document Service Ontology]: http://gbv.github.io/dso/dso.html 
+
+[Document Service Ontology]: http://gbv.github.com/dso/dso.html
 [Simple Service Status Ontology]: http://purl.org/ontology/ssso
+[Holding Ontology]: https://github.com/cKlee/holding-ontology
 
