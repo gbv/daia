@@ -23,7 +23,7 @@ and converted with [makespec](https://github.com/jakobib/makespec).
 
 Updates and sources of DAIA 1.0 can be found at
 <http://github.com/gbv/daiaspec>. The current version of this document was last
-modified at GIT_REVISION_DATE with revision GIT_REVISION_HASH.
+modified at {GIT_REVISION_DATE} with revision {GIT_REVISION_HASH}.
 
 This document is publically available under the terms of the Creative-Commons
 Attribution-No Derivative ([CC-ND 3.0]) license. Feedback is welcome:
@@ -34,7 +34,7 @@ Attribution-No Derivative ([CC-ND 3.0]) license. Feedback is welcome:
 
 **Revision history**
 
-GIT_CHANGES
+{GIT_CHANGES}
 
 ## Conformance requirements
 
@@ -76,11 +76,11 @@ DAIA/JSON and DAIA/XML. The basic information entities of DAIA format
 are:
 
 -   [daia](#root-element) (root element)
--   [document](#document-element)
--   [item](#item-element)
--   [available](#available-element) and [unavailable](#unavailable-element)
+-   [document]
+-   [item]
+-   [available] and [unavailable]
 -   [messages](#messages)
--   [Additional entities](#additional-entities) (institution, department, storage, and limitation)
+-   Additional entities ([institution], [department], [storage], and [limitation])
 
 Daia entities in DAIA/JSON are encoded as simple nodes with child nodes,
 daia entities in DAIA/XML are encoded as XML-elements with attributes
@@ -140,13 +140,13 @@ DAIA/JSON the root element is just an unnamed object.
 
 **Properties**
 
-- **`version`** (attribute) - the daia version number (currently `0.5`)
-- **`timestamp`** (attribute) - the time the document was generated. Type `xs:dateTime`.
-- **`message`**\* (element) - (error) message(s) about the whole response
-- **`institution`**? (element) - information about the
+- **version** (attribute) - the daia version number (currently `0.5`)
+- **timestamp** (attribute) - the time the document was generated. Type `xs:dateTime`.
+- **[message]**\* (element) - (error) message(s) about the whole response
+- **[institution]**? (element) - information about the
   institution that grants or knows about services and their
   availability
-- **`document`**\* (element) - a group of items that can be
+- **[document]**\* (element) - a group of items that can be
   refered to with one identifier. Please note that although the number
   of document elements can be zero or greater one, one single document
   entry should be considered as the default.
@@ -157,7 +157,7 @@ XML Schema `http://ws.gbv.de/daia/daia.xsd` as
 shown in the following example. In DAIA/JSON you can include a fixed
 child element that points to the DAIA specification and namespace:
 
-- **`schema`** (attribute) - DAIA namespace string
+- **schema** (attribute) - DAIA namespace string
   `http://ws.gbv.de/daia/`
 
 **Example** 
@@ -197,20 +197,22 @@ Equivalent DAIA/XML with different namespace prefix:
 
 ## Document element
 
+[document]: #document-element
+
 The `document` element describes a single document. Nevertheless, several
 *instances* of a document (e.g. copies of a book) can exist. For these
 instances, have a look at the [item element](#item-element) below.
 
 **Properties**
 
-- **`id`** (attribute) - each document needs an unique id to
+- **id** (attribute) - each document needs an unique id to
   query it (e.g. ISBN, ppn, etc.). Please consider that ids have to be
   URIs. Type `xs:anyURI`.
-- **`href`**? (attribute) - a link to the document or to
+- **href**? (attribute) - a link to the document or to
   additional information. Type `xs:anyURI`.
-- **`message`**\* (element) - (error) message(s) about the
+- **[message]**\* (element) - (error) message(s) about the
   document.
-- **`item`**\* (element) - an instance or copy of the queried
+- **[item]**\* (element) - an instance or copy of the queried
   document (correspondends to the FRBR class of same name).
 
 In DAIA/XML messages and items can be mixed in any order.
@@ -248,30 +250,32 @@ In DAIA/XML messages and items can be mixed in any order.
 
 ## Item element
 
+[item]: #item-element
+
 The `item` node references a single
 instance (copy, URI, etc.) of a document. The availability information
 is of course connected to the item nodes.
 
 **Properties**
 
-- **`id`**? (attribute) - again, each item (instance) may have
+- **id**? (attribute) - again, each item (instance) may have
   an unique ID (e.g., an individual call number for a book). Please
   consider that ids have to be URIs. Type `xs:anyURI`.
-- **`href`**? (attribute) - a link to the item or to additional
+- **href**? (attribute) - a link to the item or to additional
   information. Type `xs:anyURI`.
-- **`part`**? (attribute) - indicate that the item only contains
+- **part**? (attribute) - indicate that the item only contains
   a part of the document (`part="narrower"`) or contains
   more than the document (`part="broader"`)
-- **`message`**\* (element) - (error) message(s) about the item.
-- **`label`**? (element) - a label that helps to identify and/or
+- **[message]**\* (element) - (error) message(s) about the item.
+- **label**? (element) - a label that helps to identify and/or
   find the item (call number etc.)
-- **`department`**? (element) - an administrative sub-entitity
+- **[department]**? (element) - an administrative sub-entitity
   of the institution that is responsible for this item
-- **`storage`**? (element) - a physical location of the item
+- **[storage]**? (element) - a physical location of the item
   (stacks, floor etc.)
-- **`available`**\* (element) - information about an available
+- **[available]**\* (element) - information about an available
   service with the item.
-- **`unavailable`**\* (element) - information about an
+- **[unavailable]**\* (element) - information about an
   unavailable service with the item
 
 Multiple service status can be given for an item represented by
@@ -354,23 +358,25 @@ document:
 
 ## Available element
 
+[available]: #available-element
+
 The structure of an `available` element is:
 
-- **`service`**? (attribute) - the specific service from the [Document Service Ontology] 
+- **service**? (attribute) - the specific service from the [Document Service Ontology] 
   (DSO). The value can be given as full URI or as simple name. A name
   is mapped to an URI by uppercasing the first letter and prepending the base
   URI <http://purl.org/ontology/dso#>. Multiple services
   are represented by multiple available/unavailable elements. Type
   enumeration or `xs:anyURI`.
-- **`href`**? (attribute) - a link to perform, register or
+- **href**? (attribute) - a link to perform, register or
   reserve the service. Type `xs:anyURI`.
-- **`delay`**? (attribute) - a time period of estimated delay.
+- **delay**? (attribute) - a time period of estimated delay.
   Use `unknown` or an ISO time period. If missing, then there
   is probably no significant delay. Type `xs:duration` or the
   string `unknown`.
-- **`message`**\* (element) - (error) message(s) about the
+- **[message]**\* (element) - (error) message(s) about the
   specific availability status of the item.
-- **`limitation`**\* (element) - more specific limitations of
+- **[limitation]**\* (element) - more specific limitations of
   the availability status.
 
 In DAIA/XML messages and limitations can be mixed in any order.
@@ -430,20 +436,22 @@ specify a service).
 
 ## Unavailable element
 
+[unavailable]: #unavailable-element
+
 The structure of an `unavailable` element is identical to the structure of the
 available element in most cases.
 
-- **`service}}?** (attribute) - see above
-- **`href`**? (attribute) - see above
-- **`expected`** (attribute) - A time period until the service
+- **service**? (attribute) - see above
+- **href**? (attribute) - see above
+- **expected** (attribute) - A time period until the service
   will be available again. Use `unknown` or an ISO time period.
   If missing, then the service probably won't be available in the
   future. Type `xs:date` or `xs:dateTime` or the string
   `unknown`.
-- **`message`**\* (element) - see above
-- **`limitation`**\* (element) - more specific limitations of
+- **[message]**\* (element) - see above
+- **[limitation]**\* (element) - more specific limitations of
   the availability status
-- **`queue?`** (attribute) - the number of waiting requests for
+- **queue**? (attribute) - the number of waiting requests for
   this service. Type `xs:nonNegativeInteger`.
 
 If no `expected` element is given, it is not sure whether the item
@@ -480,14 +488,16 @@ mixed in any order.
 
 ## Messages
 
+[message]: #messages
+
 Messages can occur at several places in a DAIA
 response. The structure of a `message` element is:
 
-- **`lang`** (attribute) - a [RFC 3066] language code. Type
+- **lang** (attribute) - a [RFC 3066] language code. Type
   `xs:language`.
-- **`content`** (string) - the message text, a simple string
+- **content** (string) - the message text, a simple string
   without further formatting.
-- **`errno`**? (attribute) - an error code (integer value). Type
+- **errno**? (attribute) - an error code (integer value). Type
   `xs:integer`.
 
 **Notes:**
@@ -536,30 +546,37 @@ keys. Multiple messages are combined in a JSON array:
 
 ## Additional entities
 
+[institution]: #additional-entities
+[department]: #additional-entities
+[storage]: #additional-entities
+[limitation]: #additional-entities
+
 In this section, the additional entries
 institution, department, storage and limitation are discussed.
 
-- **`institution`** nodes refer to an institution (e.g., the
+- **institution** nodes refer to an institution (e.g., the
   University of Hamburg), referenced by an ISIL, a hyperlink and/or a
   name. 
 
-- **`department`** nodes refer to a single department of an
+- **department** nodes refer to a single department of an
   institution, e.g., the Faculty of Computer Science of Bielefeld
   University. They should be used when the institution has an own library.
 
-- **`storage`** nodes deliver information about the place where
-  an item is stored ("2nd floor"). \* **`limitation`** nodes give
+- **storage** nodes deliver information about the place where
+  an item is stored ("2nd floor"). i
+
+- **limitation** nodes give
   information of limitations of the availability of an item
 
 The data structure of all these nodes is identical and discussed below.
 
 **Data structure**
 
-- **`id`**? - a (persistent) identifier for the entity. Type
+- **id**? - a (persistent) identifier for the entity. Type
   `xs:anyURI`.
-- **`href`**? - a URI linking to the entity. Type
+- **href**? - a URI linking to the entity. Type
   `xs:anyURI`.
-- **`content`**? - a simple message text describing the entity.
+- **content**? - a simple message text describing the entity.
 
 If `content` is an empty string, it should be removed in DAIA
 encodings. Applications may treat a missing `content` as the empty
