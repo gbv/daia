@@ -4,7 +4,7 @@ The **Document Availability Information API (DAIA)** defines model of document
 availability, a set of exchangeable serializations of this model (in JSON, XML,
 and RDF), and an HTTP API to query document availability information encoded in
 any of these serializations. The DAIA data model basically consists of abstract
-documents, concrete holdings of documents, and document services, each with an
+documents, concrete holdings of documents, and document services, with an
 availability status. 
 
 ## Status of this document
@@ -26,7 +26,7 @@ Updates and sources of DAIA 1.0 can be found at
 modified at {GIT_REVISION_DATE} with revision {GIT_REVISION_HASH}.
 
 This document is publically available under the terms of the Creative-Commons
-Attribution-No Derivative ([CC-ND 3.0]) license. Feedback is welcome:
+Attribution-ShareAlike Derivative ([CC-BY-SA 3.0]) license. Feedback is welcome:
 
 * implement the specication!
 * [correct](https://github.com/gbv/daiaspec/blob/master/daia.md) the specification!
@@ -47,8 +47,9 @@ interpreted as described in RFC 2119.
 DAIA serializations in XML (DAIA/XML) and RDF (DAIA/RDF) are each formally
 described by a schema or ontology. The DAIA/XML Schema is identified by the XML
 namespace `http://ws.gbv.de/daia/`. The DAIA/RDF Ontology is identified by the
-URI <http://purl.org/ontology/daia/> which is also used URI namespace. The
-namespace prefix `daia` is recommeded for both DAIA/XML and DAIA/RDF.
+URI <http://purl.org/ontology/daia/> which is also used URI namespace. Both may
+be changed to <http://purl.org/ontology/daia#>. The namespace prefix `daia` is
+recommeded for both DAIA/XML and DAIA/RDF.
 
     @prefix daia: <http://purl.org/ontology/daia/> .
     @base         <http://purl.org/ontology/daia/> .
@@ -71,11 +72,11 @@ The current XML Schema is located at <http://purl.org/NET/DAIA/schema.xsd>.
 # Structure and Encoding
 
 In the following paragraphs we want to give a short introduction to DAIA
-format. Examples of equivalent DAIA document fragments are given in
+format. Examples of equivalent DAIA response fragments are given in
 DAIA/JSON and DAIA/XML. The basic information entities of DAIA format
 are:
 
--   [daia](#root-element) (root element)
+-   [daia] (root element)
 -   [document]
 -   [item]
 -   [available] and [unavailable]
@@ -94,6 +95,9 @@ mandatory and non-repeatable. Repeatable elements in DAIA/XML are just
 line up after another. Repeatable elements in DAIA/JSON must be encoded
 as array with one ore more content elements.
 
+The order or repeatable elements ([message], [limitation], [document], [item],
+[available], [unavailable]) *is irrelevant*. DAIA servers and clients MAY
+sort these lists as they like.
 
 +--------------+------------------------------------+----------------------------+
 |              | DAIA/JSON                          |  DAIA/XML                  |
@@ -134,119 +138,110 @@ it may be the empty string). DAIA uses the following XML Schema Datatypes:
 
 ## Root element
 
-Each full DAIA document contains exactly one
-root element. In DAIA/XML the root element name is **`daia`**, in
-DAIA/JSON the root element is just an unnamed object.
+[daia]: #root-element
 
-**Properties**
+A DAIA response in DAIA/XML and DAIA/JSON contains exactely one root element. A DAIA response in 
+DAIA/RDF consists of an RDF graph without root element.
 
-- **version** (attribute) - the daia version number (currently `0.5`)
-- **timestamp** (attribute) - the time the document was generated. Type `xs:dateTime`.
-- **[message]**\* (element) - (error) message(s) about the whole response
-- **[institution]**? (element) - information about the
-  institution that grants or knows about services and their
-  availability
-- **[document]**\* (element) - a group of items that can be
-  refered to with one identifier. Please note that although the number
-  of document elements can be zero or greater one, one single document
-  entry should be considered as the default.
+In DAIA/XML the root element name is **daia**. The XML namespace
+`http://ws.gbv.de/daia/` MUST be specified and the XML Schema
+`http://ws.gbv.de/daia/daia.xsd` MAY be referred to. In DAIA/JSON, the fixed
+child element **schema** with value `http://ws.gbv.de/daia/` MAY be used to
+refer to DAIA specification and namespace.
 
-In DAIA/XML you must further specifiy the XML namespace
-`http://ws.gbv.de/daia/` and may refer to the DAIA
-XML Schema `http://ws.gbv.de/daia/daia.xsd` as
-shown in the following example. In DAIA/JSON you can include a fixed
-child element that points to the DAIA specification and namespace:
+Structure
+  : - **version** (attribute) - the daia version number (currently `0.5`)
+    - **timestamp** (attribute) - the time the document was generated. Type `xs:dateTime`.
+    - **[message]**\* (element) - (error) message(s) about the whole response
+    - **[institution]**? (element) - information about the
+      institution that grants or knows about services and their
+      availability
+    - **[document]**\* (element) - a group of items that can be
+      refered to with one identifier. Please note that although the number
+      of document elements can be zero or greater one, one single document
+      entry should be considered as the default.
 
-- **schema** (attribute) - DAIA namespace string
-  `http://ws.gbv.de/daia/`
+Example
+  : DAIA/JSON
+      : ~~~ {.json}
+        {
+          "version" : "0.5",
+          "schema" : "http://ws.gbv.de/daia/",
+          "timestamp" : "2009-06-09T15:39:52.831+02:00",
+          "institution" : { }
+        }
+        ~~~
+  : DAIA/XML
+      : ~~~ {.xml}
+        <daia xmlns="http://ws.gbv.de/daia/" version="0.5"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd"
+              timestamp="2009-06-09T15:39:52.831+02:00">
+           <institution/>
+        </daia>
+        ~~~
 
-**Example** 
+        Equivalent DAIA/XML with different namespace prefix:
 
-DAIA/JSON
-
-~~~ {.json}
-{
-  "version" : "0.5",
-  "schema" : "http://ws.gbv.de/daia/",
-  "timestamp" : "2009-06-09T15:39:52.831+02:00",
-  "institution" : { }
-}
-~~~
-
-DAIA/XML
-
-~~~ {.xml}
-<daia xmlns="http://ws.gbv.de/daia/" version="0.5"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd"
-      timestamp="2009-06-09T15:39:52.831+02:00">
-   <institution/>
-</daia>
-~~~
-
-Equivalent DAIA/XML with different namespace prefix:
-
-~~~ {.xml}
-<d:daia xmlns:d="http://ws.gbv.de/daia/" version="0.5"
-      xmlns:s="http://www.w3.org/2001/XMLSchema-instance"
-      s:schemaLocation="http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd"
-      timestamp="2009-06-09T15:39:52.831+02:00">
-   <d:institution/>
-</d:daia>
-~~~
+        ~~~ {.xml}
+        <d:daia xmlns:d="http://ws.gbv.de/daia/" version="0.5"
+              xmlns:s="http://www.w3.org/2001/XMLSchema-instance"
+              s:schemaLocation="http://ws.gbv.de/daia/ http://ws.gbv.de/daia/daia.xsd"
+              timestamp="2009-06-09T15:39:52.831+02:00">
+           <d:institution/>
+        </d:daia>
+        ~~~
+  : DAIA/RDF
+      : ~~~ {.turtle}
+        # In DAIA/RDF there is no timestamp unless one uses N-Quads or reification
+        [ ] a foaf:Organization .
+        ~~~
 
 ## Document element
 
 [document]: #document-element
 
-The `document` element describes a single document. Nevertheless, several
+The **document** element describes a single document. Nevertheless, several
 *instances* of a document (e.g. copies of a book) can exist. For these
 instances, have a look at the [item element](#item-element) below.
 
-**Properties**
+Content
+  : - **id** (attribute) - each document needs an unique id to
+      query it (e.g. ISBN, ppn, etc.). Please consider that ids have to be
+      URIs. Type `xs:anyURI`.
+    - **href**? (attribute) - a link to the document or to
+      additional information. Type `xs:anyURI`.
+    - **[message]**\* (element) - (error) message(s) about the
+      document.
+    - **[item]**\* (element) - an instance or copy of the queried
+      document (correspondends to the FRBR class of same name).
 
-- **id** (attribute) - each document needs an unique id to
-  query it (e.g. ISBN, ppn, etc.). Please consider that ids have to be
-  URIs. Type `xs:anyURI`.
-- **href**? (attribute) - a link to the document or to
-  additional information. Type `xs:anyURI`.
-- **[message]**\* (element) - (error) message(s) about the
-  document.
-- **[item]**\* (element) - an instance or copy of the queried
-  document (correspondends to the FRBR class of same name).
-
-In DAIA/XML messages and items can be mixed in any order.
-
-**Example in DAIA/JSON**
-
-~~~ {.json}
-{
-  "document" : [ {
-    "href" : "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X",
-    "id" : "gvk:ppn:57793371X",
-    "item" : [ {  }, {  }, {  } ]
-  } ]
-}
-~~~
-
-**Example in DAIA/XML**
-
-~~~ {.xml}
-<document href="https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X" 
-          id="gvk:ppn:57793371X">
-  <item/>
-  <item/>
-  <item/>
-</document>
-~~~
-
-**Example in DAIA/RDF**
-
-~~~ {.turtle}
-<gvk:ppn:57793371X> a bibo:Document ;
-  foaf:primaryTopicOf <https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X> ;
-  daia:exemplar [ ], [ ], [ ] .
-~~~
+Example
+  : DAIA/JSON
+      : ~~~ {.json}
+        {
+          "document" : [ {
+            "href" : "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X",
+            "id" : "gvk:ppn:57793371X",
+            "item" : [ {  }, {  }, {  } ]
+          } ]
+        }
+        ~~~
+  : DAIA/XML
+      : ~~~ {.xml}
+        <document href="https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X" 
+                  id="gvk:ppn:57793371X">
+          <item/>
+          <item/>
+          <item/>
+        </document>
+        ~~~
+  : DAIA/RDF
+      : ~~~ {.turtle}
+        <gvk:ppn:57793371X> a bibo:Document ;
+          foaf:primaryTopicOf <https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X> ;
+          daia:exemplar [ ], [ ], [ ] .
+        ~~~
 
 ## Item element
 
@@ -256,76 +251,71 @@ The `item` node references a single
 instance (copy, URI, etc.) of a document. The availability information
 is of course connected to the item nodes.
 
-**Properties**
-
-- **id**? (attribute) - again, each item (instance) may have
-  an unique ID (e.g., an individual call number for a book). Please
-  consider that ids have to be URIs. Type `xs:anyURI`.
-- **href**? (attribute) - a link to the item or to additional
-  information. Type `xs:anyURI`.
-- **part**? (attribute) - indicate that the item only contains
-  a part of the document (`part="narrower"`) or contains
-  more than the document (`part="broader"`)
-- **[message]**\* (element) - (error) message(s) about the item.
-- **label**? (element) - a label that helps to identify and/or
-  find the item (call number etc.)
-- **[department]**? (element) - an administrative sub-entitity
-  of the institution that is responsible for this item
-- **[storage]**? (element) - a physical location of the item
-  (stacks, floor etc.)
-- **[available]**\* (element) - information about an available
-  service with the item.
-- **[unavailable]**\* (element) - information about an
-  unavailable service with the item
+Content
+  : - **id**? (attribute) - again, each item (instance) may have
+      an unique ID (e.g., an individual call number for a book). Please
+      consider that ids have to be URIs. Type `xs:anyURI`.
+    - **href**? (attribute) - a link to the item or to additional
+      information. Type `xs:anyURI`.
+    - **part**? (attribute) - indicate that the item only contains
+      a part of the document (`part="narrower"`) or contains
+      more than the document (`part="broader"`)
+    - **[message]**\* (element) - (error) message(s) about the item.
+    - **label**? (element) - a label that helps to identify and/or
+      find the item (call number etc.)
+    - **[department]**? (element) - an administrative sub-entitity
+      of the institution that is responsible for this item
+    - **[storage]**? (element) - a physical location of the item
+      (stacks, floor etc.)
+    - **[available]**\* (element) - information about an available
+      service with the item.
+    - **[unavailable]**\* (element) - information about an
+      unavailable service with the item
 
 Multiple service status can be given for an item represented by
 different available/unavailable elements.
 
-**Example in DAIA/JSON**
-
-~~~ {.json}
-{
-    "item" : [ {
-      "id" : "id:123",
-      "message" : [ { "lang": "en", "content": "foo" } ],
-      "department" : { "id": "id:abc" },
-      "label" : "bar",
-      "available" : [ {"service" : "presentation"}, 
-                      {"service" : "loan"}, 
-                      {"service" : "interloan"} ],
-      "unavailable" : [ {"service" : "openaccess"} ]
-    } ]
-}
-~~~
-
-**Example in DAIA/XML**
-
-~~~ {.xml}
-<item id="id:123">
-   <message lang="en">foo</message>
-   <department id="id:abc" />
-   <label>bar<label>
-   <available service="presentation" />
-   <available service="loan" />
-   <available service="interloan" />
-   <unavailable service="openaccess" />
-</item>
-~~~
-
-**Example in DAIA/RDF**
-
-~~~ {.turtle}
-<id:123> a frbr:Item ;
-  dct:description "foo"@en ; 
-  daia:label "bar" ;
-  daia:heldBy <id:abc> ;
-  daia:availableFor [ a dso:Presentation ] ;
-  daia:availableFor [ a dso:Loan ] ;
-  daia:availableFor [ a dso:Interloan ] ;
-  daia:unavailableFor [ a dso:Openaccess ] ;
-<id:abc> a foaf:Organization ; dct:isPartOf [
-  a foaf:Organization ; dct:hasPart <id:abc> ] .
-~~~
+Example
+  : DAIA/JSON
+      : ~~~ {.json}
+        {
+            "item" : [ {
+              "id" : "id:123",
+              "message" : [ { "lang": "en", "content": "foo" } ],
+              "department" : { "id": "id:abc" },
+              "label" : "bar",
+              "available" : [ {"service" : "presentation"}, 
+                              {"service" : "loan"}, 
+                              {"service" : "interloan"} ],
+              "unavailable" : [ {"service" : "openaccess"} ]
+            } ]
+        }
+        ~~~
+    DAIA/XML
+      : ~~~ {.xml}
+        <item id="id:123">
+           <message lang="en">foo</message>
+           <department id="id:abc" />
+           <label>bar<label>
+           <available service="presentation" />
+           <available service="loan" />
+           <available service="interloan" />
+           <unavailable service="openaccess" />
+        </item>
+        ~~~
+    DAIA/RDF
+      : ~~~ {.turtle}
+        <id:123> a frbr:Item ;
+          dct:description "foo"@en ; 
+          daia:label "bar" ;
+          daia:heldBy <id:abc> ;
+          daia:availableFor [ a dso:Presentation ] ;
+          daia:availableFor [ a dso:Loan ] ;
+          daia:availableFor [ a dso:Interloan ] ;
+          daia:unavailableFor [ a dso:Openaccess ] ;
+        <id:abc> a foaf:Organization ; dct:isPartOf [
+          a foaf:Organization ; dct:hasPart <id:abc> ] .
+        ~~~
 
 In DAIA/RDF, an Item element corresponds to an instance of
 [frbr:Item](http://purl.org/vocab/frbr/core#Item) . Partial items refer to
@@ -360,26 +350,23 @@ document:
 
 [available]: #available-element
 
-The structure of an `available` element is:
-
-- **service**? (attribute) - the specific service from the [Document Service Ontology] 
-  (DSO). The value can be given as full URI or as simple name. A name
-  is mapped to an URI by uppercasing the first letter and prepending the base
-  URI <http://purl.org/ontology/dso#>. Multiple services
-  are represented by multiple available/unavailable elements. Type
-  enumeration or `xs:anyURI`.
-- **href**? (attribute) - a link to perform, register or
-  reserve the service. Type `xs:anyURI`.
-- **delay**? (attribute) - a time period of estimated delay.
-  Use `unknown` or an ISO time period. If missing, then there
-  is probably no significant delay. Type `xs:duration` or the
-  string `unknown`.
-- **[message]**\* (element) - (error) message(s) about the
-  specific availability status of the item.
-- **[limitation]**\* (element) - more specific limitations of
-  the availability status.
-
-In DAIA/XML messages and limitations can be mixed in any order.
+Content
+  : - **service**? (attribute) - the specific service from the [Document Service Ontology] 
+      (DSO). The value can be given as full URI or as simple name. A name
+      is mapped to an URI by uppercasing the first letter and prepending the base
+      URI <http://purl.org/ontology/dso#>. Multiple services
+      are represented by multiple available/unavailable elements. Type
+      enumeration or `xs:anyURI`.
+    - **href**? (attribute) - a link to perform, register or
+      reserve the service. Type `xs:anyURI`.
+    - **delay**? (attribute) - a time period of estimated delay.
+      Use `unknown` or an ISO time period. If missing, then there
+      is probably no significant delay. Type `xs:duration` or the
+      string `unknown`.
+    - **[message]**\* (element) - (error) message(s) about the
+      specific availability status of the item.
+    - **[limitation]**\* (element) - more specific limitations of
+      the availability status.
 
 **Typical DSO Services used in DAIA**
 
@@ -411,138 +398,114 @@ If you omit the service element then the unspecified service must be assumed
 (do not use the string `unspecified` or the empty string but just omit to
 specify a service).
 
-**Example in DAIA/JSON**
-
-~~~ {.json}
-{ 
-  "available": [ { "service":"loan", "delay":"PT2H" 
-}
-~~~
-
-**Example in DAIA/XML**
-
-~~~ {.xml}
-<available service="loan" delay="PT2H" />
-~~~
-
-**Example in DAIA/RDF**
-
-~~~ {.turtle}
-[ ] daia:availableFor [
-  a dso:Loan ;
-  daia:delay "PT2H"^^xsd:duration 
-] .
-~~~
+Example
+  : DAIA/JSON
+      : ~~~ {.json}
+        { 
+          "available": [ { "service":"loan", "delay":"PT2H" 
+        }
+        ~~~
+    DAIA/XML
+      : ~~~ {.xml}
+        <available service="loan" delay="PT2H" />
+        ~~~
+    DAIA/RDF
+      : ~~~ {.turtle}
+        [ ] daia:availableFor [
+          a dso:Loan ;
+          daia:delay "PT2H"^^xsd:duration 
+        ] .
+        ~~~
 
 ## Unavailable element
 
 [unavailable]: #unavailable-element
 
-The structure of an `unavailable` element is identical to the structure of the
+The content of an `unavailable` element is identical to the structure of the
 available element in most cases.
 
-- **service**? (attribute) - see above
-- **href**? (attribute) - see above
-- **expected** (attribute) - A time period until the service
-  will be available again. Use `unknown` or an ISO time period.
-  If missing, then the service probably won't be available in the
-  future. Type `xs:date` or `xs:dateTime` or the string
-  `unknown`.
-- **[message]**\* (element) - see above
-- **[limitation]**\* (element) - more specific limitations of
-  the availability status
-- **queue**? (attribute) - the number of waiting requests for
-  this service. Type `xs:nonNegativeInteger`.
+Content
+  : - **service**? (attribute) - see above
+    - **href**? (attribute) - see above
+    - **expected** (attribute) - A time period until the service
+      will be available again. Use `unknown` or an ISO time period.
+      If missing, then the service probably won't be available in the
+      future. Type `xs:date` or `xs:dateTime` or the string
+      `unknown`.
+    - **[message]**\* (element) - see above
+    - **[limitation]**\* (element) - more specific limitations of
+      the availability status
+    - **queue**? (attribute) - the number of waiting requests for
+      this service. Type `xs:nonNegativeInteger`.
 
 If no `expected` element is given, it is not sure whether the item
 will ever be available, so this is not the same as setting it to
 `unknown`. If no `queue` element is given, it may (but does not
-need to) be assumed as zero. In DAIA/XML messages and limitations can be
-mixed in any order.
+need to) be assumed as zero. 
 
-**Example in DAIA/JSON**
-
-~~~ {.json}
-{
-    "unavailable": [ {
-      "service":"presentation",
-      "delay":"PT4H"
-    } ]
-}
-~~~
-
-**Example in DAIA/XML**
-
-~~~ {.xml}
-<unavailable service="presentation" delay="PT4H" />
-~~~
-
-**Example in DAIA/RDF**
-
-~~~ {.turtle}
-[ ] daia:unavailableFor [
-  a dso:Presentation ;
-  daia:delay "PT4H"^^xsd:duration 
-] .
-~~~
+Example
+  : DAIA/JSON
+      : ~~~ {.json}
+        {
+            "unavailable": [ {
+              "service":"presentation",
+              "delay":"PT4H"
+            } ]
+        }
+        ~~~
+    DAIA/XML
+      : ~~~ {.xml}
+        <unavailable service="presentation" delay="PT4H" />
+        ~~~
+    DAIA/RDF
+      : ~~~ {.turtle}
+        [ ] daia:unavailableFor [
+          a dso:Presentation ;
+          daia:delay "PT4H"^^xsd:duration 
+        ] .
+        ~~~
 
 ## Messages
 
 [message]: #messages
 
-Messages can occur at several places in a DAIA
-response. The structure of a `message` element is:
+Messages can occur at several places in a DAIA response. Messages are not meant
+to be shown to end-users, but only used for debugging. If you need a DAIA
+message to transport some relevant information, you likely try to use DAIA for
+the wrong purpose.
 
-- **lang** (attribute) - a [RFC 3066] language code. Type
-  `xs:language`.
-- **content** (string) - the message text, a simple string
-  without further formatting.
-- **errno**? (attribute) - an error code (integer value). Type
-  `xs:integer`.
+Content
+  : - **lang** (attribute) - a [RFC 3066] language code. Type
+      `xs:language`.
+    - **content** (string) - the message text, a simple string
+      without further formatting. If `content` is an empty string, the
+      content element/attribute SHOULD be omitted.
+    - **errno**? (attribute) - an error code (integer value). Type
+      `xs:integer`.
+Example
+  : In DAIA/XML the `message` element is a repeatable XML element
+    with optional attributes `lang` and `errno` and the string
+    encoded as element content. In DAIA/JSON a `message` element is
+    an object with `lang`, `errno`, and `string` as
+    keys. Multiple messages are combined in a JSON array:
 
-**Notes:**
-
-- If `content` is an empty string, it should be removed in DAIA
-  encodings. Applications may treat a missing `content` as the
-  empty string.
-- Messages are not meant to be shown to end-users, but only used for
-  debugging. If you need a DAIA message to transport some relevant
-  information, you likely try to use DAIA for the wrong purpose.
-
-**Example:**
-
-In DAIA/XML the `message` element is a repeatable XML element
-with optional attributes `lang` and `errno` and the string
-encoded as element content. In DAIA/JSON a `message` element is
-an object with `lang`, `errno`, and `string` as
-keys. Multiple messages are combined in a JSON array:
-
-
-**Example in DAIA/JSON**
-
-~~~ {.json}
-{
-  "message" : [ {
-    "content":"request failed",
-    "lang":"en"
-  } ]
-}
-~~~
-
-**Example in DAIA/XML**
-
-~~~ {.xml}
-<message lang="en">request failed</message>
-~~~
-
-**Example in DAIA/RDF**
-
-~~~ {.turtle}
-[ ] daia:message [ 
-  rdfs:value "request failed"@en .
-]
-~~~
-
+    DAIA/JSON
+      : ~~~ {.json}
+        {
+          "message" : [ {
+            "content":"request failed",
+            "lang":"en"
+          } ]
+        }
+        ~~~
+    DAIA/XML
+      : ~~~ {.xml}
+        <message lang="en">request failed</message>
+        ~~~
+    DAIA/RDF
+      : ~~~ {.turtle}
+        # not supported
+        ~~~
 
 ## Additional entities
 
@@ -568,15 +531,14 @@ institution, department, storage and limitation are discussed.
 - **limitation** nodes give
   information of limitations of the availability of an item
 
-The data structure of all these nodes is identical and discussed below.
+The content of these nodes is identical and discussed below.
 
-**Data structure**
-
-- **id**? - a (persistent) identifier for the entity. Type
-  `xs:anyURI`.
-- **href**? - a URI linking to the entity. Type
-  `xs:anyURI`.
-- **content**? - a simple message text describing the entity.
+Content
+  : - **id**? - a (persistent) identifier for the entity. Type
+      `xs:anyURI`.
+    - **href**? - a URI linking to the entity. Type
+      `xs:anyURI`.
+    - **content**? - a simple message text describing the entity.
 
 If `content` is an empty string, it should be removed in DAIA
 encodings. Applications may treat a missing `content` as the empty
@@ -584,32 +546,47 @@ string. It is recommended to supply an `id` property to point to a
 taxonomy or authority record and a `href` property to provide a
 hyperlink to information about the specified entity.
 
-**Examples in DAIA/JSON and DAIA/XML**
+*TODO*: multilingual content
 
-~~~ {.json}
-{
-    "institution" : { "href" : "http://www.tib.uni-hannover.de" }
-    ...
-    "department" : { 
-                     "id" : "info:isil/DE-7-022",
-                     "content" : "Library of the Geographical Institute, Goettingen University"
-                   }
-    ...
-    "limitation"  : { "content" : "3 day loan" }
-}
-~~~
+Example
+  : DAIA/JSON
+      : ~~~ {.json}
+        {
+            "institution" : { "href" : "http://www.tib.uni-hannover.de/" }
+            ...
+            "department" : { 
+                             "id" : "info:isil/DE-7-022",
+                             "content" : "Library of the Geographical Institute, Goettingen University"
+                           }
+            ...
+            "limitation"  : { "content" : "3 day loan" }
+        }
+        ~~~
+  : DAIA/XML
+      : ~~~ {.xml}
+        <institution href="http://www.tib.uni-hannover.de/"/>
+        ...
+        <department id="info:isil/DE-7-022">Library of the Geographical Institute, Goettingen University</department> 
+        ...
+        <limitation>3 day loan</limitation>
+        ~~~
+  : DAIA/Turtle
+      : ~~~ {.xml}
+        [ ] a foaf:Organization ;
+            foaf:homepage <http://www.tib.uni-hannover.de/> .
 
-~~~ {.xml}
-<institution href="http://www.tib.uni-hannover.de"/>
-...
-<department id="info:isil/DE-7-022">Library of the Geographical Institute, Goettingen University</department> 
-...
-<limitation>3 day loan</limitation>
-~~~
+        <info:isil/DE-7-022> a foaf:Organization ;
+            foaf:name "Library of the Geographical Institute, Goettingen University"@en .
+
+        [ ] a ssso:Limitation ;
+            schema:name "3 day loan"
+        ~~~
+
+<!-- schema:name? rdfs:label? subclass of ssso:Limitation? -->
 
 # 3. DAIA Ontology
 
-All DAIA documents, given in DAIA/JSON or DAIA/XML can also be expressed in
+All DAIA responses, given in DAIA/JSON or DAIA/XML can also be expressed in
 RDF. The ontology used for this purpose is also called DAIA/RDF. DAIA Ontology
 mainly consists of a set of classes and properties from related ontologies.
 
@@ -628,7 +605,7 @@ DAIA ontology is based on the following RDF ontologies:
 
 ## Namespaces
 
-The URI namespace of DAIA Ontology is <http://purl.org/ontology/daia#>. The
+The URI namespace of DAIA Ontology is `http://purl.org/ontology/daia#`. The
 namespace prefix `daia` is recommended. The URI of DAIA Ontology as as a whole
 is <http://purl.org/ontology/daia>.
 
@@ -749,6 +726,7 @@ not* share the same base URL.
 - **[DSO]** [Document Service Ontology] Work in Progress 2013
 - **[HTTP]** [Hypertext Transfer Protocol - HTTP/1.1](http://tools.ietf.org/html/rfc2616).
   June 1999 (RFC 2616).
+- **[HOLDINGS]** [Holding Ontology] Work in progress 2013
 - **[JSON]** [JavaScript Object Notation](http://www.json.org/). (RFC 4627)
 - **[SSSO]** [Simple Service Status Ontology] Work in Progress 2013
 - **[URI]** [Uniform Resource Identifiers (URI): Generic Syntax](http://tools.ietf.org/html/rfc2396).
@@ -873,7 +851,7 @@ ontology** (or moved to another ontology, such as DSO?):
 If department and institution have same id, the department SHOULD be
 ignored.
 
-[CC-ND 3.0]: http://creativecommons.org/licenses/by-nd/3.0/
+[CC-BY-SA 3.0]: http://creativecommons.org/licenses/by-sa/3.0/
 [RFC 3066]: http://tools.ietf.org/html/rfc3066
 
 [Document Service Ontology]: http://gbv.github.com/dso/dso.html
