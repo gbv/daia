@@ -682,8 +682,6 @@ A storage is a place where items are stored.
 
 # 4. Query API
 
-## DAIA Query API
-
 A **DAIA-API** is provided in form of a **Base URL** that can be queried by
 HTTP (or HTTPS) GET. The Base URL may contain fixed query parameters but it
 must not contain the query parameters `id` and `format`. A DAIA query is
@@ -707,17 +705,6 @@ DAIA server may limit queries to any positive number of URIs.
 `http://example.com/`           `gvk:ppn:588923168`                            DAIA/XML    `http://example.com/?id=gvk:ppn:588923168&format=xml`
 `http://example.com/?cmd=daia`  `gvk:ppn:588923168`                            DAIA/JSON   `http://example.com/?cmd=daia&id=gvk:ppn:588923168&format=json`
 `http://example.com/`           `gvk:ppn:588923168` and `gvk:ppn:365058963`    DAIA/JSON   `http://example.com/?id=gvk:ppn:588923168%7Cgvk:ppn:365058963&format=json`
-
-## DAIA Storage API (experimental)
-
-The **DAIA-Storage-API** is an additional API, similar to the DAIA-API, but to
-retrieve Storage information only.  The request parameter are also **`format`**
-and **`id`** but the latter can be any Unicode character string (it is up to
-the specific implementation of an DAIA-Storage-API what kinds of identifiers to
-expect). Typical applications include mapping from call number to locations.
-The request is limited to any combination of the elements `institution`,
-`department`, `storage`, and `message`. A DAIA Storage API and a DAIA API *must
-not* share the same base URL.
 
 # References
 
