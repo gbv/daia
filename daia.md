@@ -21,9 +21,9 @@ and schemas are generated from the source file
 [Pandoc’s Markdown](http://johnmacfarlane.net/pandoc/demo/example9/pandocs-markdown.html)
 and converted with [makespec](https://github.com/jakobib/makespec).
 
-Updates and sources of DAIA 1.0 can be found at
-<http://github.com/gbv/daiaspec>. The current version of this document was last
-modified at {GIT_REVISION_DATE} with revision {GIT_REVISION_HASH}.
+Updates and sources of DAIA 1.0 can be found at <{GITHUB}>. The current version
+of this document was last modified at {GIT_REVISION_DATE} with revision
+{GIT_REVISION_HASH}.
 
 This document is publically available under the terms of the Creative-Commons
 Attribution-ShareAlike Derivative ([CC-BY-SA 3.0]) license. Feedback is welcome:
@@ -31,10 +31,6 @@ Attribution-ShareAlike Derivative ([CC-BY-SA 3.0]) license. Feedback is welcome:
 * implement the specication!
 * [correct](https://github.com/gbv/daiaspec/blob/master/daia.md) the specification!
 * [comment](https://github.com/gbv/daiaspec/issues) on the specification!
-
-**Revision history**
-
-{GIT_CHANGES}
 
 ## Conformance requirements
 
@@ -51,23 +47,9 @@ URI <http://purl.org/ontology/daia/> which is also used URI namespace. Both may
 be changed to <http://purl.org/ontology/daia#>. The namespace prefix `daia` is
 recommeded for both DAIA/XML and DAIA/RDF.
 
-    @prefix daia: <http://purl.org/ontology/daia/> .
-    @base         <http://purl.org/ontology/daia/> .
-
-The following namspace prefixes are used to refer to related ontologies:
-
-    @prefix bibo: <http://purl.org/ontology/bibo/> .
-    @prefix dct:  <http://purl.org/dc/terms/> .
-    @prefix dso:  <http://purl.org/ontology/dso#> .
-    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-    @prefix org:  <http://www.w3.org/ns/org#> .
-    @prefix owl:  <http://www.w3.org/2002/07/owl#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix vann: <http://purl.org/vocab/vann/> .
-    @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+A list of namespaces prefixes is included below.
 
 The current XML Schema is located at <http://purl.org/NET/DAIA/schema.xsd>. 
-
 
 # Structure and Encoding
 
@@ -120,21 +102,21 @@ strings, numbers, or boolean values. Unless a more specific limitation is
 defined with an XML Schema Datatype, the content must be an Unicode string (but
 it may be the empty string). DAIA uses the following XML Schema Datatypes:
 
-- `xs:boolean` - in DAIA/XML one of `true`, `false`,
+- `xsd:boolean` - in DAIA/XML one of `true`, `false`,
   `1`, `0`. In DAIA/JSON one of `true`, `false` (but literally instead of string).
-- `xs:language` - must conform to the pattern
+- `xsd:language` - must conform to the pattern
   `[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})\*`.
-- `xs:date` - must follow the form
+- `xsd:date` - must follow the form
   `\d{4}[-](\d\d)[-](\d\d)((([+-])\d\d:\d\d)|Z)?`.
-- `xs:dateTime` - must follow the form
+- `xsd:dateTime` - must follow the form
   `\d{4}[-](\d\d)[-](\d\d)[T](\d\d)[:](\d\d)[:]\d\d([.]\d+)?((([+-])\d\d:\d\d)|Z)?`.
-- `xs:duration` - must follow the form `-PnYnMnDTnHnMnS`.
+- `xsd:duration` - must follow the form `-PnYnMnDTnHnMnS`.
   Empty parts can be omitted.
-- `xs:integer` - must conform to the pattern `[+-]?[0-9]+` in
+- `xsd:integer` - must conform to the pattern `[+-]?[0-9]+` in
   DAIA/XML. In DAIA/JSON it is an integer.
-- `xs:nonNegativeInteger` - must conform to the pattern
+- `xsd:nonNegativeInteger` - must conform to the pattern
   `([+]?[0-9]+|-0)` in DAIA/XML. In DAIA/JSON it is a non-negative integer.
-- `xs:anyURI` - must conform to the pattern of an URI.
+- `xsd:anyURI` - must conform to the pattern of an URI.
 
 ## Root element
 
@@ -151,7 +133,7 @@ refer to DAIA specification and namespace.
 
 Structure
   : - **version** (attribute) - the daia version number (currently `0.5`)
-    - **timestamp** (attribute) - the time the document was generated. Type `xs:dateTime`.
+    - **timestamp** (attribute) - the time the document was generated. Type `xsd:dateTime`.
     - **[message]**\* (element) - (error) message(s) about the whole response
     - **[institution]**? (element) - information about the
       institution that grants or knows about services and their
@@ -208,9 +190,9 @@ instances, have a look at the [item element](#item-element) below.
 Content
   : - **id** (attribute) - each document needs an unique id to
       query it (e.g. ISBN, ppn, etc.). Please consider that ids have to be
-      URIs. Type `xs:anyURI`.
+      URIs. Type `xsd:anyURI`.
     - **href**? (attribute) - a link to the document or to
-      additional information. Type `xs:anyURI`.
+      additional information. Type `xsd:anyURI`.
     - **[message]**\* (element) - (error) message(s) about the
       document.
     - **[item]**\* (element) - an instance or copy of the queried
@@ -240,7 +222,7 @@ Example
       : ~~~ {.turtle}
         <gvk:ppn:57793371X> a bibo:Document ;
           foaf:primaryTopicOf <https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X> ;
-          daia:exemplar [ ], [ ], [ ] .
+          holding:exemplar [ ], [ ], [ ] .
         ~~~
 
 ## Item element
@@ -254,9 +236,9 @@ is of course connected to the item nodes.
 Content
   : - **id**? (attribute) - again, each item (instance) may have
       an unique ID (e.g., an individual call number for a book). Please
-      consider that ids have to be URIs. Type `xs:anyURI`.
+      consider that ids have to be URIs. Type `xsd:anyURI`.
     - **href**? (attribute) - a link to the item or to additional
-      information. Type `xs:anyURI`.
+      information. Type `xsd:anyURI`.
     - **part**? (attribute) - indicate that the item only contains
       a part of the document (`part="narrower"`) or contains
       more than the document (`part="broader"`)
@@ -307,8 +289,8 @@ Example
       : ~~~ {.turtle}
         <id:123> a frbr:Item ;
           dct:description "foo"@en ; 
-          daia:label "bar" ;
-          daia:heldBy <id:abc> ;
+          holding:label "bar" ;
+          holding:heldBy <id:abc> ;
           daia:availableFor [ a dso:Presentation ] ;
           daia:availableFor [ a dso:Loan ] ;
           daia:availableFor [ a dso:Interloan ] ;
@@ -330,8 +312,8 @@ document:
 |                      | ~~~                                                                     |
 +----------------------+-------------------------------------------------------------------------+
 | narrower in DAIA/RDF | ~~~ {.turtle}                                                           |
-|                      | <x:123> a bibo:Document ; daia:narrowerExemplar <x:ABC> .               |  
-|                      | <x:123> a bibo:Document ; dct:hasPart [ daia:exemplar <x:ABC> ] } .     |
+|                      | <x:123> a bibo:Document ; holding:narrowerExemplar <x:ABC> .            |  
+|                      | <x:123> a bibo:Document ; dct:hasPart [ holding:exemplar <x:ABC> ] } .  |
 |                      | ~~~                                                                     |
 +----------------------+-------------------------------------------------------------------------+
 | broader in DAIA/XML  | ~~~ {.xml}                                                              |
@@ -341,8 +323,8 @@ document:
 |                      | ~~~                                                                     |
 +----------------------+-------------------------------------------------------------------------+
 | broader in DAIA/RDF  | ~~~ {.turtle}                                                           |
-|                      | <x:123> a bibo:Document ; daia:broaderExemplar <x:ABC> .                |
-|                      | <x:123> a bibo:Document ; daia:exemplar [ dct:hasPart <x:ABC> ] } .     |
+|                      | <x:123> a bibo:Document ; holding:broaderExemplar <x:ABC> .             |
+|                      | <x:123> a bibo:Document ; holding:exemplar [ dct:hasPart <x:ABC> ] } .  |
 |                      | ~~~                                                                     |
 +----------------------+-------------------------------------------------------------------------+
 
@@ -356,12 +338,12 @@ Content
       is mapped to an URI by uppercasing the first letter and prepending the base
       URI <http://purl.org/ontology/dso#>. Multiple services
       are represented by multiple available/unavailable elements. Type
-      enumeration or `xs:anyURI`.
+      enumeration or `xsd:anyURI`.
     - **href**? (attribute) - a link to perform, register or
-      reserve the service. Type `xs:anyURI`.
+      reserve the service. Type `xsd:anyURI`.
     - **delay**? (attribute) - a time period of estimated delay.
       Use `unknown` or an ISO time period. If missing, then there
-      is probably no significant delay. Type `xs:duration` or the
+      is probably no significant delay. Type `xsd:duration` or the
       string `unknown`.
     - **[message]**\* (element) - (error) message(s) about the
       specific availability status of the item.
@@ -391,8 +373,7 @@ Content
   The item is accessible for an unspecified purpose by an unspecified way.
 
 One MAY use custom service types, not specified in DSO, if these services are
-specified with an URI as subclasses of
-<http://purl.org/ontology/dso#DocumentService>.
+specified with an URI as subclasses of [dso:DocumentService].
 
 If you omit the service element then the unspecified service must be assumed
 (do not use the string `unspecified` or the empty string but just omit to
@@ -413,7 +394,7 @@ Example
       : ~~~ {.turtle}
         [ ] daia:availableFor [
           a dso:Loan ;
-          daia:delay "PT2H"^^xsd:duration 
+          service:delay "PT2H"^^xsd:duration 
         ] .
         ~~~
 
@@ -430,13 +411,13 @@ Content
     - **expected** (attribute) - A time period until the service
       will be available again. Use `unknown` or an ISO time period.
       If missing, then the service probably won't be available in the
-      future. Type `xs:date` or `xs:dateTime` or the string
+      future. Type `xsd:date` or `xsd:dateTime` or the string
       `unknown`.
     - **[message]**\* (element) - see above
     - **[limitation]**\* (element) - more specific limitations of
       the availability status
     - **queue**? (attribute) - the number of waiting requests for
-      this service. Type `xs:nonNegativeInteger`.
+      this service. Type `xsd:nonNegativeInteger`.
 
 If no `expected` element is given, it is not sure whether the item
 will ever be available, so this is not the same as setting it to
@@ -461,7 +442,7 @@ Example
       : ~~~ {.turtle}
         [ ] daia:unavailableFor [
           a dso:Presentation ;
-          daia:delay "PT4H"^^xsd:duration 
+          service:delay "PT4H"^^xsd:duration 
         ] .
         ~~~
 
@@ -476,12 +457,12 @@ the wrong purpose.
 
 Content
   : - **lang** (attribute) - a [RFC 3066] language code. Type
-      `xs:language`.
+      `xsd:language`.
     - **content** (string) - the message text, a simple string
       without further formatting. If `content` is an empty string, the
       content element/attribute SHOULD be omitted.
     - **errno**? (attribute) - an error code (integer value). Type
-      `xs:integer`.
+      `xsd:integer`.
 Example
   : In DAIA/XML the `message` element is a repeatable XML element
     with optional attributes `lang` and `errno` and the string
@@ -535,9 +516,9 @@ The content of these nodes is identical and discussed below.
 
 Content
   : - **id**? - a (persistent) identifier for the entity. Type
-      `xs:anyURI`.
+      `xsd:anyURI`.
     - **href**? - a URI linking to the entity. Type
-      `xs:anyURI`.
+      `xsd:anyURI`.
     - **content**? - a simple message text describing the entity.
 
 If `content` is an empty string, it should be removed in DAIA
@@ -578,34 +559,86 @@ Example
         <info:isil/DE-7-022> a foaf:Organization ;
             foaf:name "Library of the Geographical Institute, Goettingen University"@en .
 
-        [ ] a ssso:Limitation ;
-            schema:name "3 day loan"
+        [ ] a service:ServiceLimitation ;
+            schema:name "3 day loan" . # TODO: schema:name (???)
         ~~~
 
-<!-- schema:name? rdfs:label? subclass of ssso:Limitation? -->
+<!-- schema:name? rdfs:label? subclass of service:ServiceLimitation? -->
 
-# 3. DAIA Ontology
+# DAIA Ontology
 
-All DAIA responses, given in DAIA/JSON or DAIA/XML can also be expressed in
-RDF. The ontology used for this purpose is also called DAIA/RDF. DAIA Ontology
-mainly consists of a set of classes and properties from related ontologies.
+The Document Availability Information Ontology (DAIA ontology) defines a set of
+RDF classes and RDF properties to express DAIA data in RDF. RDF data that makes
+use of DAIA ontology is also referred to as DAIA/RDF.
 
 ## Overview
 
 DAIA ontology is based on the following RDF ontologies:
 
-* The [Document Service Ontology](http://gbv.github.com/dso/) (DSO)
-  defines document services which can be available or unavailable.
-* FRBR and Bibliographic Ontology (bibo) is used to defined documents
-* DAIA Items will be defined by a holding ontology to be created
+----------------------------------- ---------------------------- ---------------------------------------
+ Ontology                            relevant classes            relevant properties
+----------------------------------- ---------------------------- ---------------------------------------
+ [Document Service Ontology] (DSO)   [dso:DocumentService]\       -
+                                     [dso:Loan]\
+                                     [dso:Presentation]\
+                                     [dso:Interloan]\
+                                     [dso:OpenAccess]\
+
+ Service Ontology                    [service:ServiceLimitation]  [service:limits] / [service:limitedBy]\
+                                                                  [service:delay]
+
+ [Holding Ontology]                  ...                          holding:exemplar\
+                                                                  holding:narrowerExemplar\
+                                                                  holding:broaderExemplar\
+                                                                  holding:heldby / holding:holds\
+                                                                  holding:label\
+                                                                  ...
+
+ FOAF                                foaf:Organization\           foaf:primaryTopicOf\
+                                                                  foaf:name\
+                                     ...                          ...
+
+ Bibliographic Ontology (bibo)       bibo:Document                -
+
+ FRBR                                frbr:Item                    -
+
+ DCTerms                             ...                          dct:description\
+                                                                  dct:hasPart / dct:isPartOf
+----------------------------------- ---------------------------- ---------------------------------------
+
+In addition:
+
 * [Organization ontology](http://www.w3.org/TR/vocab-org/) may be used
   to refer to organizations and institutions.
+* Simple Service Status Ontology (SSSO) should be referred to.
 * DAIA should be aligned with [Schema.org Ontology](http://schema.org/).
-* ...
 
-## Namespaces
+[dso:DocumentService]: http://purl.org/ontology/dso#DocumentService
+[dso:Loan]: http://purl.org/ontology/dso#Loan
+[dso:Presentation]: http://purl.org/ontology/dso#Presentation
+[dso:Interloan]: http://purl.org/ontology/dso#Interloan
+[dso:OpenAccess]: http://purl.org/ontology/dso#OpenAccess
 
-The URI namespace of DAIA Ontology is `http://purl.org/ontology/daia#`. The
+[service:ServiceLimitation]: http://purl.org/ontology/service#ServiceLimitation
+[service:limits]: http://purl.org/ontology/serviceo#limits
+[service:limitedBy]: http://purl.org/ontology/service#limitedBy
+[service:delay]: http://purl.org/ontology/serviceo#delay
+
+~~~{.ditaa}
++-----------+     daia:availableFor    +---------------------+
+|           |------------------------->|                     |
+|           |<-------------------------|                     |
+|           |     daia:availableOf     |                     |
+| frbr:Item |                          | dso:DocumentService |
+|           |    daia:unavailableFor   |                     |
+|           |------------------------->|                     |
+|           |<-------------------------|                     |
++-----------+    daia:unavailableOf    +---------------------+
+~~~
+
+## Namespaces and Ontology
+
+The URI namespace of DAIA ontology is `http://purl.org/ontology/daia#`. The
 namespace prefix `daia` is recommended. The URI of DAIA Ontology as as a whole
 is <http://purl.org/ontology/daia>.
 
@@ -614,73 +647,107 @@ is <http://purl.org/ontology/daia>.
 
 The following namspace prefixes are used to refer to related ontologies:
 
-    @prefix dso:  <http://purl.org/ontology/dso#> .
-    @prefix owl:  <http://www.w3.org/2002/07/owl#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix ssso: <http://purl.org/ontology/ssso#> .
-    @prefix vann: <http://purl.org/vocab/vann/> .
+    @prefix cc:      <http://creativecommons.org/ns#> .
+    @prefix dct:     <http://purl.org/dc/terms/> .
+    @prefix dso:     <http://purl.org/ontology/dso#> .
+    @prefix holding: <http://purl.org/ontology/holding#> .
+    @prefix frbr:    <http://purl.org/vocab/frbr/core#> .
+    @prefix owl:     <http://www.w3.org/2002/07/owl#> .
+    @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix ssso:    <http://purl.org/ontology/ssso#> .
+    @prefix service: <http://purl.org/ontology/service#> .
+    @prefix holding: <http://purl.org/ontology/holding#> .
+    @prefix vann:    <http://purl.org/vocab/vann/> .
+    @prefix voaf:    <http://purl.org/vocommons/voaf#> .
+    @prefix vs:      <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+    @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 
 In Turtle syntax, the ontology is defined as following:
 
-    <> a owl:Ontology ;
-        rdfs:label "Document Availability Information Ontology" ;
+    <> a owl:Ontology, voaf:Vocabulary ;
+        dct:title "Document Availability Information Ontology"@en ;
         rdfs:label "DAIA" ;
-        vann:preferredNamespacePrefix "daia" .
+        vann:preferredNamespacePrefix "daia" ;
+        vann:preferredNamespaceUri "http://purl.org/ontology/daia#" ;
+        dct:modified "{GIT_REVISION_DATE}"^^xsd:date ;
+        owl:versionInfo "{VERSION}" ;
+        cc:license <http://creativecommons.org/licenses/by/3.0/> ;
+        dct:creator "Jakob Voß" 
+    .
 
-## Documents and Holdings
+## Classes
+
+DAIA ontology does not define new classes but makes use of classes defined in
+related ontologies.
+
+### Documents and Holdings
 
 ...
-
-## Services and Limitations
 
     ssso:ServiceEvent a owl:Class ;
         rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
 
-    dso:DocumentService a owl:Class ;
-        rdfs:subClassOf ssso:ServiceEvent ;
-        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
-
-    dso:Loan a owl:Class ;
-        rdfs:subClassOf dso:DocumentService ;
-        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
-
-    dso:Presentation a owl:Class ;
-        rdfs:subClassOf dso:DocumentService ;
-        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
-
-    dso:Interloan a owl:Class ;
-        rdfs:subClassOf dso:DocumentService ;
-        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
-
-    dso:OpenAccess a owl:Class ;
-        rdfs:subClassOf dso:DocumentService ;
-        rdfs:isDefinedBy <http://purl.org/ontology/dso> .
-
-    ssso:Limitation a owl:Class ;
-        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
-
-    ssso:limits a owl:ObjectProperty ;
-        rdfs:domain ssso:ServiceLimitation ;
-        rdfs:range ssso:ServiceEvent ;
-        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
-
-    ssso:limitedBy a owl:ObjectProperty ;
-        rdfs:domain ssso:ServiceEvent ;
-        rdfs:range ssso:ServiceLimitation ;
-        owl:inverseOf ssso:limits ;
-        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
-
-## Storage
+### Storage
 
 A storage is a place where items are stored.
 
     daia:Storage a owl:Class .
 
-## Availability
+### Availability
 
 ...
 
-# 4. Query API
+## Properties
+
+### availableFor
+
+    daia:availableFor a owl:ObjectProperty ;
+        rdfs:label "availableFor"@en ;
+        rdfs:domain frbr:Item ;
+        rdfs:range dso:DocumentService ;
+        owl:inverseOf daia:availableOf ;
+        rdfs:subPropertyOf dso:hasService ;
+        rdfs:seeAlso daia:unavailableFor ;
+        rdfs:isDefinedBy <> ;
+        vs:term_status "testing" .
+
+### availableOf
+    
+    daia:availableOf a owl:ObjectProperty ;
+        rdfs:label "availableOf"@en ;
+        rdfs:domain dso:DocumentService ;
+        rdfs:range frbr:Item ;
+        owl:inverseOf daia:availableFor ;
+        rdfs:subPropertyOf dso:hasDocument ;
+        rdfs:seeAlso daia:unavailableOf ;
+        rdfs:isDefinedBy <> ;
+        vs:term_status "testing" .
+
+### unavailableFor
+    
+    daia:unavailableFor a owl:ObjectProperty ;
+        rdfs:label "unavailableFor"@en ;
+        rdfs:domain frbr:Item ;
+        rdfs:range dso:DocumentService ;
+        owl:inverseOf daia:unavailableOf ;
+        rdfs:subPropertyOf dso:hasService ;
+        rdfs:seeAlso daia:availableFor ;
+        rdfs:isDefinedBy <> ;
+        vs:term_status "testing" .
+
+### unavailableOf
+    
+    daia:unavailableOf a owl:ObjectProperty ;
+        rdfs:label "unavailableOf"@en ;
+        rdfs:domain dso:DocumentService ;
+        rdfs:range frbr:Item ;
+        owl:inverseOf daia:unavailableOf ;
+        rdfs:subPropertyOf dso:hasDocument ;
+        rdfs:seeAlso daia:availableOf ;
+        rdfs:isDefinedBy <> ;
+        vs:term_status "testing" .
+
+# Query API
 
 A **DAIA-API** is provided in form of a **Base URL** that can be queried by
 HTTP (or HTTPS) GET. The Base URL may contain fixed query parameters but it
@@ -725,7 +792,11 @@ DAIA server may limit queries to any positive number of URIs.
 - **[XML-NS]** [Namespaces in XML 1.0 (Second Edition)](http://www.w3.org/TR/xml-names/).
   W3C Recommendation 16 August 2006
 
-# Notes (Informative)
+# Appendixes
+
+The following appendixes are informative only.
+
+## Notes
 
 - A [reference implementation in Perl](http://search.cpan.org/perldoc?DAIA) 
   is available at CPAN. It includes a simple
@@ -808,28 +879,25 @@ Moved to [Holding Ontology]:
   moved to ...
 * <http://purl.org/ontology/daia/heldBy> 
   moved to ...
+* <http://purl.org/ontology/daia/label> 
+  moved to ...
 
 Nur sure about:
 
-* daia:label
 * daia:collectedBy, daia:inCollection (?) to connect holding institution/agent 
   and abstract document which holding is exemplar of.
 * daia:Storage maybe to be replaced by dct:Location, geo:SpatialThing or similar (?)
 
-The remaining DAIA/RDF classes and properties may be the **core of DAIA
-ontology** (or moved to another ontology, such as DSO?):
+DAIA Ontology
 
-* daia:perform, daia:baseURL ...
+* daia:perform, daia:baseURL ... (?)
 
 * <http://purl.org/ontology/daia/availableOf> changed to
   <http://purl.org/ontology/daia#availableOf>.
-
 * <http://purl.org/ontology/daia/availableFor> changed to
   <http://purl.org/ontology/daia#availableFor>.
-
 * <http://purl.org/ontology/daia/unavailableOf> changed to
   <http://purl.org/ontology/daia#unavailableOf>.
-
 * <http://purl.org/ontology/daia/unavailableFor> changed to
   <http://purl.org/ontology/daia#unavailableFor>.
 
@@ -841,7 +909,11 @@ ignored.
 [CC-BY-SA 3.0]: http://creativecommons.org/licenses/by-sa/3.0/
 [RFC 3066]: http://tools.ietf.org/html/rfc3066
 
-[Document Service Ontology]: http://gbv.github.com/dso/dso.html
+[Document Service Ontology]: http://purl.org/ontology/dso
 [Simple Service Status Ontology]: http://purl.org/ontology/ssso
-[Holding Ontology]: https://github.com/cKlee/holding-ontology
+[Holding Ontology]: http://dini-ag-kim.github.io/holding-ontology/
+
+## Revision history
+
+{GIT_CHANGES}
 
