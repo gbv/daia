@@ -810,7 +810,10 @@ status
     loan
       : not `openaccess` but accessible for lending or temporary online access.
     presentation
-      : not `openaccess` or `loan` but accessible within the institution.
+      : none of the above but accessible within the institution.
+    expected
+      : none of the above but accessible for lending or temporary online access in the
+        future.
     none
       : none of the above. This is the default value of no status field is given.
 
