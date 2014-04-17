@@ -796,6 +796,47 @@ DAIA server may limit queries to any positive number of URIs.
 
 The following appendixes are informative only.
 
+## DAIA Simple
+
+**DAIA Simple** is a boiled down version of a DAIA response consisting of plain
+key-value structure having the following fields:
+
+status
+  : optional field with one of four possible values:
+
+    openaccess
+      : accessible online without any restriction (Open Access). The `href` field
+        should contain a link to directly access the document.
+    loan
+      : not `openaccess` but accessible for lending or temporary online access.
+    presentation
+      : not `openaccess` or `loan` but accessible within the institution.
+    none
+      : none of the above. This is the default value of no status field is given.
+
+expected
+  : optional field only allowed if status is set to `expected`. Allowed values must
+    conform to `xsd:date` or `xsd:dateTime` or the string `unknown`.
+delay
+  : optional field only allowed if status is set to `loan` or `presentation`. Allowed
+    values must conform to `xsd:duration` or the string `unknown`.
+href
+  : optional URL to perform or request a service.
+limitation
+  : optional string or boolean value describing an additional limitation.
+
+To give a few examples, encoded in JSON:
+
+~~~ {.json}
+{ "status": "loan" }
+{ "status": "expected", "expected": "2014-12-07" }
+{ "status": "presentation" }
+{ "status": "openaccess", "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
+~~~
+ 
+Note that DAIA Simple only covers one typical use case but it may not suitable
+for other applications.
+
 ## Notes
 
 - A [reference implementation in Perl](http://search.cpan.org/perldoc?DAIA) 
