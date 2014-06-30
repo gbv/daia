@@ -671,6 +671,7 @@ In Turtle syntax, the ontology is defined as following:
         vann:preferredNamespaceUri "http://purl.org/ontology/daia#" ;
         dct:modified "{GIT_REVISION_DATE}"^^xsd:date ;
         owl:versionInfo "{VERSION}" ;
+        foaf:isPrimaryTopicOf <http://purl.org/NET/DAIA> ;
         cc:license <http://creativecommons.org/licenses/by/3.0/> ;
         dct:creator "Jakob Voß" 
     .
