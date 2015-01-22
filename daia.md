@@ -9,10 +9,9 @@ availability status.
 
 ## Status of this document
 
-This document is a draft of what is going to be DAIA 1.0 specification.
-
-The previous version 0.5 is available at <http://purl.org/NET/DAIA> and DAIA
-ontology at <http://uri.gbv.de/ontology/daia/>.
+This document is a draft of what is going to be DAIA 1.0 specification. Version
+0.5 is available at
+<https://www.gbv.de/wikis/cls/DAIA_-_Document_Availability_Information_API>.
 
 The RDF ontology of DAIA/RDF is available in [Turtle](daia.ttl) and in
 [RDF/XML](daia.owl). Schema files for DAIA/XML will follow. All documentation
@@ -802,28 +801,18 @@ The following appendixes are informative only.
 **DAIA Simple** is a boiled down version of a DAIA response consisting of plain
 key-value structure having the following fields:
 
-status
-  : optional field with one of four possible values:
-
-    openaccess
-      : accessible online without any restriction (Open Access). The `href` field
-        should contain a link to directly access the document.
-    loan
-      : not `openaccess` but accessible for lending or temporary online access.
-    presentation
-      : none of the above but accessible within the institution.
-    expected
-      : none of the above but accessible for lending or temporary online access in the
-        future.
-    none
-      : none of the above. This is the default value of no status field is given.
-
-expected
-  : optional field only allowed if status is set to `expected`. Allowed values must
-    conform to `xsd:date` or `xsd:dateTime` or the string `unknown`.
+service
+  : most relevant service (`openaccess`, `loan`, `presentation`, `none`)
+available
+  : boolean value (`true` or `false`)
 delay
-  : optional field only allowed if status is set to `loan` or `presentation`. Allowed
+  : optional field only allowed if available=`true`. Allowed
     values must conform to `xsd:duration` or the string `unknown`.
+expected
+  : Only if available=`false`. Allowed values must
+    conform to `xsd:date` or `xsd:dateTime` or the string `unknown`.
+queue
+  : length of waiting queue (only if available=`false`)
 href
   : optional URL to perform or request a service.
 limitation
@@ -832,10 +821,11 @@ limitation
 To give a few examples, encoded in JSON:
 
 ~~~ {.json}
-{ "status": "loan" }
-{ "status": "expected", "expected": "2014-12-07" }
-{ "status": "presentation" }
-{ "status": "openaccess", "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
+{ "service": "loan", "available": true }
+{ "service": "loan", "available": false, "expected": "2014-12-07" }
+{ "service": "presentation", "available": true }
+{ "service": "openaccess", "available": true,
+  "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
 ~~~
  
 Note that DAIA Simple only covers one typical use case but it may not suitable
