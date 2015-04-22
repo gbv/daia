@@ -520,6 +520,10 @@ instance RDF/XML in Turtle format). Multiple document URIs can be provided by
 concatenating them with the vertical bar (`|`, `%7C` in URL-Encoding) but a
 DAIA server may limit queries to any positive number of URIs.
 
+A DAIA server SHOULD include the HTTP response header `Content-Language` to
+indicate the language of textual response fields. The HTTP request header
+`Accept-Language` SHOULD be respected to select between multiple languages.
+
 **Examples:**
 
  Base URL                       Document URIs                                  Format      Query URL 
