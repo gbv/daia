@@ -1,11 +1,14 @@
 # Introduction
 
 The **Document Availability Information API (DAIA)** defines model of document
-availability, a set of exchangeable serializations of this model (in JSON, XML,
-and RDF), and an HTTP API to query document availability information encoded in
-any of these serializations. The DAIA data model basically consists of abstract
+availability, a set of exchangeable serializations of this model (in JSON and
+XML), and an HTTP API to query document availability information encoded in any
+of these serializations. The DAIA data model basically consists of abstract
 documents, concrete holdings of documents, and document services, with an
 availability status. 
+
+Information expressed by DAIA can also be encoded in RDF as described with the
+[DAIA Ontology](https://gbv.github.io/daia-rdf/)
 
 ## Status of this document
 
@@ -13,9 +16,7 @@ This document is a draft of what is going to be DAIA 1.0 specification. Version
 0.5 is available at
 <https://www.gbv.de/wikis/cls/DAIA_-_Document_Availability_Information_API>.
 
-The RDF ontology of DAIA/RDF is available in [Turtle](daia.ttl) and in
-[RDF/XML](daia.owl). Schema files for DAIA/XML will follow. All documentation
-and schemas are generated from the source file 
+All documentation and schemas are generated from the source file 
 [`daia.md`](https://github.com/gbv/daiaspec/blob/master/daia.md) written in
 [Pandoc’s Markdown](http://johnmacfarlane.net/pandoc/demo/example9/pandocs-markdown.html)
 and converted with [makespec](https://github.com/jakobib/makespec).
@@ -39,14 +40,9 @@ interpreted as described in RFC 2119.
 
 ## Namespaces
 
-DAIA serializations in XML (DAIA/XML) and RDF (DAIA/RDF) are each formally
-described by a schema or ontology. The DAIA/XML Schema is identified by the XML
-namespace `http://ws.gbv.de/daia/`. The DAIA/RDF Ontology is identified by the
-URI <http://purl.org/ontology/daia/> which is also used URI namespace. Both may
-be changed to <http://purl.org/ontology/daia#>. The namespace prefix `daia` is
-recommeded for both DAIA/XML and DAIA/RDF.
-
-A list of namespaces prefixes is included below.
+DAIA serializations in XML (DAIA/XML) is formally described by an XML schema.
+The DAIA/XML Schema is identified by the XML namespace
+`http://ws.gbv.de/daia/`.  The XML namespace prefix `daia` is recommeded..
 
 The current XML Schema is located at <http://purl.org/NET/DAIA/schema.xsd>. 
 
@@ -121,8 +117,7 @@ it may be the empty string). DAIA uses the following XML Schema Datatypes:
 
 [daia]: #root-element
 
-A DAIA response in DAIA/XML and DAIA/JSON contains exactely one root element. A DAIA response in 
-DAIA/RDF consists of an RDF graph without root element.
+A DAIA response in DAIA/XML and DAIA/JSON contains exactely one root element. 
 
 In DAIA/XML the root element name is **daia**. The XML namespace
 `http://ws.gbv.de/daia/` MUST be specified and the XML Schema
@@ -172,11 +167,6 @@ Example
            <d:institution/>
         </d:daia>
         ~~~
-  : DAIA/RDF
-      : ~~~ {.turtle}
-        # In DAIA/RDF there is no timestamp unless one uses N-Quads or reification
-        [ ] a foaf:Organization .
-        ~~~
 
 ## Document element
 
@@ -216,12 +206,6 @@ Example
           <item/>
           <item/>
         </document>
-        ~~~
-  : DAIA/RDF
-      : ~~~ {.turtle}
-        <gvk:ppn:57793371X> a bibo:Document ;
-          foaf:primaryTopicOf <https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X> ;
-          holding:exemplar [ ], [ ], [ ] .
         ~~~
 
 ## Item element
@@ -284,24 +268,9 @@ Example
            <unavailable service="openaccess" />
         </item>
         ~~~
-    DAIA/RDF
-      : ~~~ {.turtle}
-        <id:123> a frbr:Item ;
-          dct:description "foo"@en ; 
-          holding:label "bar" ;
-          holding:heldBy <id:abc> ;
-          daia:availableFor [ a dso:Presentation ] ;
-          daia:availableFor [ a dso:Loan ] ;
-          daia:availableFor [ a dso:Interloan ] ;
-          daia:unavailableFor [ a dso:Openaccess ] ;
-        <id:abc> a foaf:Organization ; dct:isPartOf [
-          a foaf:Organization ; dct:hasPart <id:abc> ] .
-        ~~~
 
-In DAIA/RDF, an Item element corresponds to an instance of
-[frbr:Item](http://purl.org/vocab/frbr/core#Item) . Partial items refer to
-items which contain less (`narrower`) or more (`broader`) than the whole
-document:
+Partial items refer to items which contain less (`narrower`) or more
+(`broader`) than the whole document:
 
 +----------------------+-------------------------------------------------------------------------+
 | narrower in DAIA/XML | ~~~ {.xml}                                                              |
@@ -389,13 +358,6 @@ Example
       : ~~~ {.xml}
         <available service="loan" delay="PT2H" />
         ~~~
-    DAIA/RDF
-      : ~~~ {.turtle}
-        [ ] daia:availableFor [
-          a dso:Loan ;
-          service:delay "PT2H"^^xsd:duration 
-        ] .
-        ~~~
 
 ## Unavailable element
 
@@ -437,13 +399,6 @@ Example
       : ~~~ {.xml}
         <unavailable service="presentation" delay="PT4H" />
         ~~~
-    DAIA/RDF
-      : ~~~ {.turtle}
-        [ ] daia:unavailableFor [
-          a dso:Presentation ;
-          service:delay "PT4H"^^xsd:duration 
-        ] .
-        ~~~
 
 ## Messages
 
@@ -481,10 +436,6 @@ Example
     DAIA/XML
       : ~~~ {.xml}
         <message lang="en">request failed</message>
-        ~~~
-    DAIA/RDF
-      : ~~~ {.turtle}
-        # not supported
         ~~~
 
 ## Additional entities
@@ -550,202 +501,6 @@ Example
         ...
         <limitation>3 day loan</limitation>
         ~~~
-  : DAIA/Turtle
-      : ~~~ {.xml}
-        [ ] a foaf:Organization ;
-            foaf:homepage <http://www.tib.uni-hannover.de/> .
-
-        <info:isil/DE-7-022> a foaf:Organization ;
-            foaf:name "Library of the Geographical Institute, Goettingen University"@en .
-
-        [ ] a service:ServiceLimitation ;
-            schema:name "3 day loan" . # TODO: schema:name (???)
-        ~~~
-
-<!-- schema:name? rdfs:label? subclass of service:ServiceLimitation? -->
-
-# DAIA Ontology
-
-The Document Availability Information Ontology (DAIA ontology) defines a set of
-RDF classes and RDF properties to express DAIA data in RDF. RDF data that makes
-use of DAIA ontology is also referred to as DAIA/RDF.
-
-## Overview
-
-DAIA ontology is based on the following RDF ontologies:
-
------------------------------------ ---------------------------- ---------------------------------------
- Ontology                            relevant classes            relevant properties
------------------------------------ ---------------------------- ---------------------------------------
- [Document Service Ontology] (DSO)   [dso:DocumentService]\       -
-                                     [dso:Loan]\
-                                     [dso:Presentation]\
-                                     [dso:Interloan]\
-                                     [dso:OpenAccess]\
-
- Service Ontology                    [service:ServiceLimitation]  [service:limits] / [service:limitedBy]\
-                                                                  [service:delay]
-
- [Holding Ontology]                  ...                          holding:exemplar\
-                                                                  holding:narrowerExemplar\
-                                                                  holding:broaderExemplar\
-                                                                  holding:heldby / holding:holds\
-                                                                  holding:label\
-                                                                  ...
-
- FOAF                                foaf:Organization\           foaf:primaryTopicOf\
-                                                                  foaf:name\
-                                     ...                          ...
-
- Bibliographic Ontology (bibo)       bibo:Document                -
-
- FRBR                                frbr:Item                    -
-
- DCTerms                             ...                          dct:description\
-                                                                  dct:hasPart / dct:isPartOf
------------------------------------ ---------------------------- ---------------------------------------
-
-In addition:
-
-* [Organization ontology](http://www.w3.org/TR/vocab-org/) may be used
-  to refer to organizations and institutions.
-* Simple Service Status Ontology (SSSO) should be referred to.
-* DAIA should be aligned with [Schema.org Ontology](http://schema.org/).
-
-[dso:DocumentService]: http://purl.org/ontology/dso#DocumentService
-[dso:Loan]: http://purl.org/ontology/dso#Loan
-[dso:Presentation]: http://purl.org/ontology/dso#Presentation
-[dso:Interloan]: http://purl.org/ontology/dso#Interloan
-[dso:OpenAccess]: http://purl.org/ontology/dso#OpenAccess
-
-[service:ServiceLimitation]: http://purl.org/ontology/service#ServiceLimitation
-[service:limits]: http://purl.org/ontology/serviceo#limits
-[service:limitedBy]: http://purl.org/ontology/service#limitedBy
-[service:delay]: http://purl.org/ontology/serviceo#delay
-
-~~~{.ditaa}
-+-----------+     daia:availableFor    +---------------------+
-|           |------------------------->|                     |
-|           |<-------------------------|                     |
-|           |     daia:availableOf     |                     |
-| frbr:Item |                          | dso:DocumentService |
-|           |    daia:unavailableFor   |                     |
-|           |------------------------->|                     |
-|           |<-------------------------|                     |
-+-----------+    daia:unavailableOf    +---------------------+
-~~~
-
-## Namespaces and Ontology
-
-The URI namespace of DAIA ontology is `http://purl.org/ontology/daia#`. The
-namespace prefix `daia` is recommended. The URI of DAIA Ontology as as a whole
-is <http://purl.org/ontology/daia>.
-
-    @prefix daia: <http://purl.org/ontology/daia#> .
-    @base         <http://purl.org/ontology/daia> .
-
-The following namspace prefixes are used to refer to related ontologies:
-
-    @prefix cc:      <http://creativecommons.org/ns#> .
-    @prefix dct:     <http://purl.org/dc/terms/> .
-    @prefix dso:     <http://purl.org/ontology/dso#> .
-    @prefix holding: <http://purl.org/ontology/holding#> .
-    @prefix frbr:    <http://purl.org/vocab/frbr/core#> .
-    @prefix owl:     <http://www.w3.org/2002/07/owl#> .
-    @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix ssso:    <http://purl.org/ontology/ssso#> .
-    @prefix service: <http://purl.org/ontology/service#> .
-    @prefix holding: <http://purl.org/ontology/holding#> .
-    @prefix vann:    <http://purl.org/vocab/vann/> .
-    @prefix voaf:    <http://purl.org/vocommons/voaf#> .
-    @prefix vs:      <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
-    @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-
-In Turtle syntax, the ontology is defined as following:
-
-    <> a owl:Ontology, voaf:Vocabulary ;
-        dct:title "Document Availability Information Ontology"@en ;
-        rdfs:label "DAIA" ;
-        vann:preferredNamespacePrefix "daia" ;
-        vann:preferredNamespaceUri "http://purl.org/ontology/daia#" ;
-        dct:modified "{GIT_REVISION_DATE}"^^xsd:date ;
-        owl:versionInfo "{VERSION}" ;
-        foaf:isPrimaryTopicOf <http://purl.org/NET/DAIA> ;
-        cc:license <http://creativecommons.org/licenses/by/3.0/> ;
-        dct:creator "Jakob Voß" 
-    .
-
-## Classes
-
-DAIA ontology does not define new classes but makes use of classes defined in
-related ontologies.
-
-### Documents and Holdings
-
-...
-
-    ssso:ServiceEvent a owl:Class ;
-        rdfs:isDefinedBy <http://purl.org/ontology/ssso> .
-
-### Storage
-
-A storage is a place where items are stored.
-
-    daia:Storage a owl:Class .
-
-### Availability
-
-...
-
-## Properties
-
-### availableFor
-
-    daia:availableFor a owl:ObjectProperty ;
-        rdfs:label "availableFor"@en ;
-        rdfs:domain frbr:Item ;
-        rdfs:range dso:DocumentService ;
-        owl:inverseOf daia:availableOf ;
-        rdfs:subPropertyOf dso:hasService ;
-        rdfs:seeAlso daia:unavailableFor ;
-        rdfs:isDefinedBy <> ;
-        vs:term_status "testing" .
-
-### availableOf
-    
-    daia:availableOf a owl:ObjectProperty ;
-        rdfs:label "availableOf"@en ;
-        rdfs:domain dso:DocumentService ;
-        rdfs:range frbr:Item ;
-        owl:inverseOf daia:availableFor ;
-        rdfs:subPropertyOf dso:hasDocument ;
-        rdfs:seeAlso daia:unavailableOf ;
-        rdfs:isDefinedBy <> ;
-        vs:term_status "testing" .
-
-### unavailableFor
-    
-    daia:unavailableFor a owl:ObjectProperty ;
-        rdfs:label "unavailableFor"@en ;
-        rdfs:domain frbr:Item ;
-        rdfs:range dso:DocumentService ;
-        owl:inverseOf daia:unavailableOf ;
-        rdfs:subPropertyOf dso:hasService ;
-        rdfs:seeAlso daia:availableFor ;
-        rdfs:isDefinedBy <> ;
-        vs:term_status "testing" .
-
-### unavailableOf
-    
-    daia:unavailableOf a owl:ObjectProperty ;
-        rdfs:label "unavailableOf"@en ;
-        rdfs:domain dso:DocumentService ;
-        rdfs:range frbr:Item ;
-        owl:inverseOf daia:unavailableOf ;
-        rdfs:subPropertyOf dso:hasDocument ;
-        rdfs:seeAlso daia:availableOf ;
-        rdfs:isDefinedBy <> ;
-        vs:term_status "testing" .
 
 # Query API
 
@@ -791,6 +546,8 @@ DAIA server may limit queries to any positive number of URIs.
   W3C Recommendation 26 November 2008
 - **[XML-NS]** [Namespaces in XML 1.0 (Second Edition)](http://www.w3.org/TR/xml-names/).
   W3C Recommendation 16 August 2006
+- DAIA Ontology
+  <https://gbv.github.io/daia-rdf/>
 
 # Appendixes
 
@@ -851,95 +608,6 @@ for other applications.
    -  Definition of canonical DAIA
    -  Inclusion of some additional obvious constraints like uniqueness of identifiers per document.
    -  The DAIA/XML namespace (currently <http://ws.gbv.de/daia/>) may be changed to a more stable PURL.
-
-## Relevant differences to DAIA 0.5
-
-The main difference of this specification to DAIA 0.5 is the inclusion of
-DAIA/RDF which was formerly defined in a separate document. Major parts of the
-DAIA ontology have been moved to independent micro-ontologies, involving the
-change of URIs. In particular, DAIA services are now defined in the Document
-Service Ontology. The following URIs are deprecated:
-
-Removed:
-
-* <http://purl.org/ontology/daia/Response>
-* <http://purl.org/ontology/daia/timestamp>
-
-Moved to [Document Service Ontology] (DSO):
-
-* <http://purl.org/ontology/daia/Service>
-  moved to <http://purl.org/ontology/dso#DocumentService>
-* <http://purl.org/ontology/daia/Service/Openaccess>
-  moved to <http://purl.org/ontology/dso#Openaccess>
-* <http://purl.org/ontology/daia/Service/Interloan>
-  moved to <http://purl.org/ontology/dso#Interloan>
-* <http://purl.org/ontology/daia/Service/Loan>
-  moved to <http://purl.org/ontology/dso#Loan>
-* <http://purl.org/ontology/daia/Service/Presentation> 
-  moved to <http://purl.org/ontology/dso#Presentation>
-
-Moved to [Simple Service Status Ontology] (SSSO):
-
-* <http://purl.org/ontology/daia/provides>
-  moved to <http://purl.org/ontology/ssso#provides>
-* <http://purl.org/ontology/daia/providedBy>
-  moved to <http://purl.org/ontology/ssso#providedBy>
-* <http://purl.org/ontology/daia/Limitation>
-  moved to <http://purl.org/ontology/ssso#ServiceLimitation>
-* <http://purl.org/ontology/daia/limits>
-  moved to <http://purl.org/ontology/ssso#limits>
-* <http://purl.org/ontology/daia/limitedBy>
-  moved to <http://purl.org/ontology/ssso#limitedBy>
-* <http://purl.org/ontology/daia/queue>
-  moved to <http://purl.org/ontology/ssso#queue>
-* <http://purl.org/ontology/daia/delay> 
-  and <http://purl.org/ontology/daia/expected> 
-  moved to <http://purl.org/ontology/ssso#delay>
-
-Moved to [Holding Ontology]:
-
-* <http://purl.org/ontology/daia/exemplar> 
-  moved to ...
-* <http://purl.org/ontology/daia/exemplarOf> 
-  moved to ...
-* <http://purl.org/ontology/daia/narrowerExemplar> 
-  moved to ...
-* <http://purl.org/ontology/daia/narrowerExemplarOf> 
-  moved to ...
-* <http://purl.org/ontology/daia/broaderExemplar> 
-  moved to ...
-* <http://purl.org/ontology/daia/broaderExemplarOf> 
-  moved to ...
-* <http://purl.org/ontology/daia/holds> 
-  moved to ...
-* <http://purl.org/ontology/daia/heldBy> 
-  moved to ...
-* <http://purl.org/ontology/daia/label> 
-  moved to ...
-
-Nur sure about:
-
-* daia:collectedBy, daia:inCollection (?) to connect holding institution/agent 
-  and abstract document which holding is exemplar of.
-* daia:Storage maybe to be replaced by dct:Location, geo:SpatialThing or similar (?)
-
-DAIA Ontology
-
-* daia:perform, daia:baseURL ... (?)
-
-* <http://purl.org/ontology/daia/availableOf> changed to
-  <http://purl.org/ontology/daia#availableOf>.
-* <http://purl.org/ontology/daia/availableFor> changed to
-  <http://purl.org/ontology/daia#availableFor>.
-* <http://purl.org/ontology/daia/unavailableOf> changed to
-  <http://purl.org/ontology/daia#unavailableOf>.
-* <http://purl.org/ontology/daia/unavailableFor> changed to
-  <http://purl.org/ontology/daia#unavailableFor>.
-
-## Integrity rules
-
-If department and institution have same id, the department SHOULD be
-ignored.
 
 [CC-BY-SA 3.0]: http://creativecommons.org/licenses/by-sa/3.0/
 [RFC 3066]: http://tools.ietf.org/html/rfc3066
