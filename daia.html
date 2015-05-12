@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="de_DE">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Jakob Voß" />
+  <meta name="date" content="2015-05-11" />
+  <title>Document Availability Information API (DAIA)</title>
+   <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+/*<![CDATA[*/
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+/*]]>*/
+  </style>
+  <style type="text/css">
+  body { font-family: sans-serif; }
+  a { text-decoration: none }
+  a:hover { text-decoration: underline }
+  h1 { font: 170% sans-serif }
+  h1.title { font-size: 200%; font-weight: bold; }
+  h2 { font: 140% sans-serif }
+  h3 { font: 120% sans-serif }
+  dt { font-weight: bold; }
+  h1, h2, h3, h1 a, h2 a, h3 a { color: #005A9C; }
+  table { border-collapse: collapse; }
+  td { border: 1px solid #999; padding: 3px }
+  dl p { margin-top: 0; }
+  dt { margin-top: 0.8em; }
+  dd { margin-left: 1.5em; }
+  ol { margin-bottom: 1em; }
+  table + p { margin-top: 1em; }
+  </style>
+</head>
+<body>
+<a href="http://github.com/gbv/daia2/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+<header>
+<h1 class="title">Document Availability Information API (DAIA)</h1>
+<h3 class="author">Jakob Voß</h3>
+<h4 class="date">2015-05-11 (version 0.9.x)</h4>
+</header>
+
+<h1>Table of Contents</h1>
+<nav id="TOC">
+<ul>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a><ul>
+<li><a href="#status-of-this-document"><span class="toc-section-number">1.1</span> Status of this document</a></li>
+<li><a href="#conformance-requirements"><span class="toc-section-number">1.2</span> Conformance requirements</a></li>
+</ul></li>
+<li><a href="#data-format"><span class="toc-section-number">2</span> Data format</a><ul>
+<li><a href="#data-types"><span class="toc-section-number">2.1</span> Data types</a></li>
+<li><a href="#daia-response-format"><span class="toc-section-number">2.2</span> DAIA response format</a></li>
+<li><a href="#daia-simple"><span class="toc-section-number">2.3</span> DAIA Simple</a></li>
+</ul></li>
+<li><a href="#request-and-response"><span class="toc-section-number">3</span> Request and response</a></li>
+<li><a href="#patron-specific-availability"><span class="toc-section-number">4</span> Patron-specific availability</a></li>
+<li><a href="#references"><span class="toc-section-number">5</span> References</a><ul>
+<li><a href="#normative-references"><span class="toc-section-number">5.1</span> Normative References</a></li>
+<li><a href="#revision-history"><span class="toc-section-number">5.2</span> Revision history</a></li>
+<li><a href="#acknowledgements"><span class="toc-section-number">5.3</span> Acknowledgements</a></li>
+</ul></li>
+</ul>
+</nav>
+<section id="introduction" class="level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>…</p>
+<section id="status-of-this-document" class="level2">
+<h2><span class="header-section-number">1.1</span> Status of this document</h2>
+<p>All sources and updates can be found in a public git repository at <a href="http://github.com/gbv/daia">http://github.com/gbv/daia</a>. See the <a href="#releases">list of releases</a> at <a href="https://github.com/gbv/daia/releases">https://github.com/gbv/daia/releases</a> for functional changes.</p>
+<p>The master file <a href="https://github.com/gbv/daia/blob/master/daia.md">daia.md</a> is written in <a href="http://johnmacfarlane.net/pandoc/demo/example9/pandocs-markdown.html">Pandoc’s Markdown</a>. HTML version of the specification is generated from the master file with <a href="https://github.com/jakobib/makespec">makespec</a>. The specification can be distributed freely under the terms of CC-BY-SA.</p>
+</section>
+<section id="conformance-requirements" class="level2">
+<h2><span class="header-section-number">1.2</span> Conformance requirements</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+</section>
+</section>
+<section id="data-format" class="level1">
+<h1><span class="header-section-number">2</span> Data format</h1>
+<p>…</p>
+<section id="data-types" class="level2">
+<h2><span class="header-section-number">2.1</span> Data types</h2>
+<p>The following data types are used to defined request and response format:</p>
+<dl>
+<dt>string</dt>
+<dd>A Unicode string. A DAIA client MUST treat fields with empty string value equal to non-existing fields.
+</dd>
+<dt>URI</dt>
+<dd>A syntactically correct URI.
+</dd>
+<dt>URL</dt>
+<dd>A syntactically correct HTTP or HTTPS URL.
+</dd>
+<dt>datetime</dt>
+<dd>An instant of time specified in the form <code>YYYY-MM-DDThh:mm:ss(.ss)?(Z|[+-]hh:mm)?</code> as defined with <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">XML Schema datatype xsd:dateTime</a>. A timezone indicator SHOULD be included.
+</dd>
+<dt>entity</dt>
+<dd><p>A JSON object with the following optional fields:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">id</td>
+<td style="text-align: left;">URI</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">href</td>
+<td style="text-align: left;">URL</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">content</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">…</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>document</dt>
+<dd><p>A JSON object with one mandatory and two optional fields:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;"></th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">id</td>
+<td style="text-align: left;">URI</td>
+<td style="text-align: left;">mandatory</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">href</td>
+<td style="text-align: left;">URL</td>
+<td style="text-align: left;">optional</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">item</td>
+<td style="text-align: left;">array of item</td>
+<td style="text-align: left;">optional</td>
+<td style="text-align: left;">…</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>item</dt>
+<dd><p>A JSON object with the following optional fields:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">id</td>
+<td style="text-align: left;">URI</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">href</td>
+<td style="text-align: left;">URL</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">part</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">label</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">department</td>
+<td style="text-align: left;">entity</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">storage</td>
+<td style="text-align: left;">entity</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">available</td>
+<td style="text-align: left;">array of available</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">unavailable</td>
+<td style="text-align: left;">array of unavailable</td>
+<td style="text-align: left;">…</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>available</dt>
+<dd><p>A JSON object with the following optional fields:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">service</td>
+<td style="text-align: left;">string or URI</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">href</td>
+<td style="text-align: left;">URL</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delay</td>
+<td style="text-align: left;">…</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">limitation</td>
+<td style="text-align: left;">entity</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>unavailable</dt>
+<dd><p>A JSON object with the following optional fields:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">service</td>
+<td style="text-align: left;">string or URI</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">href</td>
+<td style="text-align: left;">URL</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">expected</td>
+<td style="text-align: left;">…</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">queue</td>
+<td style="text-align: left;">…</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">limitation</td>
+<td style="text-align: left;">array of entity</td>
+<td style="text-align: left;">…</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<p>A DAIA client MUST treat fields with empty JSON arrays (e.g. <code>document</code>, <code>item</code>) equal to non-existing fields.</p>
+<p>A DAIA server MAY include additional fields which SHOULD be ignored by DAIA clients.</p>
+</section>
+<section id="daia-response-format" class="level2">
+<h2><span class="header-section-number">2.2</span> DAIA response format</h2>
+<p>A DAIA response is a JSON object with three optional fields:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>institution</td>
+<td style="text-align: left;">entity</td>
+<td style="text-align: left;">institution that grants or knows about services and their availability</td>
+</tr>
+<tr class="even">
+<td>document</td>
+<td style="text-align: left;">array of document</td>
+<td style="text-align: left;">…</td>
+</tr>
+<tr class="odd">
+<td>timestamp</td>
+<td style="text-align: left;">datetime</td>
+<td style="text-align: left;">…</td>
+</tr>
+</tbody>
+</table>
+<p><strong>TODO:</strong> paginated results for query ids with multiple ids</p>
+</section>
+<section id="daia-simple" class="level2">
+<h2><span class="header-section-number">2.3</span> DAIA Simple</h2>
+<p><strong>DAIA Simple</strong> is a simplified version of <a href="#daia-response-format">DAIA response format</a> that only covers a typical use case of availability information. A DAIA simple object is a plain JSON object with the following fields:</p>
+<dl>
+<dt>service</dt>
+<dd>most relevant service (<code>openaccess</code>, <code>loan</code>, <code>presentation</code>, <code>none</code>)
+</dd>
+<dt>available</dt>
+<dd>boolean value (<code>true</code> or <code>false</code>)
+</dd>
+<dt>delay</dt>
+<dd>optional field only allowed if available=<code>true</code>. Allowed values must conform to <code>xsd:duration</code> or be the string <code>unknown</code>.
+</dd>
+<dt>expected</dt>
+<dd>Only if available=<code>false</code>. Allowed values must conform to <code>xsd:date</code> or <code>xsd:dateTime</code> or be the string <code>unknown</code>.
+</dd>
+<dt>queue</dt>
+<dd>length of waiting queue (only if available=<code>false</code>)
+</dd>
+<dt>href</dt>
+<dd>optional URL to perform or request a service.
+</dd>
+<dt>limitation</dt>
+<dd>optional string or boolean value describing an additional limitation.
+</dd>
+</dl>
+<p><strong>Examples:</strong></p>
+<pre class="sourceCode json"><code class="sourceCode json"><span class="fu">{</span> <span class="dt">&quot;service&quot;</span><span class="fu">:</span> <span class="st">&quot;loan&quot;</span><span class="fu">,</span> <span class="dt">&quot;available&quot;</span><span class="fu">:</span> <span class="kw">true</span> <span class="fu">}</span>
+<span class="fu">{</span> <span class="dt">&quot;service&quot;</span><span class="fu">:</span> <span class="st">&quot;loan&quot;</span><span class="fu">,</span> <span class="dt">&quot;available&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span> <span class="dt">&quot;expected&quot;</span><span class="fu">:</span> <span class="st">&quot;2014-12-07&quot;</span> <span class="fu">}</span>
+<span class="fu">{</span> <span class="dt">&quot;service&quot;</span><span class="fu">:</span> <span class="st">&quot;presentation&quot;</span><span class="fu">,</span> <span class="dt">&quot;available&quot;</span><span class="fu">:</span> <span class="kw">true</span> <span class="fu">}</span>
+<span class="fu">{</span> <span class="dt">&quot;service&quot;</span><span class="fu">:</span> <span class="st">&quot;openaccess&quot;</span><span class="fu">,</span> <span class="dt">&quot;available&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span>
+  <span class="dt">&quot;href&quot;</span><span class="fu">:</span> <span class="st">&quot;http://dx.doi.org/10.1901%2Fjaba.1974.7-497a&quot;</span> <span class="fu">}</span></code></pre>
+</section>
+</section>
+<section id="request-and-response" class="level1">
+<h1><span class="header-section-number">3</span> Request and response</h1>
+<p>A DAIA server is queried via HTTP or HTTPS GET request and the following query parameters:</p>
+<dl>
+<dt>id</dt>
+<dd>request identifiers to identify documents or items
+</dd>
+<dt>format</dt>
+<dd>set to <code>json</code> (mandatory)
+</dd>
+<dt>callback</dt>
+<dd>a JavaScript callback method name to return JSONP instead of JSON. The callback MUST only contain alphanumeric characters and underscores
+</dd>
+<dt>patron</dt>
+<dd>… for <a href="#patron-specific-availability">patron-specific availability</a> …
+</dd>
+<dt>access_token</dt>
+<dd>… optional authentification
+</dd>
+<dt>suppress_response_codes</dt>
+<dd>if this parameter is present, all responses MUST be returned with a 200 OK status code, even [request errors]. Support of this parameter is OPTIONAL.
+</dd>
+</dl>
+<p>The URL to query a DAIA server when stripped from query parameters <code>id</code>, <code>format</code>, <code>callback</code>, <code>patron</code>, <code>access_token</code>, <code>suppress_response_codes</code> is called its <strong>base URL</strong>.</p>
+<p>DAIA server and client MUST use HTTPS for requests with with access tokens.</p>
+<p>A DAIA server SHOULD also support HTTP HEAD and HTTP OPTIONS requests.</p>
+<p>A missing parameter <code>format</code> or another value but <code>json</code> SHOULD result in a HTTP <a href="#response-errors">error response</a> with status 422 (invalid request).</p>
+<p><strong>TODO</strong> query ID for multiple documents (HTTP 422: query ID too long), <code>Link</code> to to refer to a list of next <a href="#request-and-response">request id</a> if the request id was only processed partially …</p>
+<section id="request-headers" class="level3 unnumbered">
+<h3>Request headers</h3>
+<p>A DAIA client SHOULD sent the following HTTP request headers:</p>
+<dl>
+<dt>User-Agent</dt>
+<dd>with an appropriate client name and version number
+</dd>
+<dt>Accept</dt>
+<dd>with the value <code>application/json</code>
+</dd>
+</dl>
+<p>A DAIA client MAY sent the following HTTP request headers:</p>
+<dl>
+<dt>Accept-Language</dt>
+<dd>to indicate preferred languages of textual response fields (<code>content</code>)
+</dd>
+<dt>Authorization</dt>
+<dd>to provide an access token for <a href="#patron-specific-availability">patron-specific availability</a> as OAuth 2 Bearer token.
+</dd>
+</dl>
+<p>For OPTIONS preflight requests of Cross-Origin Resource Sharing (CORS) a DAIA client MUST include the following HTTP request headers:</p>
+<dl>
+<dt>Origin</dt>
+<dd>where the cross-origin request originates from
+</dd>
+<dt>Access-Control-Request-Method</dt>
+<dd>the HTTP verb <code>GET</code>
+</dd>
+<dt>Access-Control-Request-Headers</dt>
+<dd>the value <code>Authorization</code> if access tokens are sent as HTTP headers
+</dd>
+</dl>
+<p>Note that DAIA clients are not required to respect CORS rules. CORS preflight requests in browsers can be avoided by omitting the request headers <code>Accept</code> and <code>Authorization</code>.</p>
+</section>
+<section id="response-headers" class="level3 unnumbered">
+<h3>Response headers</h3>
+<p>A DAIA server SHOULD sent the following HTTP response headers with every <a href="#daia-response-format">DAIA response</a>:</p>
+<dl>
+<dt>Content-Language</dt>
+<dd>to indicate the language of textual response fields (<code>content</code>)
+</dd>
+<dt>Content-Type</dt>
+<dd>the value <code>application/json</code> or <code>application/json; charset=utf-8</code> for JSON response; the value <code>application/javascript</code> or <code>application/javascript; charset=utf-8</code> for JSONP response
+</dd>
+<dt>X-DAIA-Version</dt>
+<dd>the version of DAIA specification which the server was checked against
+</dd>
+<dt>Link</dt>
+<dd>to refer to a list of next <a href="#request-and-response">request id</a> for paginated results
+</dd>
+</dl>
+</section>
+<section id="response-errors" class="level3 unnumbered">
+<h3>Response errors</h3>
+<p>A DAIA server SHOULD use HTTP status codes to indicate server errors and client request errors. An error response SHOULD include a JSON object with the following fields:</p>
+<dl>
+<dt>error</dt>
+<dd>alphanumeric error code
+</dd>
+<dt>code</dt>
+<dd>HTTP status code
+</dd>
+<dt>error_description</dt>
+<dd>human-readable error description (optional)
+</dd>
+<dt>error_uri</dt>
+<dd>human-readable web page about the error (optional)
+</dd>
+</dl>
+<p>The following error responsed are expected:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">error</th>
+<th style="text-align: left;">code</th>
+<th style="text-align: center;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>invalid_request</td>
+<td style="text-align: left;">400</td>
+<td>Malformed request, for instance malformed HTTP request headers</td>
+</tr>
+<tr class="even">
+<td>invalid_grant</td>
+<td style="text-align: left;">401</td>
+<td>The <a href="#patron-specific-availability">access token</a> was missing, invalid, or expired</td>
+</tr>
+<tr class="odd">
+<td>insufficient_scope</td>
+<td style="text-align: left;">403</td>
+<td>The access token was accepted but it lacks permission for the request</td>
+</tr>
+<tr class="even">
+<td>invalid_request</td>
+<td style="text-align: left;">405</td>
+<td>Unexpected HTTP verb</td>
+</tr>
+<tr class="odd">
+<td>invalid_request</td>
+<td style="text-align: left;">422</td>
+<td>Missing or invalid request parameters</td>
+</tr>
+<tr class="even">
+<td>internal_error</td>
+<td style="text-align: left;">500</td>
+<td>An unexpected error occurred, such as a serious bug</td>
+</tr>
+<tr class="odd">
+<td>not_implemented</td>
+<td style="text-align: left;">501</td>
+<td>Access token was sent but no support of <a href="#patron-specific-availability">patron-specific availability</a></td>
+</tr>
+<tr class="even">
+<td>bad_gateway</td>
+<td style="text-align: left;">502</td>
+<td>The request couldn’t be serviced because of a backend failure</td>
+</tr>
+<tr class="odd">
+<td>service_unavailable</td>
+<td style="text-align: left;">503</td>
+<td>The request couldn’t be serviced because of a temporary failure</td>
+</tr>
+<tr class="even">
+<td>gateway_timeout</td>
+<td style="text-align: left;">504</td>
+<td>The request couldn’t be serviced because of a backend failure</td>
+</tr>
+</tbody>
+</table>
+<p>A DAIA server SHOULD never return a HTTP 404 error if queried at its <a href="#request-and-response">base URL</a>. In particular a DAIA server MUST NOT respond with a HTTP 404 status code for missing or unknown <a href="#request-and-response">request id</a>.</p>
+<p>For backwards compatibility with DAIA 0.5, a DAIA server MAY respond with a HTTP 200 status code (instead of 422) and an arbitrary document if query parameter <code>format</code> has not been set to <code>json</code>. The document returned in this case MUST NOT be JSON. A DAIA client MAY translate the document to a valid <a href="#daia-response-format">DAIA response</a>, for instance from XML.</p>
+</section>
+</section>
+<section id="patron-specific-availability" class="level1">
+<h1><span class="header-section-number">4</span> Patron-specific availability</h1>
+<p><strong>TODO</strong></p>
+<p>A DAIA server MAY support patron-specific availability.</p>
+<ul>
+<li>Query parameter <code>patron</code> and <a href="#patron-specific-availability">access token</a>…</li>
+<li>SHOULD respond with <a href="#response-errors">error response</a> status 501 if not supported…</li>
+</ul>
+<p>DAIA server and client MUST use HTTPS for patron-specific availability with access tokens.</p>
+<p>A DAIA server that supports patron-specific availability, MUST also support HTTP OPTIONS requests for CORS.</p>
+</section>
+<section id="references" class="level1">
+<h1><span class="header-section-number">5</span> References</h1>
+<section id="normative-references" class="level2">
+<h2><span class="header-section-number">5.1</span> Normative References</h2>
+<ul>
+<li><p>Berners-Lee, T., Fielding R., Masinter L. 1998. “Uniform Resource Identifiers (URI): Generic Syntax”. <a href="http://tools.ietf.org/html/rfc2396">http://tools.ietf.org/html/rfc2396</a></p></li>
+<li><p>Biron, P. V., Malhotra, A. 2004. “XML Schema Part 2: Datatypes Second Edition”. <a href="http://www.w3.org/TR/xmlschema-2/">http://www.w3.org/TR/xmlschema-2/</a></p></li>
+<li><p>Bradner, S. 1997. “RFC 2119: Key words for use in RFCs to Indicate Requirement Levels”. <a href="http://tools.ietf.org/html/rfc2119">http://tools.ietf.org/html/rfc2119</a></p></li>
+<li><p>Crockford, D. 2006. “RFC 6427: The application/json Media Type for JavaScript Object Notation (JSON)”. <a href="http://tools.ietf.org/html/rfc4627">http://tools.ietf.org/html/rfc4627</a></p></li>
+<li><p>Fielding, R. 1999. “RFC 2616: Hypertext Transfer Protocol”. <a href="http://tools.ietf.org/html/rfc2616">http://tools.ietf.org/html/rfc2616</a></p></li>
+<li><p>Jones, M. and Hardt, D. 2012. “RFC 6750: The OAuth 2.0 Authorization Framework: Bearer Token Usage”. <a href="http://tools.ietf.org/html/rfc6750">http://tools.ietf.org/html/rfc6750</a>.</p></li>
+<li><p>van Kesteren, A. 2014. “Cross-Origin Resource Sharing” <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a></p></li>
+</ul>
+</section>
+<section id="revision-history" class="level2">
+<h2><span class="header-section-number">5.2</span> Revision history</h2>
+<p>This is version <strong>0.9.x</strong> of DAIA specification, last modified at 2015-05-11 with revision <a href="http://github.com/gbv/daia2/commit/58c9ba6d6f9c14c1f23e110a8c4c997cde4a56df">58c9ba6</a>.</p>
+<p>Version numbers follow <a href="http://semver.org/">Semantic Versioning</a>: each number consists of three numbers, optionally followed by <code>+</code> and a suffix:</p>
+<ul>
+<li>The major version (first number) is increased if changes require a modification of DAIA clients</li>
+<li>The minor version (second number) is increased if changes require a modification a DAIA servers</li>
+<li>The patch version (third number) is increased for backwards compatible fixes or extensions, such as the introduction of new optional fields</li>
+<li>The optional suffix indicates informal changes in documentation</li>
+</ul>
+<section id="releases" class="level3 unnumbered">
+<h3>Releases</h3>
+<p>Releases with functional changes are tagged with a version number and included at <a href="https://github.com/gbv/daia/releases">https://github.com/gbv/daia/releases</a> with release notes.</p>
+<section id="section" class="level4 unnumbered">
+<h4>0.9.? (2015-05-??)</h4>
+<ul>
+<li>Removed DAIA/XML and DAIA/RDF</li>
+<li>Added DAIA Simple</li>
+<li>Dropped fields <code>message</code>, <code>version</code>, <code>schema</code></li>
+<li>Made <code>format</code> query parameter mandatory</li>
+<li>Added support of authentificated DAIA</li>
+<li>Added CORS (HTTP OPTIONS request)</li>
+<li>Added paginated results to better support querying multiple IDs</li>
+</ul>
+</section>
+<section id="section-1" class="level4 unnumbered">
+<h4>0.5 (2009)</h4>
+<ul>
+<li>First specification</li>
+</ul>
+</section>
+</section>
+<section id="full-changelog" class="level3 unnumbered">
+<h3>Full changelog</h3>
+<ul>
+<li><a href="daia-58c9ba6.html"><code>2015-05-12 14:09:46 +0200</code></a>: <a href="http://github.com/gbv/daia2/commit/58c9ba6d6f9c14c1f23e110a8c4c997cde4a56df">started rewrite from scratch</a></li>
+</ul>
+</section>
+</section>
+<section id="acknowledgements" class="level2">
+<h2><span class="header-section-number">5.3</span> Acknowledgements</h2>
+<p>Thanks for contributions to DAIA specification from Uwe Reh, David Maus, Oliver Goldschmidt, Jan Frederik Maas, Jürgen Hofmann, and Anne Christensen among others.</p>
+</section>
+</section>
+</body>
+</html>
