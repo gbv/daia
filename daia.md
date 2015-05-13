@@ -1,6 +1,8 @@
 # Introduction
 
-...
+The **Document Availability Information API (DAIA)** defines a data model of
+document availability encoded in JSON, and a HTTP based interface to query
+document availability information.
 
 ## Status of this document
 
@@ -11,9 +13,10 @@ All sources and updates can be found in a public git repository at
 The master file [daia.md](https://github.com/gbv/daia/blob/master/daia.md) is
 written in [Pandoc’s Markdown].  HTML version of the specification is generated
 from the master file with [makespec](https://github.com/jakobib/makespec). The
-specification can be distributed freely under the terms of CC-BY-SA.
+specification can be distributed freely under the terms of [CC-BY-SA].
 
 [Pandoc’s Markdown]: http://johnmacfarlane.net/pandoc/demo/example9/pandocs-markdown.html
+[CC-BY-SA]: http://creativecommons.org/licenses/by-sa/3.0/
 
 ## Conformance requirements
 
@@ -23,14 +26,13 @@ interpreted as described in RFC 2119.
 
 # Data format
 
-Document Availability Information in DAIA is expressed in JSON. A DAIA server
-MUST return a [DAIA response] or an [error response].
+The DAIA data model basically consists of abstract [documents], concrete
+holdings of documents ([items]), and document [services], with an availability
+status. The data model is encoded in JSON as [DAIA response].
 
-## Data types
+## Simple data types
 
 The following data types are used to defined [DAIA response] format and [DAIA Simple] format.
-
-### Simple data types {.unnumbered}
 
 string
   : A Unicode string. A DAIA client MUST treat fields with empty string value 
@@ -39,7 +41,7 @@ URI
   : A syntactically correct URI.
 URL
   : A syntactically correct HTTP or HTTPS URL.
-nonNegativeInteger
+count
   : A non-negative integer.
 boolean
   : A Boolean value (`true` or `false`).
@@ -47,75 +49,124 @@ datetime
   : An instant of time specified in the form `YYYY-MM-DDThh:mm:ss(.ss)?(Z|[+-]hh:mm)?`
     as defined with [XML Schema datatype xsd:dateTime](http://www.w3.org/TR/xmlschema-2/#dateTime).
     A timezone indicator SHOULD be included.
+anydate
+  : A date as defined with [XML Schema datatype xsd:date](http://www.w3.org/TR/xmlschema-2/#date)
+    (`YYYY-MM-DD(Z|[+-]hh:mm)?`), a datetime as defined above, or the string `unknown`.
+    A timezone indicator SHOULD be included.
 duration
   : A duration as defined with 
     [XML Schema datatype xsd:duration](http://www.w3.org/TR/xmlschema-2/#duration)
-    the string `unknown` to indicate a duration of unknown length.
+    or the string `unknown`.
+service
+  : An URI or string with one of values `presentation`, `loan`, `interloan`, and
+    `openaccess`. DAIA clients SHOULD ignore other string values.
 entity
   : A JSON object with the following optional fields:
 
     name    type    description
-    ------- ------- ------------
-    id      URI     ...
-    href    URL     ...
-    content string  ...
-    ------- ------- ------------
+    ------- ------- --------------------------------------------------------
+    id      URI     globally unique identifier of the entity
+    href    URL     human-readable web page about the entity
+    content string  human-readable label, title or description of the entity
+    ------- ------- --------------------------------------------------------
 
-### document {.unnumbered}
+    The language of field `content` SHOULD be given with HTTP [response header]
+    `Content-Language`. A DAIA client MAY use the `id` to retrieve additional
+    information about the entity and it MAY override fields `href` and/or `content`
+    with this information.
+
+## DAIA response
+
+[DAIA response]: #daia-response
+
+A DAIA response is a JSON object with three optional fields:
+
+name        type                 description
+----------- -------------------- ----------------------------------------------------------------------
+institution entity               institution that grants or knows about services and their availability
+document    array of [documents] documents matching the processed request identifiers
+timestamp   datetime             time the DAIA response was generated
+----------- -------------------- ----------------------------------------------------------------------
+
+DAIA clients MUST treat fields with empty JSON arrays (`document`, `item`,
+`available`, `unavailable`, and `limitation`) equal to non-existing fields. 
+
+A DAIA server MAY include additional fields which SHOULD be ignored by DAIA
+clients.
+
+## Documents
+
+[documents]: #documents
 
 A **document** is a JSON object with one mandatory and three optional fields:
 
 name      type                    description
---------- ------------- --------- --------------
-id        URI           mandatory ...
-requested string        optional  ...
-href      URL           optional  ...
-item      array of item optional  ...
---------- ------------- --------- --------------
+--------- ------------- --------- ------------------------------------------
+id        URI           mandatory globally unique identifier of the document
+requested string        optional  request identifier matching this document
+href      URL           optional  human-readable web page about the document
+item      array of item optional  set of instances or copies of the document
+--------- ------------- --------- ------------------------------------------
 
-...
+A [DAIA response] sent by a DAIA server in response to a request MUST only
+contain documents matching queried [request identifiers]. A document matches a
+given request identifier if the request identifier is repeated in field `id`,
+in field `requested`, or in both fields.
 
-One of `document.id` and `document.requested` MUST match to the queried identifier.
+### Example {.unnumbered}
 
-...
+```
+GET /?format=json&id=gvk:ppn:57793371X HTTP/1.1
+Host: example.org
+User-Agent: MyDAIAClient/1.0
+Accept: application/json
 
-#### Example {.unnumbered}
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Language: en
+X-DAIA-Version: 1.0.0
+```
 
 ```{.json}
 {
-  "href": "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X",
-  "id": "http://uri.gbv.de/document/gvk:ppn:57793371X",
-  "requested": "gvk:ppn:57793371X",
-  "item": [ {
-
-  } ]
+  "document": [
+    {
+      "href": "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X",
+      "id": "http://uri.gbv.de/document/gvk:ppn:57793371X",
+      "requested": "gvk:ppn:57793371X",
+      "item": [ { } ] 
+    }
+  ]
 }
 ```
 
-### item {.unnumbered}
+## Items
+
+[items]: #items
 
 An **item** is a JSON object with the following optional fields:
 
-name        type                    description
------------ ----------------------- ------------
-id          URI                     ...
-href        URL                     ...
-part        string                  ...
-label       string                  ...
-department  entity                  ...
-storage     entity                  ...
-available   array of availability   ...
-unavailable array of unavailability ...
------------ ----------------------- ------------
+name        type                 description
+----------- -------------------- ---------------------------------------------------------------
+id          URI                  globally unique identifier of the item
+href        URL                  human-readable web page about the item
+part        string               whether and how the item is partial
+label       string               call number or similar item label for finding or identification
+department  entity               an administrative sub-entitity of the institution
+storage     entity               a physical location of the item (stacks, floor etc.)
+available   array of available   set of available services
+unavailable array of unavailable set of unavailable services
+----------- -------------------- ---------------------------------------------------------------
 
-...
+The value of field `part` must be one of `narrower` and `broader`, if given.
+Partial items refer to items which contain less (`narrower`) or more
+(`broader`) than the whole document. 
 
-Partial items refer to items which contain less (narrower) or more (broader)
-than the whole document.
+The `department` refers to a department of an institution that is resposible
+for or knows about availability of the item. DAIA clients SHOULD assume a
+general hierarchy between `institution`, `department`, and `storage`.
 
-...
-
-#### Example {.unnumbered}
+### Example {.unnumbered}
 
 ```{.json}
 {
@@ -130,94 +181,103 @@ than the whole document.
 }
 ```
 
-### availability {.unnumbered}
+## Services
 
-A **availability** is a JSON object with the following optional fields:
+[services]: #services
 
-name        type                 description
------------ -------------------- ------------
-service     string or URI        ...
-href        URL
-delay       duration             estimated delay (if given).
-limitation  entity               ...
------------ -------------------- ------------
+A service is something that an item is currently accessible (data type
+available) or unaccessible (data type unavailable) for. DAIA defines the
+following service types:
+
+presentation
+  : the item is accessible within the institution (in their rooms, in their intranet).
+loan
+  : the item is accessible outside of the institution (by lending or online access) for a limited time.
+openaccess
+  : the item is accessible freely without any restrictions by the institution
+    (Open Access or free copies).
+interloan
+  : the item is accessible mediated by another institution.
+
+An item can further be available for an unspecified service type and for
+additional service types identified by URIs. The following URIs can be used
+equivalent to DAIA services:
+
+* <http://purl.org/ontology/dso#Presentation> = presentation
+* <http://purl.org/ontology/dso#Loan> = loan
+* <http://purl.org/ontology/dso#Openaccess> = openaccess
+* <http://purl.org/ontology/dso#Interloan> = interloan
+
+### available {.unnumbered}
+
+An **available** is a JSON object with the following optional fields:
+
+name        type            description
+----------- --------------- --------------------------------------------------
+service     service         the type of service being available 
+href        URL             a link to perform, register or reserve the service
+delay       duration        estimated delay (if given).
+limitation  array of entity more specific limitations of the service
+----------- --------------- --------------------------------------------------
 
 If `delay` is missing, then there is probably no significant delay.  If `delay`
 is `unknown`, then there is probably a delay but its duration is unknown.
 
-...
-
-#### Example {.unnumbered}
-
-```{.json}
-{ 
-  "service": "loan",
-  "delay": "PT2H" 
-}
-```
-
-### unavailability {.unnumbered}
+### unavailable {.unnumbered}
 
 An **unavailable** is a JSON object with the following optional fields:
 
 name        type            description
------------ --------------- ------------
-service     string or URI   ...
-href        URL             ...
-expected    ...             ...
-queue       ...             ...
-limitation  array of entity ...
------------ --------------- ------------
+----------- --------------- ------------------------------------------------------
+service     service         the type of service being unavailable 
+href        URL             a link to perform, register or reserve the service
+expected    anydate         expected date when the service will be available again
+queue       count           number of waiting requests for this service
+limitation  array of entity more specific limitations of the service
+----------- --------------- ------------------------------------------------------
 
-## DAIA response format
+If `expected` is `unknown` then the service probably won’t be available in the
+future. If no `expected` value is given, it is not known when or whether the
+service will be available again.
 
-[DAIA response format]: #daia-response-format
-[DAIA response]: #daia-response-format
+### Examples {.unnumbered}
 
-A DAIA response is a JSON object with three optional fields:
+An [item] being available for one service and unavailable for another.
 
- name        type              description
------------- ----------------- -----------------------------------------------------------------------
- institution entity            institution that grants or knows about services and their availability 
- document    array of document ...
- timestamp   datetime          ...
------------- ----------------- -----------------------------------------------------------------------
-
-
-**TODO:** 
-
-* paginated results for query ids with multiple ids
-
-* A DAIA client MUST treat fields with empty JSON arrays (e.g. `document`,
-  `item`) equal to non-existing fields. 
-
-* A DAIA server MAY include additional fields which SHOULD be ignored by DAIA clients.
-
-* ...
+```{.json}
+{
+  "available": [
+    { 
+      "service": "presentation",
+      "delay": "PT2H" 
+    }
+  ],
+  "unavailable": [
+    { 
+      "service": "loan",
+      "expected": "unknown" 
+    }
+  ]
+}
+```
 
 
 ## DAIA Simple
 
-**DAIA Simple** is a simplified version of [DAIA response format] that only
-covers a typical use case of availability information.  A DAIA simple object is
-a plain JSON object with the following fields:
+**DAIA Simple** is a simplified version of [DAIA response] format for a
+particular document limited to a typical use case of availability information.
+A DAIA simple object is a plain JSON object with the following fields:
 
-service
-  : most relevant service (`openaccess`, `loan`, `presentation`, `none`)
-available
-  : boolean value (`true` or `false`)
-delay
-  : optional field only allowed if available=`true`. Allowed
-    values must conform to `xsd:duration` or be the string `unknown`.
-expected
-  : Only if available=`false`. Allowed values must
-    conform to `xsd:date` or `xsd:dateTime` or be the string `unknown`.
-queue
-  : length of waiting queue (only if available=`false`)
-href
-  : optional URL to perform or request a service.
-limitation
-  : optional string or boolean value describing an additional limitation.
+name       type     description
+---------- -------- ---------------------------------------------------------------------------
+service    string   most relevant service (one of `openaccess`, `loan`, `presentation`, `none`)
+available  boolean  whether the service is available or not
+delay      duration expected delay (only relevant if `available` is `true`)
+expected   anydate  expected date of availability (only relevant if `available` is `false`)
+queue      count    length of waiting queue (only relevant if `available` is `false`)
+href       URL      optional URL to perform or request the service
+limitation string   optional string describing an additional limitation
+---------- -------- ---------------------------------------------------------------------------
 
 ### Examples {.unnumbered}
 
@@ -232,102 +292,140 @@ limitation
 
 # Request and response
 
-[query id]: #request-and-response
-[query parameter]: #request-and-response
+A DAIA server is queried via HTTP or HTTPS GET request. HTTP methods HEAD and
+OPTIONS SHOULD also be supported.
 
-A DAIA server is queried via HTTP or HTTPS GET request and the following query parameters:
+A DAIA server MUST always return a [DAIA response] or an [error response] for
+HTTP GET requests.
+
+The URL to query a DAIA server stripped from all query parameters is called
+its **base URL**. It is RECOMMENDED to use a HTTPS base URL.
+
+## Query parameters
+
+[query id]: #query-parameters
+[query parameter]: #query-parameters
+[request identifiers]: #query-parameters
+[base URL]: #query-parameters
+
+A DAIA server MUST respect following query parameters:
 
 id
-  : query id with identifiers of documents or items
+  : query id with one or multiple **request identifiers** of documents or items.
 format
-  : set to `json` (mandatory)
+  : set to `json`. If this parameter is missing or not set to `json`, a DAIA server
+    SHOULD sent an [error response] with HTTP status code 422 (invalid request). For
+    backwards compatibility with DAIA 0.5, a DAIA server MAY also response with
+    HTTP status code 200 and with an arbitrary document. The document returned in
+    this case MUST NOT be JSON. A DAIA client MAY translate the document to a valid
+    [DAIA response], for instance from XML.
 callback
   : a JavaScript callback method name to return JSONP instead of JSON. The callback MUST 
-    only contain alphanumeric characters and underscores
+    only contain alphanumeric characters and underscores.
 patron
-  : a patron identifier for [patron-specific availability]
+  : a patron identifier for [patron-specific availability].
 access_token
-  : an [access token] for authentification
+  : an [access token] for authentification. A DAIA client MUST use HTTPS when sending
+    access tokens.
 suppress_response_codes
   : if this parameter is present, all responses MUST be returned with a 200 OK status code,
-    even [request errors]. Support of this parameter is OPTIONAL.
+    even an [error response]. Support of this parameter is OPTIONAL.
 
-The URL to query a DAIA server when stripped from these six query parameters is
-called its **base URL**. It is RECOMMENDED to use a HTTPS base URL. A DAIA
-client MUST NOT send an access token via HTTP.
+If the query id does not includes a vertical bar (`|` or `%7F` with URL
+encoding), a DAIA server MUST use its value as request identifier. Otherwise a
+DAIA server MUST split the query id at vertical bars into multiple request
+identifiers. A DAIA server MAY sent an [error response] with HTTP status code
+422 if it cannot handle multiple request identifiers or if the query id is too
+long.  A PAIA server MAY choose to only process a subset of multiple request
+identifiers: in this case the response MUST include a `Link` [response header]
+with a new request URL that includes a querd id with all remaining request
+identifiers, joined with vertical bars.
 
-A DAIA server SHOULD also support HTTP HEAD and HTTP OPTIONS requests.
+### Example {.unnumbered}
 
-A missing parameter `format` or another value but `json` or `simple` SHOULD result in a
-HTTP [error response] with status 422 (invalid request).
+A DAIA server with base URL `https://example.org/` is queried with a query id
+that contains five request identifiers. The server only processes the first
+three request identifiers and finds a matching document for one of them. The
+remaining request identifiers are included in a new request URL.
 
-**TODO**
+    GET /?format=json&id=x:a|x:b|x:c|x:d|x:e HTTP/1.1
+    Host: example.org
+    User-Agent: MyDAIAClient/1.0
+    Accept: application/json
 
-* query ID for multiple documents (HTTP 422: query ID too long)
-* `Link` to to refer to a list of next [query id] if the query id was only processed partially
+    HTTP/1.1 200 OK
+    Content-Type: application/json; charset=utf-8
+    Content-Language: en
+    X-DAIA-Version: 1.0.0
+    Link: <https://example.org/?format=json&id=x:d|x:e>; rel="next"
 
+    { "document": [ { "id": "x:b" } ] }
 
-### Request headers {.unnumbered}
+## Request headers
+
+[request header]: #request-headers
 
 A DAIA client SHOULD sent the following HTTP request headers:
 
 User-Agent
-  : with an appropriate client name and version number
+  : with an appropriate client name and version number.
 Accept
-  : with the value `application/json`
+  : with the value `application/json`.
 
 A DAIA client MAY sent the following HTTP request headers:
 
 Accept-Language
-  : to indicate preferred languages of textual response fields (`content`)
+  : to indicate preferred languages of textual response fields (`content`).
 Authorization
-  : to provide an access token for [patron-specific availability] as OAuth 2
-    Bearer token.
+  : to provide an OAuth 2 Bearer token for [authentification].
 
 For OPTIONS preflight requests of Cross-Origin Resource Sharing (CORS) a DAIA
 client MUST include the following HTTP request headers:
 
 Origin
-  : where the cross-origin request originates from
+  : where the cross-origin request originates from.
 Access-Control-Request-Method
-  : the HTTP verb `GET`
+  : the HTTP verb `GET`.
 Access-Control-Request-Headers
-  : the value `Authorization` if access tokens are sent as HTTP headers
+  : the value `Authorization` if access tokens are sent as HTTP headers.
 
 Note that DAIA clients are not required to respect CORS rules. CORS preflight
 requests in browsers can be avoided by omitting the request headers `Accept`
 and `Authorization`.
 
-### Response headers {.unnumbered}
+## Response headers
+
+[response header]: #response-headers
 
 A DAIA server SHOULD sent the following HTTP response headers with every [DAIA response]:
 
 Content-Language
-  : to indicate the language of textual response fields (`content`)
+  : to indicate the language of textual response fields (`content`).
 Content-Type
   : the value `application/json` or `application/json; charset=utf-8` for JSON response;
-    the value `application/javascript` or `application/javascript; charset=utf-8` for JSONP response
+    the value `application/javascript` or `application/javascript; charset=utf-8` for JSONP response.
 X-DAIA-Version
-  : the version of DAIA specification which the server was checked against
+  : the version of DAIA specification which the server was checked against.
 Link
-  : to refer to the next [query id] for paginated results
+  : to refer to another [request URL](#request-and-response) with unprocessed request 
+    identifiers and RFC 5988 relation type `next`.
 
-### Response errors {.unnumbered}
+## Error responses
 
-[error response]: #response-errors
+[error response]: #error-responses
 
 A DAIA server SHOULD use HTTP status codes to indicate server errors and client
 request errors. An error response SHOULD include a JSON object with the
 following fields:
 
 error
-  : alphanumeric error code
+  : alphanumeric error code.
 code
-  : HTTP status code
+  : HTTP status code.
 error_description
-  : human-readable error description (optional)
+  : human-readable error description (optional).
 error_uri
-  : human-readable web page about the error (optional)
+  : human-readable web page about the error (optional).
 
 The following error responses are expected:
 
@@ -337,7 +435,7 @@ The following error responses are expected:
  invalid_grant        401  The [access token] was missing, invalid, or expired
  insufficient_scope   403  The access token was accepted but it lacks permission for the request
  invalid_request      405  Unexpected HTTP verb
- invalid_request      422  Missing or invalid request parameters
+ invalid_request      422  Missing or invalid query parameters
  internal_error       500  An unexpected error occurred, such as a serious bug
  not_implemented      501  Access token was sent but no support of [patron-specific availability]
  bad_gateway          502  The request couldn't be serviced because of a backend failure
@@ -347,30 +445,51 @@ The following error responses are expected:
 
 A DAIA server SHOULD never return a HTTP 404 error if queried at its [base
 URL]. In particular a DAIA server MUST NOT respond with a HTTP 404 status code
-for missing or unknown [query id].
+for missing or unknown [request identifiers](#query-parameters).
 
-For backwards compatibility with DAIA 0.5, a DAIA server MAY respond with a
-HTTP 200 status code (instead of 422) and an arbitrary document if query
-parameter `format` has not been set to `json`. The document returned in this
-case MUST NOT be JSON. A DAIA client MAY translate the document to a valid
-[DAIA response], for instance from XML.
+## Authentification
 
+[access token]: #authentification
+[authentification]: #authentification
 
-# Patron-specific availability
+A DAIA server MAY support authentfication via OAuth 2.0 bearer tokens (RFC
+6750). Access tokens can be provided either as URL query parameter
+`access_token` or in the HTTP [request header] `Authorization`. For instance
+the following requests are equivalent:
 
-[patron-specific availability]: #patron-specific-availability
-[access token]: #patron-specific-availability
+    curl -H "Authorization: Bearer vF9dft4qmT" https://example.org/?format=json
+    curl -H https://example.org/?access_token=vF9dft4qmT&format=json
 
-A DAIA server MAY support patron-specific availability with the [query
-parameter] `patron` and an optional access token. A DAIA server that does not
-support patron-specific availability SHOULD respond with [error response]
-status 501 (not supported) when it receives a request with query parameter
-`patron`.  A DAIA server that supports patron-specific availability, MUST also
-support HTTP OPTIONS requests for CORS.
+A DAIA server that supports authentification, MUST also support HTTP OPTIONS
+requests for CORS.
 
 DAIA server and client MUST use HTTPS when sending and receiving access tokens.
 
-...
+Distribution of access tokens is out of the scope of this specification.
+
+When also using Patrons Account Information API (PAIA) it is RECOMMENDED to
+issue access tokens via PAIA auth and add a scope named `read_availability` for
+authentificated access to a DAIA server.
+
+## Patron-specific availability
+
+[patron-specific availability]: #patron-specific-availability
+
+A DAIA server MAY support patron-specific availability with the [query
+parameter] `patron`. A DAIA server that does not support patron-specific
+availability SHOULD respond with [error response] status 501 (not supported)
+when it receives a request with query parameter `patron`.
+
+A DAIA server with support of patron-specific availability can return different
+[DAIA response] for different values of `patron`. 
+
+The interpretation of `patron` values is not defined by DAIA. When also using
+PAIA it is RECOMMENDED to use PAIA patron identifiers and/or patron types.
+
+A DAIA server SHOULD reject unknown or invalid patron values with [error
+response] and HTTP status code 422.
+
+Patron-specific availability SHOULD be combined with [authentification].
 
 # References
 
@@ -394,8 +513,16 @@ DAIA server and client MUST use HTTPS when sending and receiving access tokens.
 * Jones, M. and Hardt, D. 2012. “RFC 6750: The OAuth 2.0 Authorization Framework: Bearer Token Usage”.
   <http://tools.ietf.org/html/rfc6750>.
 
+* Nottingham, M. 2010. “RFC 5988: Web Linking”.
+  <http://tools.ietf.org/html/rfc5988>.
+
 * van Kesteren, A. 2014. “Cross-Origin Resource Sharing”
   <http://www.w3.org/TR/cors/>
+
+## Informal References
+
+* Voß, J. 2015. “Patrons Account Information API (PAIA)”
+  <http://gbv.github.io/paia/>
 
 ## Revision history
 
@@ -421,13 +548,17 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 #### 0.9.? (2015-05-??) {.unnumbered}
 
 * Removed DAIA/XML and DAIA/RDF
-* Added DAIA Simple
 * Dropped fields `message`, `version`, `schema`
 * Made `format` query parameter mandatory
-* Added support of authentificated DAIA
-* Added CORS (HTTP OPTIONS request)
-* Added paginated results to better support querying multiple IDs
-* New field `requested` to map query id to documents
+* Specified processing of multiple request identifiers
+* Added field requested to map request identifiers to documents
+* Added authentification
+* Added patron-specific availability
+* Added CORS and HTTP OPTIONS
+
+#### 0.8 (2015) {.unnumbered}
+
+* Added DAIA Simple
 
 #### 0.5 (2009) {.unnumbered}
 
