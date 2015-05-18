@@ -88,35 +88,42 @@ document    array of [documents] documents matching the processed request identi
 timestamp   datetime             time the DAIA response was generated
 ----------- -------------------- ----------------------------------------------------------------------
 
-DAIA clients MUST treat fields with empty JSON arrays (`document`, `item`,
-`available`, `unavailable`, and `limitation`) equal to non-existing fields. 
+A DAIA response sent by a DAIA server in response to a request MUST only
+contain [documents] matching queried [request identifiers]. A document matches
+a given request identifier if the request identifier is repeated in document
+field `id`, `requested`, or both. A DAIA response MAY contain multiple
+documents that match the esame request identifier.  
 
-A DAIA server MAY include additional fields which SHOULD be ignored by DAIA
-clients.
+DAIA clients MUST treat fields with empty JSON arrays (possible fields
+`document`, `item`, `available`, `unavailable`, and `limitation`) equal to
+non-existing fields.  A DAIA server MAY include additional fields not included
+in this specification. Additional fields SHOULD be ignored by DAIA clients.
 
 ## Documents
 
 [documents]: #documents
 
-A **document** is a JSON object with one mandatory and three optional fields:
+A **document** is a JSON object with one mandatory and four optional fields:
 
 name      type                    description
 --------- ------------- --------- ------------------------------------------
 id        URI           mandatory globally unique identifier of the document
 requested string        optional  request identifier matching this document
 href      URL           optional  human-readable web page about the document
+about     string        optional  textual description of the document
 item      array of item optional  set of instances or copies of the document
 --------- ------------- --------- ------------------------------------------
 
-A [DAIA response] sent by a DAIA server in response to a request MUST only
-contain documents matching queried [request identifiers]. A document matches a
-given request identifier if the request identifier is repeated in field `id`,
-in field `requested`, or in both fields.
+Documents typically refer to works or editions of publications.
 
 ### Example {.unnumbered}
 
+A DAIA server at `http://example.org/` is queried with [request identifier]
+`PPN 62486362X`. The DAIA server returns an institution and a document. The
+request identifier is mapped to the document URI `http://d-nb.info/1001703464`:
+
 ```
-GET /?format=json&id=gvk:ppn:57793371X HTTP/1.1
+GET /?format=json&id=PPN%2062486362X HTTP/1.1
 Host: example.org
 User-Agent: MyDAIAClient/1.0
 Accept: application/json
@@ -129,12 +136,16 @@ X-DAIA-Version: 1.0.0
 
 ```{.json}
 {
+  "institution": {
+    "content": "Staats- und Universitätsbibliothek Hamburg",
+    "href": "http://www.sub.uni-hamburg.de/"
+  },
   "document": [
     {
-      "href": "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=57793371X",
-      "id": "http://uri.gbv.de/document/gvk:ppn:57793371X",
-      "requested": "gvk:ppn:57793371X",
-      "item": [ { } ] 
+      "href": "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=62486362X",
+      "id": "http://d-nb.info/1001703464",
+      "requested": "PPN 62486362X",
+      "about": "Emma Goldman: Gelebtes Leben. Ed. Nautilus, 2010"
     }
   ]
 }
@@ -143,6 +154,7 @@ X-DAIA-Version: 1.0.0
 ## Items
 
 [items]: #items
+[item]: #items
 
 An **item** is a JSON object with the following optional fields:
 
@@ -152,15 +164,19 @@ id          URI                  globally unique identifier of the item
 href        URL                  human-readable web page about the item
 part        string               whether and how the item is partial
 label       string               call number or similar item label for finding or identification
+about       string               textual description of the item
 department  entity               an administrative sub-entitity of the institution
 storage     entity               a physical location of the item (stacks, floor etc.)
-available   array of available   set of available services
-unavailable array of unavailable set of unavailable services
+available   array of available   set of available [services]
+unavailable array of unavailable set of unavailable [services]
 ----------- -------------------- ---------------------------------------------------------------
 
-The value of field `part` must be one of `narrower` and `broader`, if given.
-Partial items refer to items which contain less (`narrower`) or more
-(`broader`) than the whole document. 
+Items refer to particular copies or holdings of documents. The value of field
+`part` must be one of `narrower` and `broader`, if given.  Partial items refer
+to items which contain less (`narrower`) or more (`broader`) than the whole
+document. Some items MAY be identical with their document, for instance
+indistinguishable digital copies of a digital document. The field `part` MUST NOT 
+be set in this case.
 
 The `department` refers to a department of an institution that is resposible
 for or knows about availability of the item. DAIA clients SHOULD assume a
@@ -168,26 +184,53 @@ general hierarchy between `institution`, `department`, and `storage`.
 
 ### Example {.unnumbered}
 
+The following DAIA response contains two documents in response to the request
+identifier `10.1007/978-3-531-19144-7_13`. The first document is a printed
+collection that contains the requested article as one part (`part` is
+`broader`). A copy of the collection is available for loan. The second document
+is a digital edition of the article. A copy of this article can be used within
+the the institution and for loan under special conditions but it is not
+available as Open Access.
+
 ```{.json}
 {
-  "id": "id:123",
-  "message": [ { "lang": "en", "content": "foo" } ],
-  "department": { "id": "id:abc" },
-  "label": "bar",
-  "available":   [ {"service" : "presentation"}, 
-                   {"service" : "loan"}, 
-                   {"service" : "interloan"} ],
-  "unavailable": [ {"service" : "openaccess"} ]
+  "document": [
+    {
+      "id": "urn:isbn:978-3-531-18621-4",
+      "requested": "10.1007/978-3-531-19144-7_13",
+      "item": [
+        {
+          "part": "broader",
+          "available": [ { "service": "loan" } ]
+        }
+      ]
+    },
+    {
+      "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
+      "requested": "10.1007/978-3-531-19144-7_13",
+      "item": [
+        {
+          "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
+          "available": [ 
+            { "service": "presentation" },
+            { "service": "loan",
+              "limitation": [ { "content": "via VPN" } ] }
+          ],
+          "unavailable": [ { "service": "openaccess" } ]
+        }
+      ]
+    }
+  ]
 }
 ```
-
+ 
 ## Services
 
 [services]: #services
 
-A service is something that an item is currently accessible (data type
-available) or unaccessible (data type unavailable) for. DAIA defines the
-following service types:
+A service is something that an item is currently accessible or unaccessible for
+([item] fields `available` and `unavailable`). DAIA defines the following
+service types:
 
 presentation
   : the item is accessible within the institution (in their rooms, in their intranet).
@@ -210,7 +253,7 @@ equivalent to DAIA services:
 
 ### available {.unnumbered}
 
-An **available** is a JSON object with the following optional fields:
+An **available** service is a JSON object with the following optional fields:
 
 name        type            description
 ----------- --------------- --------------------------------------------------
@@ -225,7 +268,7 @@ is `unknown`, then there is probably a delay but its duration is unknown.
 
 ### unavailable {.unnumbered}
 
-An **unavailable** is a JSON object with the following optional fields:
+An **unavailable** service is a JSON object with the following optional fields:
 
 name        type            description
 ----------- --------------- ------------------------------------------------------
@@ -240,9 +283,11 @@ If `expected` is `unknown` then the service probably won’t be available in the
 future. If no `expected` value is given, it is not known when or whether the
 service will be available again.
 
-### Examples {.unnumbered}
+### Example {.unnumbered}
 
-An [item] being available for one service and unavailable for another.
+The following [item] is available for service `presentation`with a delay of two
+hours, unavailable for service `loan`, and currently unavailable for an additional
+service identified by URI `http://example.org/scan-this-book`.
 
 ```{.json}
 {
@@ -256,11 +301,13 @@ An [item] being available for one service and unavailable for another.
     { 
       "service": "loan",
       "expected": "unknown" 
+    },
+    {
+      "service": "http://example.org/scan-this-book"
     }
   ]
 }
 ```
-
 
 ## DAIA Simple
 
@@ -305,6 +352,7 @@ its **base URL**. It is RECOMMENDED to use a HTTPS base URL.
 
 [query id]: #query-parameters
 [query parameter]: #query-parameters
+[request identifier]: #query-parameters
 [request identifiers]: #query-parameters
 [base URL]: #query-parameters
 
@@ -346,20 +394,24 @@ identifiers, joined with vertical bars.
 A DAIA server with base URL `https://example.org/` is queried with a query id
 that contains five request identifiers. The server only processes the first
 three request identifiers and finds a matching document for one of them. The
-remaining request identifiers are included in a new request URL.
+remaining request identifiers are included in a new request URL:
 
-    GET /?format=json&id=x:a|x:b|x:c|x:d|x:e HTTP/1.1
-    Host: example.org
-    User-Agent: MyDAIAClient/1.0
-    Accept: application/json
+```
+GET /?format=json&id=x:a|x:b|x:c|x:d|x:e HTTP/1.1
+Host: example.org
+User-Agent: MyDAIAClient/1.0
+Accept: application/json
 
-    HTTP/1.1 200 OK
-    Content-Type: application/json; charset=utf-8
-    Content-Language: en
-    X-DAIA-Version: 1.0.0
-    Link: <https://example.org/?format=json&id=x:d|x:e>; rel="next"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Language: en
+X-DAIA-Version: 1.0.0
+Link: <https://example.org/?format=json&id=x:d|x:e>; rel="next"
+```
 
-    { "document": [ { "id": "x:b" } ] }
+```{.json}
+{ "document": [ { "id": "x:b" } ] }
+```
 
 ## Request headers
 
@@ -547,14 +599,15 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 
 #### 0.9.? (2015-05-??) {.unnumbered}
 
-* Removed DAIA/XML and DAIA/RDF
 * Dropped fields `message`, `version`, `schema`
 * Made `format` query parameter mandatory
+* Removed DAIA/XML and DAIA/RDF
 * Specified processing of multiple request identifiers
 * Added field requested to map request identifiers to documents
 * Added authentification
 * Added patron-specific availability
 * Added CORS and HTTP OPTIONS
+* Added field about to document and item
 
 #### 0.8 (2015) {.unnumbered}
 
