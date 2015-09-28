@@ -1,12 +1,12 @@
 # Introduction
 
-The **Document Availability Information API (DAIA)** defines a data model of
-document availability encoded in JSON, and a HTTP based interface to query
-document availability information.
+The **Document Availability Information API (DAIA)** is a HTTP based
+programming interface to query information about current availability of
+documents in libraries.
 
 ## Status of this document
 
-All sources and updates can be found in a public git repository at
+Sources and updates can be found in a public git repository at
 <http://github.com/gbv/daia>. See the [list of releases](#releases) at
 <https://github.com/gbv/daia/releases> for functional changes.
 
@@ -36,11 +36,12 @@ The following data types are used to defined [DAIA response] format and [DAIA Si
 
 string
   : A Unicode string. A DAIA client MUST treat fields with empty string value 
-    equal to non-existing fields.
+    equal to non-existing fields. Strings SHOULD be normalized to Unicode 
+    Normalization Form C (NFC).
 URI
   : A syntactically correct URI.
 URL
-  : A syntactically correct HTTP or HTTPS URL.
+  : A syntactically correct URL with HTTP or HTTPS URL.
 count
   : A non-negative integer.
 boolean
@@ -384,7 +385,7 @@ encoding), a DAIA server MUST use its value as request identifier. Otherwise a
 DAIA server MUST split the query id at vertical bars into multiple request
 identifiers. A DAIA server MAY sent an [error response] with HTTP status code
 422 if it cannot handle multiple request identifiers or if the query id is too
-long.  A PAIA server MAY choose to only process a subset of multiple request
+long.  A DAIA server MAY choose to only process a subset of multiple request
 identifiers: in this case the response MUST include a `Link` [response header]
 with a new request URL that includes a querd id with all remaining request
 identifiers, joined with vertical bars.
@@ -572,6 +573,9 @@ Patron-specific availability SHOULD be combined with [authentification].
   <http://www.w3.org/TR/cors/>
 
 ## Informal References
+
+* M. Davis and K. Whistler: “Unicode Normalization Forms”.
+  Unicode Standard Annex #15. <http://www.unicode.org/reports/tr15/>.
 
 * Voß, J. 2015. “Patrons Account Information API (PAIA)”
   <http://gbv.github.io/paia/>
