@@ -5,3 +5,4 @@ GITHUB = http://github.com/gbv/daia/
 
 include makespec/Makefile
 HTML_ARGS+="--toc-depth=2"
+HTML_CSS=default.css
