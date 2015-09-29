@@ -56,7 +56,7 @@ service
   : An URI or a string with one of values `presentation`, `loan`, `interloan`, and
     `openaccess`. DAIA clients SHOULD ignore other non-URI values.
 entity
-  : A JSON object with the following optional fields:
+  : A JSON object with the following OPTIONAL fields:
 
     name    type    description
     ------- ------- --------------------------------------------------------
@@ -91,7 +91,7 @@ via <http://viaf.org/viaf/151962300>.
 
 [DAIA Response]: #daia-response
 
-A **DAIA Response** is a JSON object with three optional fields:
+A **DAIA Response** is a JSON object with three OPTIONAL fields:
 
 name        type                 description
 ----------- -------------------- ----------------------------------------------------------------------
@@ -115,16 +115,16 @@ in this specification. Additional fields SHOULD be ignored by DAIA clients.
 
 [documents]: #documents
 
-A **document** is a JSON object with one mandatory and four optional fields:
+A **document** is a JSON object with one REQUIRED and four OPTIONAL fields:
 
-name      type                    description
---------- ------------- --------- ------------------------------------------
-id        URI           mandatory globally unique identifier of the document
-requested string        optional  request identifier matching this document
-href      URL           optional  human-readable web page about the document
-about     string        optional  textual description of the document
-item      array of item optional  set of instances or copies of the document
---------- ------------- --------- ------------------------------------------
+name      type                   description
+--------- ------------- -------- ------------------------------------------
+id        URI           REQUIRED globally unique identifier of the document
+requested string        OPTIONAL request identifier matching this document
+href      URL           OPTIONAL human-readable web page about the document
+about     string        OPTIONAL textual description of the document
+item      array of item OPTIONAL set of instances or copies of the document
+--------- ------------- -------- ------------------------------------------
 
 Documents typically refer to works or editions of publications.
 
@@ -170,7 +170,7 @@ X-DAIA-Version: 1.0.0
 [items]: #items
 [item]: #items
 
-An **item** is a JSON object with the following optional fields:
+An **item** is a JSON object with the following OPTIONAL fields:
 
 name        type                 description
 ----------- -------------------- ---------------------------------------------------------------
@@ -186,7 +186,7 @@ unavailable array of unavailable set of unavailable [services]
 ----------- -------------------- ---------------------------------------------------------------
 
 Items refer to particular copies or holdings of documents. The value of field
-`part` must be one of `narrower` and `broader`, if given.  Partial items refer
+`part` MUST be one of `narrower` and `broader`, if given.  Partial items refer
 to items which contain less (`narrower`) or more (`broader`) than the whole
 document. Some items MAY be identical with their document, for instance
 indistinguishable digital copies of a digital document. The field `part` MUST NOT 
@@ -267,7 +267,7 @@ equivalent to DAIA services:
 
 ### available {.unnumbered}
 
-An **available** service is a JSON object with the following optional fields:
+An **available** service is a JSON object with the following OPTIONAL fields:
 
 name        type            description
 ----------- --------------- --------------------------------------------------
@@ -282,7 +282,7 @@ is `unknown`, then there is probably a delay but its duration is unknown.
 
 ### unavailable {.unnumbered}
 
-An **unavailable** service is a JSON object with the following optional fields:
+An **unavailable** service is a JSON object with the following OPTIONAL fields:
 
 name        type            description
 ----------- --------------- ------------------------------------------------------
@@ -325,7 +325,7 @@ service identified by URI `http://example.org/scan-this-book`.
 
 ## DAIA Simple
 
-**DAIA Simple** is an optional, simplified version of [DAIA Response] format
+**DAIA Simple** is an OPTIONAL, simplified version of [DAIA Response] format
 for a particular document limited to a typical use case of availability
 information.  A DAIA simple object is a plain JSON object with the following
 fields:
@@ -337,8 +337,8 @@ available  boolean  whether the service is available or not
 delay      duration expected delay (only relevant if `available` is `true`)
 expected   anydate  expected date of availability (only relevant if `available` is `false`)
 queue      count    length of waiting queue (only relevant if `available` is `false`)
-href       URL      optional URL to perform or request the service
-limitation string   optional string describing an additional limitation
+href       URL      OPTIONAL URL to perform or request the service
+limitation string   OPTIONAL string describing an additional limitation
 ---------- -------- ---------------------------------------------------------------------------
 
 DAIA server MAY directly support DAIA Simple as additional response when
@@ -396,9 +396,11 @@ callback
     only contain alphanumeric characters and underscores.
 patron
   : a patron identifier for [patron-specific availability].
+patron-type
+  : a patron identifier for [patron-specific availability].
 access_token
-  : an [access token] for authentification. A DAIA client MUST use HTTPS when sending
-    access tokens.
+  : an [access token] for authentification.
+    A DAIA client MUST use HTTPS when sending access tokens.
 suppress_response_codes
   : if this parameter is present, all responses MUST be returned with a 200 OK status code,
     even an [error response]. Support of this parameter is OPTIONAL.
@@ -468,7 +470,7 @@ Access-Control-Request-Method
 Access-Control-Request-Headers
   : the value `Authorization` if access tokens are sent as HTTP headers.
 
-Note that DAIA clients are not required to respect CORS rules. CORS preflight
+Note that DAIA clients do not need to respect CORS rules. CORS preflight
 requests in browsers can be avoided by omitting the request headers `Accept`
 and `Authorization`.
 
@@ -501,9 +503,9 @@ error
 code
   : HTTP status code.
 error_description
-  : human-readable error description (optional).
+  : human-readable error description (OPTIONAL).
 error_uri
-  : human-readable web page about the error (optional).
+  : human-readable web page about the error (OPTIONAL).
 
 The following error responses are expected:
 
