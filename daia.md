@@ -61,7 +61,7 @@ entity
     name    type    description
     ------- ------- --------------------------------------------------------
     id      URI     globally unique identifier of the entity
-    href    URL     human-readable web page about the entity
+    href    URL     web page about the entity
     content string  human-readable label, title or description of the entity
     ------- ------- --------------------------------------------------------
 
@@ -111,6 +111,13 @@ DAIA clients MUST treat fields with empty JSON arrays (possible fields
 non-existing fields.  A DAIA server MAY include additional fields not included
 in this specification. Additional fields SHOULD be ignored by DAIA clients.
 
+<div class="note">
+DAIA Response format is not a flat data structure (see [DAIA Simple] for a very
+condensed alternative). To uniquely refer to fields within this nested structure
+it makes sense to use a JSON path or JSPath expression, such as `institution.href`,
+`document.*.item`, or `document[0].item.*.available{.service == "loan"}`.
+</div>
+
 ## Documents
 
 [documents]: #documents
@@ -118,13 +125,13 @@ in this specification. Additional fields SHOULD be ignored by DAIA clients.
 A **document** is a JSON object with one REQUIRED and four OPTIONAL fields:
 
 name      type                   description
---------- ------------- -------- ------------------------------------------
-id        URI           REQUIRED globally unique identifier of the document
-requested string        OPTIONAL request identifier matching this document
-href      URL           OPTIONAL human-readable web page about the document
-about     string        OPTIONAL textual description of the document
-item      array of item OPTIONAL set of instances or copies of the document
---------- ------------- -------- ------------------------------------------
+--------- ---------------- -------- ------------------------------------------
+id        URI              REQUIRED globally unique identifier of the document
+requested string           OPTIONAL request identifier matching this document
+href      URL              OPTIONAL web page about the document
+about     string           OPTIONAL human-readable description of the document
+item      array of [items] OPTIONAL set of instances or copies of the document
+--------- ---------------- -------- ------------------------------------------
 
 Documents typically refer to works or editions of publications.
 
@@ -172,18 +179,18 @@ X-DAIA-Version: 1.0.0
 
 An **item** is a JSON object with the following OPTIONAL fields:
 
-name        type                 description
------------ -------------------- ---------------------------------------------------------------
-id          URI                  globally unique identifier of the item
-href        URL                  human-readable web page about the item
-part        string               whether and how the item is partial
-label       string               call number or similar item label for finding or identification
-about       string               textual description of the item
-department  entity               an administrative sub-entitity of the institution
-storage     entity               a physical location of the item (stacks, floor etc.)
-available   array of available   set of available [services]
-unavailable array of unavailable set of unavailable [services]
------------ -------------------- ---------------------------------------------------------------
+name        type                   description
+----------- ---------------------- ---------------------------------------------------------------
+id          URI                    globally unique identifier of the item
+href        URL                    web page about the item
+part        string                 whether and how the item is partial
+label       string                 call number or similar item label for finding or identification
+about       string                 human-readable description of the item
+department  entity                 an administrative sub-entitity of the institution
+storage     entity                 a physical location of the item (stacks, floor etc.)
+available   array of [available]   set of available [services]
+unavailable array of [unavailable] set of unavailable [services]
+----------- ---------------------- ---------------------------------------------------------------
 
 Items refer to particular copies or holdings of documents. The value of field
 `part` MUST be one of `narrower` and `broader`, if given.  Partial items refer
@@ -456,7 +463,8 @@ Accept
 A DAIA client MAY sent the following HTTP request headers:
 
 Accept-Language
-  : to indicate preferred languages of textual response fields (`content`).
+  : to indicate preferred languages of human-readable response fields
+    (`content`, `about`, `error_description`).
 Authorization
   : to provide an OAuth 2 Bearer token for [authentification].
 
@@ -480,7 +488,8 @@ and `Authorization`.
 A DAIA server SHOULD sent the following HTTP response headers with every [DAIA Response]:
 
 Content-Language
-  : to indicate the language of textual response fields (`content`).
+  : to indicate the language of human-readable response fields
+    (`content`, `about`, `error_description`).
 Content-Type
   : the value `application/json` or `application/json; charset=utf-8` for JSON response;
     the value `application/javascript` or `application/javascript; charset=utf-8` for JSONP response.
