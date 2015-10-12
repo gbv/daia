@@ -22,7 +22,9 @@ interpreted as described in RFC 2119.
 
 The DAIA data model basically consists of abstract [documents], concrete
 holdings of documents ([items]), and document [services], with an availability
-status. The data model is encoded in JSON as [DAIA Response].
+status. The data model is encoded in JSON as [DAIA Response].  Additional
+[Integrity rules] ensure that a DAIA Response and parts of it can also be
+mapped to other data formats such as RDF.
 
 ## Simple data types
 
@@ -124,7 +126,7 @@ it makes sense to use a JSON path or JSPath expression, such as `institution.hre
 
 A **document** is a JSON object with one REQUIRED and four OPTIONAL fields:
 
-name      type                   description
+name      type                      description
 --------- ---------------- -------- ------------------------------------------
 id        URI              REQUIRED globally unique identifier of the document
 requested string           OPTIONAL request identifier matching this document
@@ -177,20 +179,20 @@ X-DAIA-Version: 1.0.0
 [items]: #items
 [item]: #items
 
-An **item** is a JSON object with the following OPTIONAL fields:
+An **item** is a JSON object with one REQUIRED and eight OPTIONAL fields:
 
-name        type                   description
------------ ---------------------- ---------------------------------------------------------------
-id          URI                    globally unique identifier of the item
-href        URL                    web page about the item
-part        string                 whether and how the item is partial
-label       string                 call number or similar item label for finding or identification
-about       string                 human-readable description of the item
-department  entity                 an administrative sub-entitity of the institution
-storage     entity                 a physical location of the item (stacks, floor etc.)
-available   array of [available]   set of available [services]
-unavailable array of [unavailable] set of unavailable [services]
------------ ---------------------- ---------------------------------------------------------------
+name        type                            description
+----------- ---------------------- -------- ---------------------------------------------------------------
+id          URI                    REQUIRED globally unique identifier of the item
+href        URL                    OPTIONAL web page about the item
+part        string                 OPTIONAL whether and how the item is partial
+label       string                 OPTIONAL call number or similar item label for finding or identification
+about       string                 OPTIONAL human-readable description of the item
+department  entity                 OPTIONAL an administrative sub-entitity of the institution
+storage     entity                 OPTIONAL a physical location of the item (stacks, floor etc.)
+available   array of [available]   OPTIONAL set of available [services]
+unavailable array of [unavailable] OPTIONAL set of unavailable [services]
+----------- ---------------------- -------- ------------------------------------------------------
 
 Items refer to particular copies or holdings of documents. The value of field
 `part` MUST be one of `narrower` and `broader`, if given.  Partial items refer
@@ -274,31 +276,33 @@ equivalent to DAIA services:
 
 ### available {.unnumbered}
 
-An **available** service is a JSON object with the following OPTIONAL fields:
+An **available** service is a JSON object with one REQUIRED and three OPTIONAL
+fields:
 
-name        type            description
------------ --------------- --------------------------------------------------
-service     service         the type of service being available 
-href        URL             a link to perform, register or reserve the service
-delay       duration        estimated delay (if given).
-limitation  array of entity more specific limitations of the service
------------ --------------- --------------------------------------------------
+name        type                     description
+----------- --------------- -------- --------------------------------------------------
+service     service         REQUIRED the type of service being available 
+href        URL             OPTIONAL a link to perform, register or reserve the service
+delay       duration        OPTIONAL estimated delay (if given).
+limitation  array of entity OPTIONAL more specific limitations of the service
+----------- --------------- -------- --------------------------------------------------
 
 If `delay` is missing, then there is probably no significant delay.  If `delay`
 is `unknown`, then there is probably a delay but its duration is unknown.
 
 ### unavailable {.unnumbered}
 
-An **unavailable** service is a JSON object with the following OPTIONAL fields:
+An **unavailable** service is a JSON object with one REQUIRED and four OPTIONAL
+fields:
 
-name        type            description
------------ --------------- ------------------------------------------------------
-service     service         the type of service being unavailable 
-href        URL             a link to perform, register or reserve the service
-expected    anydate         expected date when the service will be available again
-queue       count           number of waiting requests for this service
-limitation  array of entity more specific limitations of the service
------------ --------------- ------------------------------------------------------
+name        type                     description
+----------- --------------- -------- --------------------------------------------------
+service     service         REQUIRED the type of service being unavailable 
+href        URL             OPTIONAL a link to perform, register or reserve the service
+expected    anydate         OPTIONAL expected date when the service will be available again
+queue       count           OPTIONAL number of waiting requests for this service
+limitation  array of entity OPTIONAL more specific limitations of the service
+----------- --------------- -------- --------------------------------------------------
 
 If `expected` is `unknown` then the service probably won’t be available in the
 future. If no `expected` value is given, it is not known when or whether the
@@ -326,6 +330,66 @@ service identified by URI `http://example.org/scan-this-book`.
       "service": "http://example.org/scan-this-book"
     }
   ]
+}
+```
+</div>
+
+## Integrity rules
+[Integrity rules]: #integrity-rules
+
+DAIA data model is specified using JSON but it can also be expressed in other
+data structuring languages such as RDF. For this reason and to avoid misleading
+data instances, the following **integrity rules** MUST be met in a [DAIA
+Response]:
+
+1. Documents and items are unique: all [Documents] and [Items] MUST have unique
+   values in field "id".
+
+2. Institution is disjoint to departments and storages: The value of field "id" 
+   in [DAIA Response] entity "institution" MUST NOT occur as "id" of another entity.
+
+3. Storages are subordinated to departments: The value of field "id" in [Item] 
+   entity "storage" MUST NOT be equal to field "id" of entity "department" of
+   the same item.
+
+4. An [Item] MUST NOT have an [available] service and an [unavailable] service
+   with exactely the same values in fields "service" and "limitation".
+ 
+<div class="example">
+The URI <http://example.org/123> in the following example is used multiple times
+so the JSON document is no valid DAIA Response:
+
+```json
+{
+  "document": [
+    { "id": "http://example.org/123" },
+    { "id": "http://example.org/123", 
+      "item": [ { "id": "http://example.org/123" } ] }
+  ]
+}
+```
+
+The same entity MAY occur as storage in one item and as department in another
+item.
+
+This is not allowed:
+
+```json
+{
+   "available": [ { "service": "presentation" } ],
+  "unavailable": [ { "service": "presentation" } ]
+}
+```
+
+This is allowed and makes sense:
+
+```json
+{
+  "available": [ { 
+    "service": "presentation", 
+    "limitation": [ { "id": "http://example.org/restricted" } ] 
+  } ],
+  "unavailable": [ { "service": "presentation" } ]
 }
 ```
 </div>
