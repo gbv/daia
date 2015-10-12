@@ -26,7 +26,7 @@ status. The data model is encoded in JSON as [DAIA Response].
 
 ## Simple data types
 
-The following data types are used to defined [DAIA Response] format and [DAIA Simple] format.
+The following data types are used to defined [DAIA Response] format.
 
 string
   : A Unicode string. A DAIA client MUST treat fields with empty string value 
@@ -330,45 +330,6 @@ service identified by URI `http://example.org/scan-this-book`.
 ```
 </div>
 
-## DAIA Simple
-
-**DAIA Simple** is an OPTIONAL, simplified version of [DAIA Response] format
-for a particular document limited to a typical use case of availability
-information.  A DAIA simple object is a plain JSON object with the following
-fields:
-
-name       type     description
----------- -------- ---------------------------------------------------------------------------
-service    string   most relevant service (one of `openaccess`, `loan`, `presentation`, `none`)
-available  boolean  whether the service is available or not
-delay      duration expected delay (only relevant if `available` is `true`)
-expected   anydate  expected date of availability (only relevant if `available` is `false`)
-queue      count    length of waiting queue (only relevant if `available` is `false`)
-href       URL      OPTIONAL URL to perform or request the service
-limitation string   OPTIONAL string describing an additional limitation
----------- -------- ---------------------------------------------------------------------------
-
-DAIA server MAY directly support DAIA Simple as additional response when
-[query parameter] "format" is set to `simple`.
-
-<div class="example">
-```json
-{ "service": "loan", "available": true }
-{ "service": "loan", "available": false, "expected": "2014-12-07" }
-{ "service": "presentation", "available": true }
-{ "service": "openaccess", "available": true,
-  "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
-```
-</div> 
-
-<div class="note">
-The DAIA client [ng-daia] implements both a possible mapping of DAIA 
-Response to DAIA Simple and a possible HTML display of DAIA Response and 
-DAIA Simple.
-</div>
-
-[ng-daia]: http://gbv.github.io/ng-daia/
-
 # Request and response
 
 A DAIA server is queried via HTTP or HTTPS GET request. HTTP methods HEAD and
@@ -666,6 +627,45 @@ Accept: application/json
 ```
 </div>
 
+# DAIA Simple
+
+**DAIA Simple** is an OPTIONAL, simplified alternative to [DAIA Response]
+format for a particular document limited to a typical use case of availability
+information.  A DAIA server MAY directly support DAIA Simple as additional
+response when [query parameter] "format" is set to `simple`.
+
+A DAIA Simple object is a plain JSON object with the following
+fields, based on [simple data types](#simple-data-types):
+
+name       type     description
+---------- -------- ---------------------------------------------------------------------------
+service    string   most relevant service (one of `openaccess`, `loan`, `presentation`, `none`)
+available  boolean  whether the service is available or not
+delay      duration expected delay (only relevant if `available` is `true`)
+expected   anydate  expected date of availability (only relevant if `available` is `false`)
+queue      count    length of waiting queue (only relevant if `available` is `false`)
+href       URL      OPTIONAL URL to perform or request the service
+limitation string   OPTIONAL string describing an additional limitation
+---------- -------- ---------------------------------------------------------------------------
+
+<div class="example">
+```json
+{ "service": "loan", "available": true }
+{ "service": "loan", "available": false, "expected": "2014-12-07" }
+{ "service": "presentation", "available": true }
+{ "service": "openaccess", "available": true, "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
+```
+</div> 
+
+<div class="note">
+The DAIA client [ng-daia] implements both a possible mapping of DAIA 
+Response to DAIA Simple and a possible HTML display of DAIA Response and 
+DAIA Simple.
+</div>
+
+[ng-daia]: http://gbv.github.io/ng-daia/
+
+
 # References
 
 ## Normative References
@@ -751,7 +751,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 
 {GIT_CHANGES}
 
-## Acknowledgements
+# Acknowledgements
 
 Thanks for contributions to DAIA specification from Uwe Reh, David Maus, Oliver
 Goldschmidt, Jan Frederik Maas, Jürgen Hofmann, Anne Christensen, and André
