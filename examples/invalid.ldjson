@@ -1,0 +1,10 @@
+{ "institution": "bla" }
+{ "institution": { "href": "not:url" } }
+{ "document": null }
+{ "document": [ 1 ] }
+{ "document": [ { "foo": 2} ] }
+{ "document": [ { "id": "no-uri" } ] }
+{ "document": [ { "id": "i:d", "item": [ { "id": "no-uri" } ]  } ] }
+{ "document": [ { "id": "i:d", "item": [ { "id": "d:i", "href": false } ]  } ] }
+{ "timestamp": "123" }
+{ "foo": false }

@@ -1,0 +1,17 @@
+{
+  "available": [
+    { 
+      "service": "presentation",
+      "delay": "PT2H" 
+    }
+  ],
+  "unavailable": [
+    { 
+      "service": "loan",
+      "expected": "unknown" 
+    },
+    {
+      "service": "http://example.org/scan-this-book"
+    }
+  ]
+}

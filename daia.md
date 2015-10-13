@@ -26,6 +26,8 @@ status. The data model is encoded in JSON as [DAIA Response].  Additional
 [Integrity rules] ensure that a DAIA Response and parts of it can also be
 mapped to other data formats such as RDF.
 
+A non-normative [JSON Schema] is included in the appendix.
+
 ## Simple data types
 
 The following data types are used to defined [DAIA Response] format.
@@ -77,13 +79,7 @@ entity
 <div class="example">
 The following entity describes the Library of Congress:
 
-```json
-{
-  "id": "http://viaf.org/viaf/151962300",
-  "href": "https://www.loc.org/",
-  "content": "Library of Congress"
-}
-```
+`examples/entity.json`{.include .codeblock .json}
 
 Additional information about this entity can be retrieved as Linked Open Data
 via <http://viaf.org/viaf/151962300>. 
@@ -156,22 +152,7 @@ Content-Language: en
 X-DAIA-Version: 1.0.0
 ```
 
-```json
-{
-  "institution": {
-    "content": "Staats- und Universitätsbibliothek Hamburg",
-    "href": "http://www.sub.uni-hamburg.de/"
-  },
-  "document": [
-    {
-      "href": "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=62486362X",
-      "id": "http://d-nb.info/1001703464",
-      "requested": "PPN 62486362X",
-      "about": "Emma Goldman: Gelebtes Leben. Ed. Nautilus, 2010"
-    }
-  ]
-}
-```
+`examples/response-1.json`{.include .codeblock .json}
 </div>
 
 ## Items
@@ -179,11 +160,11 @@ X-DAIA-Version: 1.0.0
 [items]: #items
 [item]: #items
 
-An **item** is a JSON object with one REQUIRED and eight OPTIONAL fields:
+An **item** is a JSON object with nine OPTIONAL fields:
 
 name        type                            description
 ----------- ---------------------- -------- ---------------------------------------------------------------
-id          URI                    REQUIRED globally unique identifier of the item
+id          URI                    OPTIONAL globally unique identifier of the item
 href        URL                    OPTIONAL web page about the item
 part        string                 OPTIONAL whether and how the item is partial
 label       string                 OPTIONAL call number or similar item label for finding or identification
@@ -214,37 +195,7 @@ is a digital edition of the article. A copy of this article can be used within
 the the institution and for loan under special conditions but it is not
 available as Open Access.
 
-```json
-{
-  "document": [
-    {
-      "id": "urn:isbn:978-3-531-18621-4",
-      "requested": "10.1007/978-3-531-19144-7_13",
-      "item": [
-        {
-          "part": "broader",
-          "available": [ { "service": "loan" } ]
-        }
-      ]
-    },
-    {
-      "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
-      "requested": "10.1007/978-3-531-19144-7_13",
-      "item": [
-        {
-          "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
-          "available": [ 
-            { "service": "presentation" },
-            { "service": "loan",
-              "limitation": [ { "content": "via VPN" } ] }
-          ],
-          "unavailable": [ { "service": "openaccess" } ]
-        }
-      ]
-    }
-  ]
-}
-```
+`examples/response-2.json`{.include .codeblock .json}
 </div>
  
 ## Services
@@ -313,25 +264,7 @@ The following [item] is available for service `presentation` with a delay of two
 hours, unavailable for service `loan`, and currently unavailable for an additional
 service identified by URI `http://example.org/scan-this-book`.
 
-```json
-{
-  "available": [
-    { 
-      "service": "presentation",
-      "delay": "PT2H" 
-    }
-  ],
-  "unavailable": [
-    { 
-      "service": "loan",
-      "expected": "unknown" 
-    },
-    {
-      "service": "http://example.org/scan-this-book"
-    }
-  ]
-}
-```
+`examples/service-1.json`{.include .codeblock .json}
 </div>
 
 ## Integrity rules
@@ -470,9 +403,7 @@ X-DAIA-Version: 1.0.0
 Link: <https://example.org/?format=json&id=x:d|x:e>; rel="next"
 ```
 
-```json
-{ "document": [ { "id": "x:b" } ] }
-```
+`examples/response-3.json`{.include .codeblock .json}
 </div>
 
 ## Request headers
@@ -595,35 +526,13 @@ but allowed for patrons of type <http://example.org/type/researcher>:
 http://example.org/?format=json&id=doc:rare&patron-type=http%3A%2F%2Fexample.org%2Ftype%2Fstudent
 ```
 
-```json
-{
-  "documents": [ {
-    "id": "doc:rare",
-    "item": [ {
-      "available": [ { "service": "presentation" } ],
-      "unavailable": [ { "service": "loan" } ]
-    } ]
-  } ]
-}
-```
+`examples/response-4.json`{.include .codeblock .json}
 
 ```
 http://example.org/?format=json&id=doc:rare&patron-type=http%3A%2F%2Fexample.org%2Ftype%2Fresearcher
 ```
 
-```json
-{
-  "documents": [ {
-    "id": "doc:rare",
-    "item": [ {
-      "available": [ 
-        { "service": "presentation" },
-        { "service": "loan" }
-      ] 
-    } ]
-  } ]
-}
-```
+`examples/response-5.json`{.include .codeblock .json}
 
 If no patron type has been specified, the special loan condition can be expressed as limitation:
 
@@ -631,25 +540,7 @@ If no patron type has been specified, the special loan condition can be expresse
 http://example.org/?format=json&id=doc:rare
 ```
  
-```json
-{
-  "documents": [ {
-    "id": "doc:rare",
-    "item": [ {
-      "available": [ 
-        { "service": "presentation" }, 
-        { 
-          "service": "loan",
-          "limitation": [ { 
-              "href": "http://example.org/rare-book-lending/",
-                "content": "only for researchers"
-          } ]
-        }, 
-      ],
-    } ]
-  } ]
-}
-```
+`examples/response-6.json`{.include .codeblock .json}
 </div>
 
 ## Authentification
@@ -691,45 +582,6 @@ Accept: application/json
 ```
 </div>
 
-# DAIA Simple
-
-**DAIA Simple** is an OPTIONAL, simplified alternative to [DAIA Response]
-format for a particular document limited to a typical use case of availability
-information.  A DAIA server MAY directly support DAIA Simple as additional
-response when [query parameter] "format" is set to `simple`.
-
-A DAIA Simple object is a plain JSON object with the following
-fields, based on [simple data types](#simple-data-types):
-
-name       type     description
----------- -------- ---------------------------------------------------------------------------
-service    string   most relevant service (one of `openaccess`, `loan`, `presentation`, `none`)
-available  boolean  whether the service is available or not
-delay      duration expected delay (only relevant if `available` is `true`)
-expected   anydate  expected date of availability (only relevant if `available` is `false`)
-queue      count    length of waiting queue (only relevant if `available` is `false`)
-href       URL      OPTIONAL URL to perform or request the service
-limitation string   OPTIONAL string describing an additional limitation
----------- -------- ---------------------------------------------------------------------------
-
-<div class="example">
-```json
-{ "service": "loan", "available": true }
-{ "service": "loan", "available": false, "expected": "2014-12-07" }
-{ "service": "presentation", "available": true }
-{ "service": "openaccess", "available": true, "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
-```
-</div> 
-
-<div class="note">
-The DAIA client [ng-daia] implements both a possible mapping of DAIA 
-Response to DAIA Simple and a possible HTML display of DAIA Response and 
-DAIA Simple.
-</div>
-
-[ng-daia]: http://gbv.github.io/ng-daia/
-
-
 # References
 
 ## Normative References
@@ -763,6 +615,9 @@ DAIA Simple.
 * Davis, M. and Whistler, K.: “Unicode Normalization Forms”.
   Unicode Standard Annex #15. <http://www.unicode.org/reports/tr15/>.
 
+* Galiegue, F. and Zyp, K. 2013: "JSON Schema v4".
+  <http://json-schema.org/latest/json-schema-core.html>.
+
 * Voß, J. 2015. “Patrons Account Information API (PAIA)”
   <http://gbv.github.io/paia/>.
 
@@ -790,6 +645,16 @@ consists of three numbers, optionally followed by `+` and a suffix:
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
 
+#### 0.9.3 (2015-10-13) {.unnumbered}
+
+* Added JSON Schema as non-normative part
+* Moved DAIA Simple no non-normative appendix
+
+#### 0.9.3 (2015-10-12) {.unnumbered}
+
+* Added integrity rules
+* Made service field required
+
 #### 0.9.2 (2015-09-28) {.unnumbered}
 
 * Dropped fields `message`, `version`, `schema`
@@ -814,6 +679,56 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 ### Full changelog {.unnumbered}
 
 {GIT_CHANGES}
+
+# Appendix
+
+The following parts are *non-normative*.
+
+## DAIA Simple
+
+**DAIA Simple** is simplified alternative to [DAIA Response] format for a
+particular document limited to a typical use case of availability information.
+A DAIA server MAY directly support DAIA Simple as additional response when
+[query parameter] "format" is set to `simple`.
+
+A DAIA Simple object is a plain JSON object with the following
+fields, based on [simple data types](#simple-data-types):
+
+name       type     description
+---------- -------- ---------------------------------------------------------------------------
+service    string   most relevant service (one of `openaccess`, `loan`, `presentation`, `none`)
+available  boolean  whether the service is available or not
+delay      duration expected delay (only relevant if `available` is `true`)
+expected   anydate  expected date of availability (only relevant if `available` is `false`)
+queue      count    length of waiting queue (only relevant if `available` is `false`)
+href       URL      OPTIONAL URL to perform or request the service
+limitation string   OPTIONAL string describing an additional limitation
+---------- -------- ---------------------------------------------------------------------------
+
+<div class="example">
+```json
+{ "service": "loan", "available": true }
+{ "service": "loan", "available": false, "expected": "2014-12-07" }
+{ "service": "presentation", "available": true }
+{ "service": "openaccess", "available": true, "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
+```
+</div> 
+
+<div class="note">
+The DAIA client [ng-daia] implements both a possible mapping of DAIA 
+Response to DAIA Simple and a possible HTML display of DAIA Response and 
+DAIA Simple.
+</div>
+
+[ng-daia]: http://gbv.github.io/ng-daia/
+
+## JSON Schema
+[JSON Schema]: #json-schema
+
+The [following JSON Schema](daia.schema.json) can be used to
+validate [DAIA Response] format. [Integrity rules] are not included.
+
+`daia.schema.json`{.include .codeblock .json}
 
 # Acknowledgements
 

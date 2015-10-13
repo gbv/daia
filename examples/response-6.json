@@ -1,0 +1,17 @@
+{
+  "document": [ {
+    "id": "doc:rare",
+    "item": [ {
+      "available": [ 
+        { "service": "presentation" }, 
+        { 
+          "service": "loan",
+          "limitation": [ { 
+              "href": "http://example.org/rare-book-lending/",
+                "content": "only for researchers"
+          } ]
+        } 
+      ]
+    } ]
+  } ]
+}

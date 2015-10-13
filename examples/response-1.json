@@ -1,0 +1,14 @@
+{
+  "institution": {
+    "content": "Staats- und Universitätsbibliothek Hamburg",
+    "href": "http://www.sub.uni-hamburg.de/"
+  },
+  "document": [
+    {
+      "href": "https://kataloge.uni-hamburg.de/DB=1/PPNSET?PPN=62486362X",
+      "id": "http://d-nb.info/1001703464",
+      "requested": "PPN 62486362X",
+      "about": "Emma Goldman: Gelebtes Leben. Ed. Nautilus, 2010"
+    }
+  ]
+}

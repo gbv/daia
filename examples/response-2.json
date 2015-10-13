@@ -1,0 +1,29 @@
+{
+  "document": [
+    {
+      "id": "urn:isbn:978-3-531-18621-4",
+      "requested": "10.1007/978-3-531-19144-7_13",
+      "item": [
+        {
+          "part": "broader",
+          "available": [ { "service": "loan" } ]
+        }
+      ]
+    },
+    {
+      "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
+      "requested": "10.1007/978-3-531-19144-7_13",
+      "item": [
+        {
+          "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
+          "available": [ 
+            { "service": "presentation" },
+            { "service": "loan",
+              "limitation": [ { "content": "via VPN" } ] }
+          ],
+          "unavailable": [ { "service": "openaccess" } ]
+        }
+      ]
+    }
+  ]
+}

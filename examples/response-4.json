@@ -1,0 +1,9 @@
+{
+  "document": [ {
+    "id": "doc:rare",
+    "item": [ {
+      "available": [ { "service": "presentation" } ],
+      "unavailable": [ { "service": "loan" } ]
+    } ]
+  } ]
+}

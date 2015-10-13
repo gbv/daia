@@ -1,0 +1,14 @@
+{
+    "name": "daia-schema",
+    "author": "Jakob Voß <voss@gbv.de>",
+    "description": "DAIA JSON Schema",
+    "devDependencies": {
+        "is-my-json-valid": "~2.12.0",
+        "jsonfile": "~2.2.0",
+        "glob": "~5.0.0",        
+        "mocha": "~1.21.4"
+    },
+    "scripts": {
+        "test": "./node_modules/.bin/mocha --reporter tap ."
+    }
+}

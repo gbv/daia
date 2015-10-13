@@ -1,0 +1,124 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "types": {
+        "URI": {
+            "type": "string",
+            "format": "uri"
+        },
+        "URL": {
+            "allOf": [
+                { "type": "string", "format": "uri" },
+                { "type": "string", "pattern": "^https?:" }
+            ]
+        },
+        "count": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "datetime": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "anydate": {
+            "anyOf": [
+                { "type": "string", "pattern": "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](Z|[+-][0-9][0-9]:[0-9][0-9])?$" },
+                { "enum": ["unknown"] }
+            ]
+        },
+        "duration": {
+            "anyOf": [
+                { "type": "string", "pattern": "^-?P([0-9]+Y)?([0-9]+M)([0-9]+D)T?([0-9]+H)([0-9]+M)([0-9]+(\\.[0-9]+)?S)?$" },
+                { "enum": ["unknown"] }
+            ]
+        },
+        "service": {
+            "anyOf": [
+                { "$ref": "#/types/URI" },
+                { "enum": ["presentation","loan","interloan","openaccess"] }
+            ]
+        },
+        "entity": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "#/types/URI" },
+                "href": { "$ref": "#/types/URL" },
+                "content": { "type": "string" }
+            },
+            "additionalProperties": false
+        },
+        "document": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "#/types/URI" },
+                "requested": { "type": "string" },
+                "href": { "$ref": "#/types/URL" },
+                "about": { "type": "string" },
+                "item": {
+                    "type": "array",
+                    "items": { "$ref": "#/types/item" }
+                }
+            },
+            "required": ["id"],
+            "additionalProperties": false
+        },
+        "item": {
+            "type": "object",
+            "properties": {
+                "id": { "$ref": "#/types/URI" },
+                "href": { "$ref": "#/types/URL" },
+                "part": { "enum": [ "broader", "narrower" ] },
+                "label": { "type": "string" },
+                "about": { "type": "string" },
+                "department": { "$ref": "#/types/entity" },
+                "storage": { "$ref": "#/types/entity" },
+                "available": {
+                    "type": "array",
+                    "items": { "$ref": "#/types/available" }
+                },
+                "unavailable": {
+                    "type": "array",
+                    "items": { "$ref": "#/types/unavailable" }
+                }
+            },
+            "additionalProperties": false
+        },
+        "available": {
+            "type": "object",
+            "properties": {
+                "service": { "$ref": "#/types/service" },
+                "href": { "$ref": "#/types/URL" },
+                "delay": { "$ref": "#/types/duration" },
+                "limitation": {
+                    "type": "array",
+                    "items": { "$ref": "#/types/entity" }
+                }
+            },
+            "required": ["service"],
+            "additionalProperties": false
+        },
+        "unavailable": {
+            "type": "object",
+            "properties": {
+                "service": { "$ref": "#/types/service" },
+                "href": { "$ref": "#/types/URL" },
+                "expected": { "$ref": "#/types/anydate" },
+                "queue": { "$ref": "#/types/count" },
+                "limitation": {
+                    "type": "array",
+                    "items": { "$ref": "#/types/entity" }
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "institution": { "$ref": "#/types/entity" },
+        "document": {
+            "type": "array",
+            "items": { "$ref": "#/types/document" }
+        },
+        "timestamp": { "$ref": "#/types/datetime" }
+    },
+    "additionalProperties": false
+}
