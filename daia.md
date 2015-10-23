@@ -23,7 +23,7 @@ interpreted as described in RFC 2119.
 The DAIA data model basically consists of abstract [documents], concrete
 holdings of documents ([items]), and document [services], with an availability
 status. The data model is encoded in JSON as [DAIA Response].  Additional
-[Integrity rules] ensure that a DAIA Response and parts of it can also be
+[integrity rules] ensure that a DAIA Response and parts of it can also be
 mapped to other data formats such as RDF.
 
 A non-normative [JSON Schema] is included in the appendix.
@@ -33,8 +33,8 @@ A non-normative [JSON Schema] is included in the appendix.
 The following data types are used to defined [DAIA Response] format.
 
 string
-  : A Unicode string. A DAIA client MUST treat fields with empty string value 
-    equal to non-existing fields. Strings SHOULD be normalized to Unicode 
+  : A Unicode string. A DAIA client MUST treat fields with empty string value
+    equal to non-existing fields. Strings SHOULD be normalized to Unicode
     Normalization Form C (NFC).
 URI
   : A syntactically correct URI.
@@ -53,7 +53,7 @@ anydate
     (`YYYY-MM-DD(Z|[+-]hh:mm)?`), a datetime as defined above, or the string `unknown`.
     A timezone indicator SHOULD be included.
 duration
-  : A duration as defined with 
+  : A duration as defined with
     [XML Schema datatype xsd:duration](http://www.w3.org/TR/xmlschema-2/#duration)
     or the string `unknown`.
 service
@@ -73,7 +73,7 @@ entity
 
     The language of field `content` SHOULD be given with HTTP [response header]
     `Content-Language`. A DAIA client MAY use the `id` field to retrieve
-    additional information about the entity and it MAY override fields `href` 
+    additional information about the entity and it MAY override fields `href`
     and/or `content` with this information.
 
 <div class="example">
@@ -82,7 +82,7 @@ The following entity describes the Library of Congress:
 `examples/entity.json`{.include .codeblock .json}
 
 Additional information about this entity can be retrieved as Linked Open Data
-via <http://viaf.org/viaf/151962300>. 
+via <http://viaf.org/viaf/151962300>.
 </div>
 
 ## DAIA Response
@@ -102,7 +102,7 @@ A DAIA Response sent by a DAIA server in response to a request MUST only
 contain [documents] matching queried [request identifiers]. A document matches
 a given request identifier if the request identifier is repeated in document
 field `id`, `requested`, or both. A DAIA Response MAY contain multiple
-documents that match the esame request identifier.  
+documents that match the esame request identifier.
 
 DAIA clients MUST treat fields with empty JSON arrays (possible fields
 `document`, `item`, `available`, `unavailable`, and `limitation`) equal to
@@ -135,7 +135,7 @@ Documents typically refer to works or editions of publications.
 
 <div class="example">
 A DAIA server at `http://example.org/` is queried with [request identifier]
-`PPN 62486362X`. 
+`PPN 62486362X`.
 
 The DAIA server returns an institution and a document. The
 request identifier is mapped to the document URI `http://d-nb.info/1001703464`:
@@ -179,7 +179,7 @@ Items refer to particular copies or holdings of documents. The value of field
 `part` MUST be one of `narrower` and `broader`, if given.  Partial items refer
 to items which contain less (`narrower`) or more (`broader`) than the whole
 document. Some items MAY be identical with their document, for instance
-indistinguishable digital copies of a digital document. The field `part` MUST NOT 
+indistinguishable digital copies of a digital document. The field `part` MUST NOT
 be set in this case.
 
 The `department` refers to a department of an institution that is resposible
@@ -197,13 +197,15 @@ available as Open Access.
 
 `examples/response-2.json`{.include .codeblock .json}
 </div>
- 
+
 ## Services
 
+[service]: #services
 [services]: #services
 
 A service is something that an item is currently accessible or unaccessible for
-([item] fields `available` and `unavailable`). DAIA defines the following
+([item] fields `available` and `unavailable`). Each service has a **service
+type** to define what can be done with a given item. DAIA defines the following
 service types:
 
 presentation
@@ -212,7 +214,7 @@ loan
   : the item is accessible outside of the institution (by lending or online access) for a limited time.
 openaccess
   : the item is accessible freely without any restrictions by the institution
-    (Open Access or free copies).
+    (Open Access).
 interloan
   : the item is accessible mediated by another institution.
 
@@ -232,14 +234,54 @@ fields:
 
 name        type                     description
 ----------- --------------- -------- --------------------------------------------------
-service     service         REQUIRED the type of service being available 
-href        URL             OPTIONAL a link to perform, register or reserve the service
+service     [service]       REQUIRED the type of service being available
+href        URL             OPTIONAL a link required to perform, register or reserve the service
 delay       duration        OPTIONAL estimated delay (if given).
 limitation  array of entity OPTIONAL more specific limitations of the service
 ----------- --------------- -------- --------------------------------------------------
 
-If `delay` is missing, then there is probably no significant delay.  If `delay`
-is `unknown`, then there is probably a delay but its duration is unknown.
+If field `delay` is missing, then there is probably no significant delay.  If
+field `delay` is `unknown`, then there is probably a delay but its duration is
+unknown.
+
+If field `href` is given, a DAIA client MUST assume that this link is required
+to perform the service. If field `href` is not given, a DAIA client SHOULD
+assume that the service can be used without further information.
+
+<div class="example">
+Directly available, e.g. documents in open stacks or pickup area:
+
+```json
+{ "service": "presentation" }
+{ "service": "loan" }
+```
+
+Available by interlibrary loan by standard method:
+
+```json
+{ "service": "interloan" }
+```
+
+Available after request, for instance submission of form at the given URL:
+
+```json
+{ "service": "presentation", "href": "http://example.org/request" }
+{ "service": "loan",         "href": "http://example.org/request" }
+{ "service": "interloan",    "href": "http://example.org/request" }
+```
+
+Available online from everywhere at the given URL:
+
+```json
+{ "service": "openaccess", "href": "http://example.org/request" }
+```
+
+Available online from everywhere at unknown URL:
+
+```json
+{ "service": "openaccess" }
+```
+</div>
 
 ### unavailable {.unnumbered}
 
@@ -248,27 +290,57 @@ fields:
 
 name        type                     description
 ----------- --------------- -------- --------------------------------------------------
-service     service         REQUIRED the type of service being unavailable 
-href        URL             OPTIONAL a link to perform, register or reserve the service
+service     service         REQUIRED the type of service being unavailable
+href        URL             OPTIONAL a link required to perform, register or reserve the service
 expected    anydate         OPTIONAL expected date when the service will be available again
 queue       count           OPTIONAL number of waiting requests for this service
 limitation  array of entity OPTIONAL more specific limitations of the service
 ----------- --------------- -------- --------------------------------------------------
 
-If `expected` is `unknown` then the service probably won’t be available in the
-future. If no `expected` value is given, it is not known when or whether the
-service will be available again.
+If field `expected` is `unknown` then the service probably won’t be available
+in the future. If field `expected` is not is given, it is not known when or
+whether the service will be available again.
+
+If field `href` is given, a DAIA client MUST assume that this link is required
+to perform the service as soon at is is available again. If field `href` is not
+given, a DAIA client SHOULD NOT assume whether additional information is needed
+once the service is available again.
 
 <div class="example">
-The following [item] is available for service `presentation` with a delay of two
-hours, unavailable for service `loan`, and currently unavailable for an additional
-service identified by URI `http://example.org/scan-this-book`.
+
+The following [item] is
+
+* available for service type `presentation` with a delay of two hours
+* available for an additional service type identified by URI
+  `http://example.org/digitize` that can be requested with a given link.
+* unavailable for service type `loan` for probably infinite time
 
 `examples/service-1.json`{.include .codeblock .json}
 </div>
 
+<div class="note">
+An item can have multiple services of the same service type as long as
+[integrity rules] are not violated. For instance the following item
+is available for presentation without limitations but expected to be
+available without limitation at a given date:
+
+```json
+{
+  "available": [ {
+    "service": "presentation",
+    "limitation": [ { "id": "http://example.org/restricted" } ]
+  } ],
+  "unavailable": [ {
+    "service": "presentation",
+    "expected": "2017-03-07"
+  } ]
+}
+```
+</div>
+
 ## Integrity rules
-[Integrity rules]: #integrity-rules
+
+[integrity rules]: #integrity-rules
 
 DAIA data model is specified using JSON but it can also be expressed in other
 data structuring languages such as RDF. For this reason and to avoid misleading
@@ -278,16 +350,18 @@ Response]:
 1. Documents and items are unique: all [Documents] and [Items] MUST have unique
    values in field "id".
 
-2. Institution is disjoint to departments and storages: The value of field "id" 
+2. Institution is disjoint to departments and storages: The value of field "id"
    in [DAIA Response] entity "institution" MUST NOT occur as "id" of another entity.
 
-3. Storages are subordinated to departments: The value of field "id" in [Item] 
+3. Storages are subordinated to departments: The value of field "id" in [Item]
    entity "storage" MUST NOT be equal to field "id" of entity "department" of
    the same item.
 
 4. An [Item] MUST NOT have an [available] service and an [unavailable] service
-   with exactely the same values in fields "service" and "limitation".
- 
+   with the same service type (field "service") and equal values in field
+   "limitation". Two limitation entities are equal if thei share the same field
+   "id" or if they both have no "id" and same field values "href" and "content".
+
 <div class="example">
 The URI <http://example.org/123> in the following example is used multiple times
 so the JSON document is no valid DAIA Response:
@@ -296,32 +370,34 @@ so the JSON document is no valid DAIA Response:
 {
   "document": [
     { "id": "http://example.org/123" },
-    { "id": "http://example.org/123", 
+    { "id": "http://example.org/123",
       "item": [ { "id": "http://example.org/123" } ] }
   ]
 }
 ```
 
-The same entity MAY occur as storage in one item and as department in another
-item.
-
-This is not allowed:
+The same entity, however can occur as storage in one item and as department in
+*another* item. For instance the following document is valid:
 
 ```json
 {
-   "available": [ { "service": "presentation" } ],
-  "unavailable": [ { "service": "presentation" } ]
+  "document": [ {
+    "id": "http://example.org/123",
+    "item": [ {
+      "department": "http://example.org/archive"
+    },{
+      "department": "http://example.org/main"
+      "storage": "http://example.org/archive"
+    } ]
 }
 ```
 
-This is allowed and makes sense:
+This is not allowed because the same service type and limitation (none) is both
+available and unavailable.
 
 ```json
 {
-  "available": [ { 
-    "service": "presentation", 
-    "limitation": [ { "id": "http://example.org/restricted" } ] 
-  } ],
+  "available": [ { "service": "presentation", "href": "http://example.org/request" } ],
   "unavailable": [ { "service": "presentation" } ]
 }
 ```
@@ -353,11 +429,11 @@ id
 format
   : set to `json`. If this parameter is missing or not set to `json`, a DAIA server
     SHOULD sent an [error response] with HTTP status code 422 (invalid request). For
-    backwards compatibility with previous implementations, a DAIA server MAY also 
+    backwards compatibility with previous implementations, a DAIA server MAY also
     response with HTTP status code 200 and with an arbitrary document (HTML, XML...)
     if no "format" parameter was given or if its value was not `json`.
 callback
-  : a JavaScript callback method name to return JSONP instead of JSON. The callback MUST 
+  : a JavaScript callback method name to return JSONP instead of JSON. The callback MUST
     only contain alphanumeric characters and underscores.
 patron
   : a patron identifier for [patron-specific availability].
@@ -392,7 +468,7 @@ Accept: application/json
 ```
 
 The server only processes the first three request identifiers and finds a
-matching document for one of them (`x:b`). The remaining request identifiers 
+matching document for one of them (`x:b`). The remaining request identifiers
 `x:d` and `x:e` are included in a new request URL:
 
 ```
@@ -407,6 +483,7 @@ Link: <https://example.org/?format=json&id=x:d|x:e>; rel="next"
 </div>
 
 ## Request headers
+
 [request header]: #request-headers
 
 A DAIA client SHOULD sent the following HTTP request headers:
@@ -439,6 +516,7 @@ requests in browsers can be avoided by omitting the request headers `Accept`
 and `Authorization`.
 
 ## Response headers
+
 [response header]: #response-headers
 
 A DAIA server SHOULD sent the following HTTP response headers with every [DAIA Response]:
@@ -452,7 +530,7 @@ Content-Type
 X-DAIA-Version
   : the version of DAIA specification which the server was checked against.
 Link
-  : to refer to another [request URL](#request-and-response) with unprocessed request 
+  : to refer to another [request URL](#request-and-response) with unprocessed request
     identifiers and RFC 5988 relation type `next`.
 
 ## Error responses
@@ -513,7 +591,7 @@ patron identifiers and patron types SHOULD be shared among both APIs.
 A DAIA client SHOULD NOT include both parameters in the same request. A DAIA
 server SHOULD return an [error response] status 422 (invalid request) if both
 are given or if given values are unknown or invalid. A DAIA server SHOULD
-return an [error response] status 501 (not supported) if it does not support 
+return an [error response] status 501 (not supported) if it does not support
 patron-specific availability for `patron` or `patron-type` respectively.
 
 Patron-specific availability SHOULD be combined with [authentification].
@@ -539,7 +617,7 @@ If no patron type has been specified, the special loan condition can be expresse
 ```
 http://example.org/?format=json&id=doc:rare
 ```
- 
+
 `examples/response-6.json`{.include .codeblock .json}
 </div>
 
@@ -645,10 +723,14 @@ consists of three numbers, optionally followed by `+` and a suffix:
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
 
+#### 0.9.5 (2015-10-23) {.unnumbered}
+
+* Clarified meaning of href field in services (#13)
+
 #### 0.9.3 (2015-10-13) {.unnumbered}
 
 * Added JSON Schema as non-normative part
-* Moved DAIA Simple no non-normative appendix
+* Moved DAIA Simple to non-normative appendix
 
 #### 0.9.3 (2015-10-12) {.unnumbered}
 
@@ -682,14 +764,15 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 
 # Appendix
 
-The following parts are *non-normative*.
+The following parts are non-normative.
 
 ## DAIA Simple
 
 **DAIA Simple** is simplified alternative to [DAIA Response] format for a
 particular document limited to a typical use case of availability information.
-A DAIA server MAY directly support DAIA Simple as additional response when
-[query parameter] "format" is set to `simple`.
+A DAIA client could map DAIA Response to DAIA Simple or a DAIA server could
+directly support DAIA Simple as additional response when [query parameter]
+"format" is set to `simple`.
 
 A DAIA Simple object is a plain JSON object with the following
 fields, based on [simple data types](#simple-data-types):
@@ -712,22 +795,25 @@ limitation string   OPTIONAL string describing an additional limitation
 { "service": "presentation", "available": true }
 { "service": "openaccess", "available": true, "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
 ```
-</div> 
+</div>
 
 <div class="note">
-The DAIA client [ng-daia] implements both a possible mapping of DAIA 
-Response to DAIA Simple and a possible HTML display of DAIA Response and 
-DAIA Simple.
+The DAIA client [ng-daia] implements a possible mapping of DAIA Response to
+DAIA Simple and a possible HTML display of DAIA Response and DAIA Simple. Try
+the [demo page](https://gbv.github.io/ng-daia/demo/) to get DAIA Simple from
+DAIA Response format.
 </div>
 
 [ng-daia]: http://gbv.github.io/ng-daia/
 
 ## JSON Schema
+
 [JSON Schema]: #json-schema
 
-The [following JSON Schema](daia.schema.json) can be used to
-validate [DAIA Response] format. [Integrity rules] are not included.
+The following JSON Schema [`daia.schema.json`](daia.schema.json) can be used
+to validate [DAIA Response] format without [integrity rules].
 
+`daia-schema/daia.schema.json`{.include .codeblock .json}
 `daia.schema.json`{.include .codeblock .json}
 
 # Acknowledgements
@@ -739,6 +825,6 @@ Lahmann among others.
 ----
 
 This version: <http://gbv.github.io/daia/{CURRENT_VERSION}.html> ({CURRENT_TIMESTAMP})\
-Latest version: <http://gbv.github.io/daia/> 
+Latest version: <http://gbv.github.io/daia/>
 
 Created with [makespec](http://jakobib.github.io/makespec/)

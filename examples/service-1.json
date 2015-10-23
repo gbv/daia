@@ -1,17 +1,13 @@
 {
-  "available": [
-    { 
-      "service": "presentation",
-      "delay": "PT2H" 
-    }
-  ],
-  "unavailable": [
-    { 
-      "service": "loan",
-      "expected": "unknown" 
-    },
-    {
-      "service": "http://example.org/scan-this-book"
-    }
-  ]
+  "available": [ { 
+    "service": "presentation",
+    "delay": "PT2H",
+  },{ 
+    "service": "http://example.org/digitize",
+    "href": "http://example.org/request?service=digitize&doc=1234"
+  } ],
+  "unavailable": [ { 
+    "service": "loan",
+    "expected": "unknown" 
+  } ]
 }

@@ -4,7 +4,7 @@ var jsonfile  = require('jsonfile');
 var fs        = require('fs');
 var validator = require('is-my-json-valid');
 
-var schema = jsonfile.readFileSync('../daia.schema.json');
+var schema = jsonfile.readFileSync('daia.schema.json');
 var valid  = validator(schema);
 
 describe('DAIA JSON Schema', function() {
