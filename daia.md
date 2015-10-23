@@ -297,9 +297,9 @@ queue       count           OPTIONAL number of waiting requests for this service
 limitation  array of entity OPTIONAL more specific limitations of the service
 ----------- --------------- -------- --------------------------------------------------
 
-If field `expected` is `unknown` then the service probably won’t be available
-in the future. If field `expected` is not is given, it is not known when or
-whether the service will be available again.
+If field `expected` is `unknown` then the service will probably be available at
+some time in the future. If field `expected` is not is given, it is not known
+when or whether the service will be available again.
 
 If field `href` is given, a DAIA client MUST assume that this link is required
 to perform the service as soon at is is available again. If field `href` is not
@@ -726,6 +726,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 #### 0.9.5 (2015-10-23) {.unnumbered}
 
 * Clarified meaning of href field in services (#13)
+* Fixed meaning of field expected with value unknown
 
 #### 0.9.3 (2015-10-13) {.unnumbered}
 
