@@ -16,7 +16,7 @@ See the [list of releases](#releases) for updates.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+interpreted as described in [RFC 2119].
 
 # Data format
 
@@ -446,22 +446,23 @@ suppress_response_codes
   : if this parameter is present, all responses MUST be returned with a 200 OK status code,
     even an [error response]. Support of this parameter is OPTIONAL.
 
-If the query id does not includes a vertical bar (`|` or `%7F` with URL
-encoding), a DAIA server MUST use its value as request identifier. Otherwise a
-DAIA server MUST split the query id at vertical bars into multiple request
-identifiers. A DAIA server MAY sent an [error response] with HTTP status code
-422 if it cannot handle multiple request identifiers or if the query id is too
-long.  A DAIA server MAY choose to only process a subset of multiple request
-identifiers: in this case the response MUST include a `Link` [response header]
-with a new request URL that includes a querd id with all remaining request
-identifiers, joined with vertical bars.
+If the query id does not includes a vertical bar (either given directly as `|`
+or as `%7C` with URL encoding), a DAIA server MUST use its value as request
+identifier. Otherwise a DAIA server MUST split the query id at vertical bars
+into multiple request identifiers. A DAIA server MAY sent an [error response]
+with HTTP status code 422 if it cannot handle multiple request identifiers or
+if the query id is too long.  A DAIA server MAY choose to only process a subset
+of multiple request identifiers: in this case the response MUST include a
+`Link` [response header] with a new request URL that includes a query id with
+all remaining request identifiers, joined with vertical bars, and additional
+known query parameters, if given.
 
 <div class="example">
 A DAIA server with base URL `https://example.org/` is queried with a query id
 that contains five request identifiers: `x:a`, `x:b`, `x:c`, `x:d`, and `x:e`.
 
 ```
-GET /?format=json&id=x:a|x:b|x:c|x:d|x:e HTTP/1.1
+GET /?id=x:a%7Cx:b%7Cx:c%7Cx:d%7Cx:e&format=json HTTP/1.1
 Host: example.org
 User-Agent: MyDAIAClient/1.0
 Accept: application/json
@@ -476,10 +477,20 @@ HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 Content-Language: en
 X-DAIA-Version: 1.0.0
-Link: <https://example.org/?format=json&id=x:d|x:e>; rel="next"
+Link: <https://example.org/?id=x:d%7Cx:e&format=json>; rel="next"
 ```
 
 `examples/response-3.json`{.include .codeblock .json}
+</div>
+
+<div class="note">
+[RFC 3986] requires the vertical bar in query parameters to be percent-encoded.
+Nevertheless many HTTP clients sent an unescaped vertical bar (byte code 124).
+For this reason a DAIA server MUST treat both as equivalent. For instance this 
+is a valid query string with three request identifier `x:a`, `x:b`, and `x:c`:
+
+    ?format=json&id=x:a%7Cx:b|x:c
+
 </div>
 
 ## Request headers
@@ -531,7 +542,7 @@ X-DAIA-Version
   : the version of DAIA specification which the server was checked against.
 Link
   : to refer to another [request URL](#request-and-response) with unprocessed request
-    identifiers and RFC 5988 relation type `next`.
+    identifiers and [RFC 5988] relation type `next`.
 
 ## Error responses
 
@@ -626,8 +637,8 @@ http://example.org/?format=json&id=doc:rare
 [access token]: #authentification
 [authentification]: #authentification
 
-A DAIA server MAY support authentfication via OAuth 2.0 bearer tokens (RFC
-6750). Access tokens can be provided either as URL query parameter
+A DAIA server MAY support authentfication via OAuth 2.0 bearer tokens ([RFC
+6750]). Access tokens can be provided either as URL query parameter
 `access_token` or in the HTTP [request header] `Authorization`.
 
 A DAIA server that supports authentification, MUST also support HTTP OPTIONS
@@ -664,8 +675,9 @@ Accept: application/json
 
 ## Normative References
 
-* Berners-Lee, T., Fielding R., Masinter L. 1998. “Uniform Resource Identifiers (URI): Generic Syntax”.
-  <http://tools.ietf.org/html/rfc2396>.
+* Berners-Lee, T., Fielding R., Masinter L. 2005. 
+  “RFC 3986: Uniform Resource Identifiers (URI): Generic Syntax”.
+  <http://tools.ietf.org/html/rfc3986>.
 
 * Biron, P. V., Malhotra, A. 2004. “XML Schema Part 2: Datatypes Second Edition”.
   <http://www.w3.org/TR/xmlschema-2/>.
@@ -701,6 +713,11 @@ Accept: application/json
 
 * Voß, J. 2015. “ng-daia”.
   <http://gbv.github.io/ng-daia/>.
+
+[RFC 2119]: http://tools.ietf.org/html/rfc2119
+[RFC 3986]: http://tools.ietf.org/html/rfc3986
+[RFC 5988]: http://tools.ietf.org/html/rfc5988
+[RFC 6750]: http://tools.ietf.org/html/rfc6750
 
 ## Revision history
 
