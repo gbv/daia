@@ -211,10 +211,16 @@ service types:
 presentation
   : the item is accessible within the institution (in their rooms, in their intranet).
 loan
-  : the item is accessible outside of the institution (by lending or online access) for a limited time.
+  : the item is accessible outside of the institution (by lending or online access) 
+    for a limited time.
 openaccess
-  : the item is accessible freely without any restrictions by the institution
-    (Open Access).
+  : the item is accessible freely and without any restrictions via a public URL.
+    This service type subsumes *gratis open access* (online access free of charge)
+    and *libre open access* (online access free of charge plus various additional
+    usage rights). This service type MUST NOT be used if access requires some kind
+    of login or registration, if access is restricted to selected IPs or if similar
+    limitations apply. See the appendix on [service limitations] for possible 
+    specification of further usage rights.
 interloan
   : the item is accessible mediated by another institution.
 
@@ -386,7 +392,7 @@ The same entity, however can occur as storage in one item and as department in
     "item": [ {
       "department": "http://example.org/archive"
     },{
-      "department": "http://example.org/main"
+      "department": "http://example.org/main",
       "storage": "http://example.org/archive"
     } ]
 }
@@ -747,6 +753,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 #### 0.9.6 (2015-12-02) {.unnumbered}
 
 * Require escaping of vertical bar in query id
+* Better explain openaccess service and add suggested license limitations
 
 #### 0.9.5 (2015-10-23) {.unnumbered}
 
@@ -805,7 +812,7 @@ fields, based on [simple data types](#simple-data-types):
 
 name       type     description
 ---------- -------- ---------------------------------------------------------------------------
-service    string   most relevant service (one of `openaccess`, `loan`, `presentation`, `none`)
+service    string   most relevant [service](#services) (one of `openaccess`, `loan`, `presentation`, `none`)
 available  boolean  whether the service is available or not
 delay      duration expected delay (only relevant if `available` is `true`)
 expected   anydate  expected date of availability (only relevant if `available` is `false`)
@@ -831,6 +838,56 @@ DAIA Response format.
 </div>
 
 [ng-daia]: http://gbv.github.io/ng-daia/
+
+## Service limitations
+[service limitations]: #service-limitations
+
+DAIA does not specify a mandatory set of [service limitations](#services) to be
+understood by DAIA servers and DAIA clients. The following service limitation
+URIs are RECOMMENDED to be used if applicable:
+
+### Creative Commons Licenses
+
+A limitation with `id` starting with `http://creativecommons.org/license/`
+SHOULD be used to refer to a specific Creative Commons License for service type
+`openaccess`. Note that limitations of this service type, in contrast to other
+service types, do not refer to access but to usage rights.
+
+<div class="example">
+An Open Access journal article licensed under CC-BY 3.0 (US):
+
+```json
+{
+  "about": "Editorial Introduction: The Code4Lib Journal Experiment, Rejection Rates, and Peer Review", 
+  "available": [ { 
+    "service": "openaccess",
+    "href": "http://journal.code4lib.org/articles/3277",
+    "limitation": {
+      "id": "http://creativecommons.org/licenses/by/3.0/us/",
+      "href": "https://creativecommons.org/licenses/by/3.0/us/",
+      "content": "CC-BY 3.0 US"
+    }
+  } ]
+}
+```
+
+A public domain audio book:
+
+```json
+{
+  "about": "Uncle Tom's Cabin",
+  "available": [ {
+    "service": "openaccess",
+    "href": "https://archive.org/details/uncle_toms_cabin_librivox",
+    "limitation": {
+      "id": "http://creativecommons.org/licenses/publicdomain/",
+      "href": "https://creativecommons.org/licenses/publicdomain/",
+      "content": "Public Domain"
+    }
+  } ]
+}
+```
+</div>
 
 ## JSON Schema
 
