@@ -446,16 +446,16 @@ suppress_response_codes
   : if this parameter is present, all responses MUST be returned with a 200 OK status code,
     even an [error response]. Support of this parameter is OPTIONAL.
 
-If the query id does not includes a vertical bar (either given directly as `|`
-or as `%7C` with URL encoding), a DAIA server MUST use its value as request
-identifier. Otherwise a DAIA server MUST split the query id at vertical bars
-into multiple request identifiers. A DAIA server MAY sent an [error response]
-with HTTP status code 422 if it cannot handle multiple request identifiers or
-if the query id is too long.  A DAIA server MAY choose to only process a subset
-of multiple request identifiers: in this case the response MUST include a
-`Link` [response header] with a new request URL that includes a query id with
-all remaining request identifiers, joined with vertical bars, and additional
-known query parameters, if given.
+If the query id does not includes a vertical bar ("`|`", Unicode character
+U+007C), a DAIA server MUST use its value as request identifier. Otherwise a
+DAIA server MUST split the query id at vertical bars into multiple request
+identifiers. A DAIA server MAY sent an [error response] with HTTP status code
+422 if it cannot handle multiple request identifiers or if the query id is too
+long.  A DAIA server MAY choose to only process a subset of multiple request
+identifiers: in this case the response MUST include a `Link` [response header]
+with a new request URL that includes a query id with all remaining request
+identifiers, joined with vertical bars, and additional known query parameters,
+if given.
 
 <div class="example">
 A DAIA server with base URL `https://example.org/` is queried with a query id
@@ -483,14 +483,18 @@ Link: <https://example.org/?id=x:d%7Cx:e&format=json>; rel="next"
 `examples/response-3.json`{.include .codeblock .json}
 </div>
 
-<div class="note">
-[RFC 3986] requires the vertical bar in query parameters to be percent-encoded.
-Nevertheless many HTTP clients sent an unescaped vertical bar (byte code 124).
-For this reason a DAIA server MUST treat both as equivalent. For instance this 
-is a valid query string with three request identifier `x:a`, `x:b`, and `x:c`:
+A DAIA client MUST escape vertical bars in the query id as `%7C`, as requested
+by [RFC 3986]. As many HTTP clients don't automatically escape the vertical bar,
+a DAIA server SHOULD also accept the unescaped character (byte code 124).
 
+<div class="example">
+A DAIA server SHOULD accept this queries equivalently with three request 
+identifiers `x:a`, `x:b`, and `x:c`:
+
+    ?format=json&id=x:a%7Cx:b%7Cx:c
     ?format=json&id=x:a%7Cx:b|x:c
-
+    ?format=json&id=x:a|x:b%7Cx:c
+    ?format=json&id=x:a|x:b|x:c
 </div>
 
 ## Request headers
@@ -739,6 +743,10 @@ consists of three numbers, optionally followed by `+` and a suffix:
 
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
+
+#### 0.9.6 (2015-12-02) {.unnumbered}
+
+* Require escaping of vertical bar in query id
 
 #### 0.9.5 (2015-10-23) {.unnumbered}
 
