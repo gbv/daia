@@ -846,12 +846,12 @@ DAIA does not specify a mandatory set of [service limitations](#services) to be
 understood by DAIA servers and DAIA clients. The following service limitation
 URIs are RECOMMENDED to be used if applicable:
 
-### Creative Commons Licenses
+### openaccess limitations {.unnumbered}
 
 A limitation with `id` starting with `http://creativecommons.org/license/`
-SHOULD be used to refer to a specific Creative Commons License for service type
-`openaccess`. Note that limitations of this service type, in contrast to other
-service types, do not refer to access but to usage rights.
+SHOULD be used to refer to a specific **Creative Commons License** for service
+type `openaccess`. Note that limitations of this service type, in contrast to
+other service types, do not refer to access but to usage rights.
 
 <div class="example">
 An Open Access journal article licensed under CC-BY 3.0 (US):
@@ -862,11 +862,11 @@ An Open Access journal article licensed under CC-BY 3.0 (US):
   "available": [ { 
     "service": "openaccess",
     "href": "http://journal.code4lib.org/articles/3277",
-    "limitation": {
+    "limitation": [ {
       "id": "http://creativecommons.org/licenses/by/3.0/us/",
       "href": "https://creativecommons.org/licenses/by/3.0/us/",
       "content": "CC-BY 3.0 US"
-    }
+    } ]
   } ]
 }
 ```
@@ -879,14 +879,62 @@ A public domain audio book:
   "available": [ {
     "service": "openaccess",
     "href": "https://archive.org/details/uncle_toms_cabin_librivox",
-    "limitation": {
+    "limitation": [ {
       "id": "http://creativecommons.org/licenses/publicdomain/",
       "href": "https://creativecommons.org/licenses/publicdomain/",
       "content": "Public Domain"
-    }
+    } ]
   } ]
 }
 ```
+</div>
+
+### interloan limitations {.unnumbered}
+
+The following limitations SHOULD be used to limit services of type Interloan,
+if applicable. The limitations typically refer to digital publications and
+origin from license restrictions.
+
+#### NoDigitalCopy {.unnumbered}
+
+The limitation id <http://purl.org/ontology/daia/NoDigitalCopy> SHOULD be used
+to indicate that patrons are only allowed to receive physical copies.
+
+#### NoDigitalTransfer {.unnumbered}
+
+The limitation id <http://purl.org/ontology/daia/NoDigitalTransfer> SHOULD be
+used to indicate that digital transfer of the document is not allowed within
+the scope of the limited service. For service type Interloan this means that
+libraries are not allowed to transfer a digital version to another library.
+
+This limitation SHOULD be assumed to subsume the NoDigitalCopy limitation.
+
+#### NoForeignCountry {.unnumbered}
+
+The limitation id <http://purl.org/ontology/daia/NoForeignCountry> SHOULD be
+used to indicate that the document can only be given to interlibrary loan to
+institutions within the same country.
+
+<div class="example">
+
+An Item available for interlibrary loan only as paper copy within the same
+country as the giving institution.
+
+```json
+{
+  "available": [ {
+    "service": "interloan",
+    "limitation": [ {
+      "id": "http://purl.org/ontology/daia/NoDigitalCopy",
+      "content": "Only paper copy to patron"
+    }, {
+      "id": "http://purl.org/ontology/daia/NoForeignCountry",
+      "content": "Only domestic loans"
+    } ]
+  } ]
+}
+```
+
 </div>
 
 ## JSON Schema
