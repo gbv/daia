@@ -897,12 +897,12 @@ origin from license restrictions.
 
 #### NoDigitalCopy {.unnumbered}
 
-The limitation id <http://purl.org/ontology/daia/NoDigitalCopy> SHOULD be used
+The limitation id <http://purl.org/ontology/dso#NoDigitalCopy> SHOULD be used
 to indicate that patrons are only allowed to receive physical copies.
 
 #### NoDigitalTransfer {.unnumbered}
 
-The limitation id <http://purl.org/ontology/daia/NoDigitalTransfer> SHOULD be
+The limitation id <http://purl.org/ontology/dso#NoDigitalTransfer> SHOULD be
 used to indicate that digital transfer of the document is not allowed within
 the scope of the limited service. For service type Interloan this means that
 libraries are not allowed to transfer a digital version to another library.
@@ -911,7 +911,7 @@ This limitation SHOULD be assumed to subsume the NoDigitalCopy limitation.
 
 #### NoForeignCountry {.unnumbered}
 
-The limitation id <http://purl.org/ontology/daia/NoForeignCountry> SHOULD be
+The limitation id <http://purl.org/ontology/dso#NoForeignCountry> SHOULD be
 used to indicate that the document can only be given to interlibrary loan to
 institutions within the same country.
 
@@ -925,10 +925,10 @@ country as the giving institution.
   "available": [ {
     "service": "interloan",
     "limitation": [ {
-      "id": "http://purl.org/ontology/daia/NoDigitalCopy",
+      "id": "http://purl.org/ontology/dso#NoDigitalCopy",
       "content": "Only paper copy to patron"
     }, {
-      "id": "http://purl.org/ontology/daia/NoForeignCountry",
+      "id": "http://purl.org/ontology/dso#NoForeignCountry",
       "content": "Only domestic loans"
     } ]
   } ]
