@@ -895,10 +895,10 @@ The following limitations SHOULD be used to limit services of type Interloan,
 if applicable. The limitations typically refer to digital publications and
 origin from license restrictions.
 
-#### NoDigitalCopy {.unnumbered}
+#### NoDigitalDelivery {.unnumbered}
 
-The limitation id <http://purl.org/ontology/dso#NoDigitalCopy> SHOULD be used
-to indicate that patrons are only allowed to receive physical copies.
+The limitation id <http://purl.org/ontology/dso#NoDigitalDelivery> SHOULD be
+used to indicate that patrons are only allowed to receive physical copies.
 
 #### NoDigitalTransfer {.unnumbered}
 
@@ -906,8 +906,6 @@ The limitation id <http://purl.org/ontology/dso#NoDigitalTransfer> SHOULD be
 used to indicate that digital transfer of the document is not allowed within
 the scope of the limited service. For service type Interloan this means that
 libraries are not allowed to transfer a digital version to another library.
-
-This limitation SHOULD be assumed to subsume the NoDigitalCopy limitation.
 
 #### NoForeignCountry {.unnumbered}
 
@@ -925,7 +923,7 @@ country as the giving institution.
   "available": [ {
     "service": "interloan",
     "limitation": [ {
-      "id": "http://purl.org/ontology/dso#NoDigitalCopy",
+      "id": "http://purl.org/ontology/dso#NoDigitalDelivery",
       "content": "Only paper copy to patron"
     }, {
       "id": "http://purl.org/ontology/dso#NoForeignCountry",
@@ -934,6 +932,13 @@ country as the giving institution.
   } ]
 }
 ```
+
+An item not available for interlibrary loan:
+
+```json
+{ "unavailable": [ { "service": "interloan" } ] }
+```
+
 
 </div>
 
