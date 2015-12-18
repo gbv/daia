@@ -750,10 +750,14 @@ consists of three numbers, optionally followed by `+` and a suffix:
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
 
+#### 0.9.7 (2015-12-18) {.unnumbered}
+
+* Recommend limitations for more service types
+
 #### 0.9.6 (2015-12-02) {.unnumbered}
 
 * Require escaping of vertical bar in query id
-* Better explain openaccess service and add suggested license limitations
+* Better explain openaccess service and add recommended license limitations
 
 #### 0.9.5 (2015-10-23) {.unnumbered}
 
@@ -846,11 +850,38 @@ DAIA does not specify a mandatory set of [service limitations](#services) to be
 understood by DAIA servers and DAIA clients. The following service limitation
 URIs are RECOMMENDED to be used if applicable:
 
+### general limitations {.unnumbered}
+
+#### ApprovalRequired {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#ApprovalRequired> SHOULD be
+used with service types `presentation`, `loan`, or `interloan` to indicate that
+service requires a special permission, such as a written justification of
+research interest or an exception permit.
+
+### presentation limitations {.unnumbered}
+
+#### NoOriginalTransfer {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#NoOriginalTransfer> SHOULD be
+used with service type `presentation` to indicate that an item can only be used
+at its current location (see item field `storage`). This applies for instance
+to museum objects which are not moved to a special place to be inspected by
+patrons.
+
+### loan limitations {.unnumbered}
+
+#### ShortLoan {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#ShortLoan> SHOULD be used with
+service type `loan` to indicate that the loan period for lending an item is
+shorter than usual.
+
 ### openaccess limitations {.unnumbered}
 
 A limitation with `id` starting with `http://creativecommons.org/license/`
-SHOULD be used to refer to a specific **Creative Commons License** for service
-type `openaccess`. Note that limitations of this service type, in contrast to
+SHOULD be used with service type `openaccess` to refer to a specific **Creative
+Commons License**. Note that limitations of this service type, in contrast to
 other service types, do not refer to access but to usage rights.
 
 <div class="example">
@@ -892,26 +923,62 @@ A public domain audio book:
 ### interloan limitations {.unnumbered}
 
 The following limitations SHOULD be used to limit services of type Interloan,
-if applicable. The limitations typically refer to digital publications and
-origin from license restrictions.
-
-#### NoDigitalDelivery {.unnumbered}
-
-The limitation id <http://purl.org/ontology/dso#NoDigitalDelivery> SHOULD be
-used to indicate that patrons are only allowed to receive physical copies.
+if applicable. The limitations origin from preservation and license
+restrictions, among other reasons. Depending on its type the limitations refer
+to an action between two of supplying library, requesting library, and patron:
 
 #### NoDigitalTransfer {.unnumbered}
 
 The limitation id <http://purl.org/ontology/dso#NoDigitalTransfer> SHOULD be
-used to indicate that digital transfer of the document is not allowed within
-the scope of the limited service. For service type Interloan this means that
-libraries are not allowed to transfer a digital version to another library.
+used with service type `interloan` to indicate that the supplying library is
+not allowed to transfer a digital copy of the item to the requesting library.
+Therefore the item is sent either as physical original (unless NoOriginalTransfer also applies) or as printed copy.
+
+#### NoOriginalTransfer {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#NoOriginalTransfer> SHOULD be
+used with service type `interloan` to indicate that an item is not allowed to
+be transfered to another library as physical original. Therefore the item is
+sent either as digital copy (unless limitation NoDigitalTransfer also applies)
+or as printed copy.
 
 #### NoForeignCountry {.unnumbered}
 
 The limitation id <http://purl.org/ontology/dso#NoForeignCountry> SHOULD be
-used to indicate that the document can only be given to interlibrary loan to
-institutions within the same country.
+used with service type `interloan` to indicate that the supplying library and
+requesting library must be in the same country.
+
+#### NoDigitalDelivery {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#NoDigitalDelivery> SHOULD be
+used with service type `interloan` to indicate that patrons are only allowed to
+receive physical copies.
+
+#### NoFullCopy {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#NoOriginalTransfer> SHOULD be
+used with service type `interloan` to indicate that an item is only copied
+in extract. This limitation often implies NoOriginalTransfer but it
+MAY also be used for an item being transfered as original or full copy to
+the requesting library before an extract is delivered to the patron.
+
+<div class="note">
+
+The typical type of transfer from supplying library to requesting library can
+be inferred from existence of limitations NoDigitalTransfer and
+NoOriginalTransfer:
+
+item type      limitations                            transfer between libraries
+-------------- -------------------------------------- --------------------------
+digital item   -                                      digital copy
+               NoDigitalTransfer                      printout copy
+physical item  -                                      original or digitized copy
+               NoDigitalTransfer                      original
+               NoDigitalTransfer & NoOriginalTransfer printed photocopy
+               NoOriginalTransfer                     digitized copy
+-------------- -------------------------------------- --------------------------
+
+</div>
 
 <div class="example">
 
