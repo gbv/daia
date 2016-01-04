@@ -36,29 +36,38 @@ string
   : A Unicode string. A DAIA client MUST treat fields with empty string value
     equal to non-existing fields. Strings SHOULD be normalized to Unicode
     Normalization Form C (NFC).
+
 URI
   : A syntactically correct URI.
+
 URL
   : A syntactically correct URL with HTTPS (RECOMMENDED) or HTTP scheme.
+
 count
   : A non-negative integer.
+
 boolean
   : A Boolean value (`true` or `false`).
+
 datetime
   : An instant of time specified in the form `YYYY-MM-DDThh:mm:ss(.ss)?(Z|[+-]hh:mm)?`
     as defined with [XML Schema datatype xsd:dateTime](http://www.w3.org/TR/xmlschema-2/#dateTime).
     A timezone indicator SHOULD be included.
+
 anydate
   : A date as defined with [XML Schema datatype xsd:date](http://www.w3.org/TR/xmlschema-2/#date)
     (`YYYY-MM-DD(Z|[+-]hh:mm)?`), a datetime as defined above, or the string `unknown`.
     A timezone indicator SHOULD be included.
+
 duration
   : A duration as defined with
     [XML Schema datatype xsd:duration](http://www.w3.org/TR/xmlschema-2/#duration)
     or the string `unknown`.
+
 service
   : An URI or a string with one of values `presentation`, `loan`, `interloan`, and
     `openaccess`. DAIA clients SHOULD ignore other non-URI values.
+
 entity
   : A JSON object with the following OPTIONAL fields:
 
@@ -91,18 +100,18 @@ via <http://viaf.org/viaf/151962300>.
 
 A **DAIA Response** is a JSON object with three OPTIONAL fields:
 
-name        type                 description
------------ -------------------- ----------------------------------------------------------------------
-institution entity               institution that grants or knows about services and their availability
-document    array of [documents] documents matching the processed request identifiers
-timestamp   datetime             time the DAIA Response was generated
------------ -------------------- ----------------------------------------------------------------------
+name        type                          description
+----------- -------------------- -------- ----------------------------------------------------------------------
+document    array of [documents] REQUIRED documents matching the processed [request identifiers]
+institution entity               OPTIONAL institution that grants or knows about services and their availability
+timestamp   datetime             OPTIONAL time the DAIA Response was generated
+----------- -------------------- -------- ----------------------------------------------------------------------
 
 A DAIA Response sent by a DAIA server in response to a request MUST only
 contain [documents] matching queried [request identifiers]. A document matches
 a given request identifier if the request identifier is repeated in document
 field `id`, `requested`, or both. A DAIA Response MAY contain multiple
-documents that match the esame request identifier.
+documents that match the same request identifier.
 
 DAIA clients MUST treat fields with empty JSON arrays (possible fields
 `document`, `item`, `available`, `unavailable`, and `limitation`) equal to
@@ -116,6 +125,33 @@ it makes sense to use a JSON path or JSPath expression, such as `institution.hre
 `document.*.item`, or `document[0].item.*.available{.service == "loan"}`.
 </div>
 
+<div class="note">
+
+DAIA was primarily designed to query availability of documents with known URIs,
+so the mapping from [request identifier] to document or item identifier is
+straightforward in most cases. DAIA server may support more complicated
+mappings to normalize identifiers or to look up documents with unknown URI, for
+instance by use of OpenURL. To give an example, a document with known ISSN,
+volume, and page could be queried with an OpenURL
+<http://example.org/?issn=0302-9743&volume=9341&spage=26> and the following
+DAIA Response:
+
+```json
+{
+  "document": [ {
+    "requested": "http://example.org/?issn=0302-9743&volume=9341&spage=26",
+    "id": "http://dx.doi.org/10.1007/978-3-319-25639-9_5",
+    "item": [ {
+      "available": [ {
+        "service": "openaccess",
+        "href": "http://csarven.ca/this-paper-is-a-demo"
+      } ]
+    } ]
+  } ]
+}
+```
+</div>
+
 ## Documents
 
 [documents]: #documents
@@ -123,13 +159,13 @@ it makes sense to use a JSON path or JSPath expression, such as `institution.hre
 A **document** is a JSON object with one REQUIRED and four OPTIONAL fields:
 
 name      type                      description
---------- ---------------- -------- ------------------------------------------
+--------- ---------------- -------- -------------------------------------------
 id        URI              REQUIRED globally unique identifier of the document
-requested string           OPTIONAL request identifier matching this document
+requested string           OPTIONAL [request identifier] matching this document
 href      URL              OPTIONAL web page about the document
 about     string           OPTIONAL human-readable description of the document
 item      array of [items] OPTIONAL set of instances or copies of the document
---------- ---------------- -------- ------------------------------------------
+--------- ---------------- -------- -------------------------------------------
 
 Documents typically refer to works or editions of publications.
 
@@ -210,9 +246,11 @@ service types:
 
 presentation
   : the item is accessible within the institution (in their rooms, in their intranet).
+
 loan
   : the item is accessible outside of the institution (by lending or online access) 
     for a limited time.
+
 openaccess
   : the item is accessible freely and without any restrictions via a public URL.
     This service type subsumes *gratis open access* (online access free of charge)
@@ -221,6 +259,7 @@ openaccess
     of login or registration, if access is restricted to selected IPs or if similar
     limitations apply. See the appendix on [service limitations] for possible 
     specification of further usage rights.
+
 interloan
   : the item is accessible mediated by another institution.
 
@@ -432,25 +471,34 @@ A DAIA server MUST respect following query parameters:
 
 id
   : query id with one or multiple **request identifiers** of documents or items.
+
 format
   : set to `json`. If this parameter is missing or not set to `json`, a DAIA server
     SHOULD sent an [error response] with HTTP status code 422 (invalid request). For
     backwards compatibility with previous implementations, a DAIA server MAY also
     response with HTTP status code 200 and with an arbitrary document (HTML, XML...)
     if no "format" parameter was given or if its value was not `json`.
+
 callback
   : a JavaScript callback method name to return JSONP instead of JSON. The callback MUST
     only contain alphanumeric characters and underscores.
+
 patron
   : a patron identifier for [patron-specific availability].
+
 patron-type
   : a patron identifier for [patron-specific availability].
+
 access_token
   : an [access token] for authentification.
     A DAIA client MUST use HTTPS when sending access tokens.
+
 suppress_response_codes
   : if this parameter is present, all responses MUST be returned with a 200 OK status code,
     even an [error response]. Support of this parameter is OPTIONAL.
+
+
+### Processing the query id {.unnumbered}
 
 If the query id does not includes a vertical bar ("`|`", Unicode character
 U+007C), a DAIA server MUST use its value as request identifier. Otherwise a
@@ -501,6 +549,17 @@ identifiers `x:a`, `x:b`, and `x:c`:
     ?format=json&id=x:a%7Cx:b|x:c
     ?format=json&id=x:a|x:b%7Cx:c
     ?format=json&id=x:a|x:b|x:c
+</div>
+
+<div class="note">
+The mapping from query id to zero or more document or item identifiers is
+done in two steps:
+
+> query id $\rightarrow$ request identifier(s) $\rightarrow$ document/item identifier(s)
+
+Request identifiers are returned in field `document.*.id` and/or
+`document.*.requested` of a [DAIA response] if the DAIA server was able to find
+a corresponding document.
 </div>
 
 ## Request headers
@@ -1022,8 +1081,8 @@ to validate [DAIA Response] format without [integrity rules].
 # Acknowledgements
 
 Thanks for contributions to DAIA specification from Uwe Reh, David Maus, Oliver
-Goldschmidt, Jan Frederik Maas, Jürgen Hofmann, Anne Christensen, and André
-Lahmann among others.
+Goldschmidt, Jan Frederik Maas, Jürgen Hofmann, Anne Christensen, André
+Lahmann, and Ross Singer among others.
 
 ----
 
