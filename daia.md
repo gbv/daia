@@ -130,11 +130,10 @@ it makes sense to use a JSON path or JSPath expression, such as `institution.hre
 DAIA was primarily designed to query availability of documents with known URIs,
 so the mapping from [request identifier] to document or item identifier is
 straightforward in most cases. DAIA server may support more complicated
-mappings to normalize identifiers or to look up documents with unknown URI, for
-instance by use of OpenURL. To give an example, a document with known ISSN,
-volume, and page could be queried with an OpenURL
-<http://example.org/?issn=0302-9743&volume=9341&spage=26> and the following
-DAIA Response:
+mappings to normalize identifiers or to look up documents with unknown URI.
+For instance, a document with known ISSN, volume, and page could be queried
+with an OpenURL <http://example.org/?issn=0302-9743&volume=9341&spage=26> and
+the following DAIA Response:
 
 ```json
 {
@@ -393,19 +392,19 @@ data instances, the following **integrity rules** MUST be met in a [DAIA
 Response]:
 
 1. Documents and items are unique: all [Documents] and [Items] MUST have unique
-   values in field "id".
+   values in field `id`.
 
-2. Institution is disjoint to departments and storages: The value of field "id"
-   in [DAIA Response] entity "institution" MUST NOT occur as "id" of another entity.
+2. Institution is disjoint to departments and storages: The value of field `id`
+   in [DAIA Response] entity `institution` MUST NOT occur as `id` of another entity.
 
-3. Storages are subordinated to departments: The value of field "id" in [Item]
-   entity "storage" MUST NOT be equal to field "id" of entity "department" of
+3. Storages are subordinated to departments: The value of field `id` in [Item]
+   entity `storage` MUST NOT be equal to field `id` of entity `department` of
    the same item.
 
 4. An [Item] MUST NOT have an [available] service and an [unavailable] service
-   with the same service type (field "service") and equal values in field
-   "limitation". Two limitation entities are equal if thei share the same field
-   "id" or if they both have no "id" and same field values "href" and "content".
+   with the same service type (field `service`) and equal values in field
+   `limitation`. Two limitation entities are equal if thei share the same field
+   `id` or if they both have no `id` and same field values `href` and `content`.
 
 <div class="example">
 The URI <http://example.org/123> in the following example is used multiple times
@@ -477,7 +476,7 @@ format
     SHOULD sent an [error response] with HTTP status code 422 (invalid request). For
     backwards compatibility with previous implementations, a DAIA server MAY also
     response with HTTP status code 200 and with an arbitrary document (HTML, XML...)
-    if no "format" parameter was given or if its value was not `json`.
+    if no `format` parameter was given or if its value was not `json`.
 
 callback
   : a JavaScript callback method name to return JSONP instead of JSON. The callback MUST
