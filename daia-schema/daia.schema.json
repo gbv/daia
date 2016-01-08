@@ -35,7 +35,7 @@
         "service": {
             "anyOf": [
                 { "$ref": "#/types/URI" },
-                { "enum": ["presentation","loan","interloan","openaccess"] }
+                { "enum": ["presentation","loan","remote","interloan","openaccess"] }
             ]
         },
         "entity": {

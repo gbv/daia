@@ -30,6 +30,8 @@ A non-normative [JSON Schema] is included in the appendix.
 
 ## Simple data types
 
+[entity]: #simple-data-types
+
 The following data types are used to defined [DAIA Response] format.
 
 string
@@ -65,8 +67,8 @@ duration
     or the string `unknown`.
 
 service
-  : An URI or a string with one of values `presentation`, `loan`, `interloan`, and
-    `openaccess`. DAIA clients SHOULD ignore other non-URI values.
+  : An URI or a string with one of values `presentation`, `loan`, `remote`, 
+    `interloan`, and `openaccess`. DAIA clients SHOULD ignore other non-URI values.
 
 entity
   : A JSON object with the following OPTIONAL fields:
@@ -103,7 +105,7 @@ A **DAIA Response** is a JSON object with three OPTIONAL fields:
 name        type                          description
 ----------- -------------------- -------- ----------------------------------------------------------------------
 document    array of [documents] REQUIRED documents matching the processed [request identifiers]
-institution entity               OPTIONAL institution that grants or knows about services and their availability
+institution [entity]             OPTIONAL institution that grants or knows about services and their availability
 timestamp   datetime             OPTIONAL time the DAIA Response was generated
 ----------- -------------------- -------- ----------------------------------------------------------------------
 
@@ -204,8 +206,8 @@ href        URL                    OPTIONAL web page about the item
 part        string                 OPTIONAL whether and how the item is partial
 label       string                 OPTIONAL call number or similar item label for finding or identification
 about       string                 OPTIONAL human-readable description of the item
-department  entity                 OPTIONAL an administrative sub-entitity of the institution
-storage     entity                 OPTIONAL a physical location of the item (stacks, floor etc.)
+department  [entity]               OPTIONAL an administrative sub-entitity of the institution
+storage     [entity]               OPTIONAL a physical location of the item (stacks, floor etc.)
 available   array of [available]   OPTIONAL set of available [services]
 unavailable array of [unavailable] OPTIONAL set of unavailable [services]
 ----------- ---------------------- -------- ------------------------------------------------------
@@ -239,50 +241,94 @@ available as Open Access.
 [services]: #services
 
 A service is something that an item is currently accessible or unaccessible for
-([item] fields `available` and `unavailable`). Each service has a **service
-type** to define what can be done with a given item. DAIA defines the following
-service types:
+([availability] fields `available` and `unavailable` of [item]). Each service
+has a **service type** to define what can be done with a given item. A service
+type MUST be identified by an URI. Abbreviated names SHOULD be used for the
+following predefined DAIA services.
 
-presentation
-  : the item is accessible within the institution (in their rooms, in their intranet).
+### presentation {.unnumbered}
 
-loan
-  : the item is accessible outside of the institution (by lending or online access) 
-    for a limited time.
+The service type <http://purl.org/ontology/dso#Presentation>, abbreviated as
+`presentation`, indicates that an item is made accessible within the
+institution or department.
 
-openaccess
-  : the item is accessible freely and without any restrictions via a public URL.
-    This service type subsumes *gratis open access* (online access free of charge)
-    and *libre open access* (online access free of charge plus various additional
-    usage rights). This service type MUST NOT be used if access requires some kind
-    of login or registration, if access is restricted to selected IPs or if similar
-    limitations apply. See the appendix on [service limitations] for possible 
-    specification of further usage rights.
+### loan {.unnumbered}
 
-interloan
-  : the item is accessible mediated by another institution.
+The service type <http://purl.org/ontology/dso#Loan>, abbreviated as `loan`,
+indicates that an item is made accessible outside of the institution or
+department for a limited time and having been picked up there.
 
-An item can further be available for an unspecified service type and for
-additional service types identified by URIs. The following URIs can be used
-equivalent to DAIA services:
+### remote {.unnumbered}
 
-* <http://purl.org/ontology/dso#Presentation> = presentation
-* <http://purl.org/ontology/dso#Loan> = loan
-* <http://purl.org/ontology/dso#Openaccess> = openaccess
-* <http://purl.org/ontology/dso#Interloan> = interloan
+The service type <http://purl.org/ontology/dso#Remote>, abbreviated as
+`remote`, indicates that an item is made accessible outside of the institution
+or department without having to visit its place. This primarily applies to
+online usage of digital documents but it also subsumes other kinds of delivery
+such as mail.  Services of this type SHOULD be restricted by an explicit
+[limitation] if access is not possible from anywhere by means. 
+
+### openaccess {.unnumbered}
+
+The service type <http://purl.org/ontology/dso#Openaccess>, abbreviated as
+`openaccess`, indicates that an item is accessible freely and without any
+restrictions at a public URL.
+
+This service type subsumes *gratis open access* (online access free of charge)
+and *libre open access* (online access free of charge plus various additional
+usage rights). This service type MUST NOT be used if access requires some kind
+of login or registration, if access is restricted to selected IPs or if similar
+limitations apply (use service type *remote* instead). 
+
+### interloan {.unnumbered}
+
+The service type <http://purl.org/ontology/dso#Interloan>, abbreviated as
+`interloan`, indicates that an item is made accessible mediated by another
+institution (interlibrary loan or comparable service).
+
+<div class="note">
+Service types *presentation* and *loan* primarily apply to physical documents
+but exceptions are possible, for instance if a digital document is only
+accessible in a closed intranet. Service type *remote* can apply to both
+digital and physical documents but digital documents can be expected if no
+`delay` is given, unless teleportation has been invented. Service type
+*openaccess* only applies to digital documents and service type *interloan* can
+apply to both. The distinction between digital and physical can further be
+clarified by [limitations], if actually needed.
+</div>
+
+
+## Limitations
+
+[limitations]: #limitations
+
+A [service] can be restricted by **limitations**, given as [entity]. It is
+RECOMMENDED to identity types of service limitations with an URI (field `id`)
+but unspecified, free-text limitations (field `content`) are possible as well.
+
+DAIA clients are not required to understand limitation types so they MAY map
+all limitations to the same "unknown" interference. DAIA servers SHOULD NOT use
+limitations to transport arbitrary messages that do not correspond to real
+impairments of a service.  The appendix contains recommendation of typical
+[limitation types](#recommended-limitation-types) that should be used by DAIA
+servers and understood by DAIA clients if possible.
+
+
+## Availability
+
+[availability]: #availability
 
 ### available {.unnumbered}
 
 An **available** service is a JSON object with one REQUIRED and three OPTIONAL
 fields:
 
-name        type                     description
------------ --------------- -------- --------------------------------------------------
-service     [service]       REQUIRED the type of service being available
-href        URL             OPTIONAL a link required to perform, register or reserve the service
-delay       duration        OPTIONAL estimated delay (if given).
-limitation  array of entity OPTIONAL more specific limitations of the service
------------ --------------- -------- --------------------------------------------------
+name        type                       description
+----------- ----------------- -------- --------------------------------------------------
+service     service           REQUIRED the type of [service] being available
+href        URL               OPTIONAL a link required to perform, register or reserve the service
+delay       duration          OPTIONAL estimated delay (if given).
+limitation  array of [entity] OPTIONAL more specific [limitations] of the service
+----------- ----------------- -------- --------------------------------------------------
 
 If field `delay` is missing, then there is probably no significant delay.  If
 field `delay` is `unknown`, then there is probably a delay but its duration is
@@ -332,14 +378,14 @@ Available online from everywhere at unknown URL:
 An **unavailable** service is a JSON object with one REQUIRED and four OPTIONAL
 fields:
 
-name        type                     description
------------ --------------- -------- --------------------------------------------------
-service     service         REQUIRED the type of service being unavailable
-href        URL             OPTIONAL a link required to perform, register or reserve the service
-expected    anydate         OPTIONAL expected date when the service will be available again
-queue       count           OPTIONAL number of waiting requests for this service
-limitation  array of entity OPTIONAL more specific limitations of the service
------------ --------------- -------- --------------------------------------------------
+name        type                       description
+----------- ----------------- -------- --------------------------------------------------
+service     service           REQUIRED the type of [service] being unavailable
+href        URL               OPTIONAL a link required to perform, register or reserve the service
+expected    anydate           OPTIONAL expected date when the service will be available again
+queue       count             OPTIONAL number of waiting requests for this service
+limitation  array of [entity] OPTIONAL more specific [limitations] of the service
+----------- ----------------- -------- --------------------------------------------------
 
 If field `expected` is `unknown` then the service will probably be available at
 some time in the future. If field `expected` is not is given, it is not known
@@ -354,7 +400,7 @@ once the service is available again.
 
 The following [item] is
 
-* available for service type `presentation` with a delay of two hours
+* available for service type *presentation* with a delay of two hours
 * available for an additional service type identified by URI
   `http://example.org/digitize` that can be requested with a given link.
 * unavailable for service type `loan` for probably infinite time
@@ -392,16 +438,22 @@ data instances, the following **integrity rules** MUST be met in a [DAIA
 Response]:
 
 1. Documents and items are unique: all [Documents] and [Items] MUST have unique
-   values in field `id`.
+   values in field `id`, if given. As exception a document with a single item
+   that does not have field `part` set MAY share the same `id` with its item
+   (for instance a unique physical item without dedicated document identifier).
 
-2. Institution is disjoint to departments and storages: The value of field `id`
-   in [DAIA Response] entity `institution` MUST NOT occur as `id` of another entity.
+2. Institution is is disjoint to departments and storages within the same 
+   [DAIA response]: The value of field `institution.id` SHOULD NOT occur as
+   `id` of another entity (`storage`, `department`, and `limitation`).
 
-3. Storages are subordinated to departments: The value of field `id` in [Item]
+4. [Limitations] SHOULD globally be disjoint with other entities
+   (`institution`, `storage`, and `department`).
+
+5. Storages are subordinated to departments: The value of field `id` in [Item]
    entity `storage` MUST NOT be equal to field `id` of entity `department` of
    the same item.
 
-4. An [Item] MUST NOT have an [available] service and an [unavailable] service
+6. An [Item] MUST NOT have an [available] service and an [unavailable] service
    with the same service type (field `service`) and equal values in field
    `limitation`. Two limitation entities are equal if thei share the same field
    `id` or if they both have no `id` and same field values `href` and `content`.
@@ -808,6 +860,11 @@ consists of three numbers, optionally followed by `+` and a suffix:
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
 
+#### 0.9.8 (2016-01-08) {.unnumbered}
+
+* Added service type remote
+* Improved description of service types and limitation types
+
 #### 0.9.7 (2015-12-18) {.unnumbered}
 
 * Recommend limitations for more service types
@@ -853,7 +910,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 
 * First specification
 
-### Full changelog {.unnumbered}
+### Recent changes {.unnumbered}
 
 {GIT_CHANGES}
 
@@ -874,7 +931,7 @@ fields, based on [simple data types](#simple-data-types):
 
 name       type     description
 ---------- -------- ---------------------------------------------------------------------------
-service    string   most relevant [service](#services) (one of `openaccess`, `loan`, `presentation`, `none`)
+service    string   most relevant [service](#services) (one of `openaccess`, `loan`, `remote`, `presentation`, `none`)
 available  boolean  whether the service is available or not
 delay      duration expected delay (only relevant if `available` is `true`)
 expected   anydate  expected date of availability (only relevant if `available` is `false`)
@@ -901,44 +958,207 @@ DAIA Response format.
 
 [ng-daia]: http://gbv.github.io/ng-daia/
 
-## Service limitations
-[service limitations]: #service-limitations
+## Recommended limitation types
 
-DAIA does not specify a mandatory set of [service limitations](#services) to be
-understood by DAIA servers and DAIA clients. The following service limitation
-URIs are RECOMMENDED to be used if applicable:
+The following [limitations] of [services] (field `limitation.id`) SHOULD be
+used by DAIA servers and clients, if applicable:
 
-### general limitations {.unnumbered}
+Local name        URI                                               applicable service types
+----------------- ------------------------------------------------- ----------------------------------
+ApprovalRequired  <http://purl.org/ontology/dso#ApprovalRequired>   all except *openaccess*
+ShortLoan         <http://purl.org/ontology/dso#ShortLoan>          *loan* and *remote*
+Stationary        <http://purl.org/ontology/dso#Stationary>         all except *loan* and *openaccess*
+PhysicalDelivery  <http://purl.org/ontology/dso#PhysicalDelivery>   *remote* and *interloan*
+NoForeignCountry  <http://purl.org/ontology/dso#NoForeignCountry>   *remote* and *interloan*
+NoDigitalTransfer <http://purl.org/ontology/dso#NoDigitalTransfer>  *interloan*
+PartialDelivery   <http://purl.org/ontology/dso#PartialDelivery>    *interloan*
+...               <http://creativecommons.org/license/...>          *openaccess*
 
-#### ApprovalRequired {.unnumbered}
 
-The limitation id <http://purl.org/ontology/dso#ApprovalRequired> SHOULD be
-used with service types `presentation`, `loan`, or `interloan` to indicate that
-service requires a special permission, such as a written justification of
-research interest or an exception permit.
+### ApprovalRequired {.unnumbered}
 
-### presentation limitations {.unnumbered}
+The limitation id <http://purl.org/ontology/dso#ApprovalRequired> can be used
+with all service types except *openaccess* to indicate that service requires a
+special permission, such as a written justification of research interest or an
+exception permit.
 
-#### NoOriginalTransfer {.unnumbered}
+### ShortLoan {.unnumbered}
 
-The limitation id <http://purl.org/ontology/dso#NoOriginalTransfer> SHOULD be
-used with service type `presentation` to indicate that an item can only be used
-at its current location (see item field `storage`). This applies for instance
-to museum objects which are not moved to a special place to be inspected by
-patrons.
+The limitation id <http://purl.org/ontology/dso#ShortLoan> can be used with
+service type *loan* and *remote* to indicate that the loan period for lending
+an item is shorter than usual.
 
-### loan limitations {.unnumbered}
+### Stationary {.unnumbered}
 
-#### ShortLoan {.unnumbered}
+The limitation id <http://purl.org/ontology/dso#Stationary> can be
+used with all service types except *loan* and *openaccess* to indicate that
+an item can only be used at its current location.
 
-The limitation id <http://purl.org/ontology/dso#ShortLoan> SHOULD be used with
-service type `loan` to indicate that the loan period for lending an item is
-shorter than usual.
+This limitation should only be used with a service of type *presentation* if
+the item cannot be moved within the institution but stays at its current
+location ([item] field `storage`). This applies for instance to museum objects
+which are not moved to a special "reading room" like other non-lending
+holdings.
+
+This limitation can be used with service types *remote* and *interloan* to
+indicate that a document is not provided (sent remotely or transferred to
+another library) as physical original but as digital or physical copy.  See
+limitation *PhysicalDelivery* and *NoDigitalTransfer* to further exclude
+digital copies.
+
+### PhysicalDelivery {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#PhysicalDelivery> can be used
+with service type *remote* or *interloan* to indicate that patrons are only
+allowed to receive physical copies. This does not imply that the original item
+is physical.
+
+With service type *remote* this limitation implies that the item or a physical
+copy is sent to the patron by mail or similar transport.
+
+With service type *interloan* this limitation implies that the receiving
+library is not allowed to hand out a digital copy to the patron. The transport
+from giving to receiving library may still be digital unless limitation
+*NoDigitalTransfer* is also given.
+
+### NoForeignCountry {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#NoForeignCountry> can be used
+with service types *remote* and *interloan* to indicate that an item is only
+made available in the country of the supplying institution. So access a service
+limited by this limitation type, a requesting library (*interloan*) or a patron
+(*remote*) must be located in the same country.
+
+<!--
+
+The following limitations can be used to limit services of type Interloan
+and Remote, if applicable. The limitations origin from preservation and license
+restrictions, among other reasons. Depending on its type the limitations refer
+to an action between two of supplying library, requesting library, and patron:
+
+-->
+
+### NoDigitalTransfer {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#NoDigitalTransfer> can be used
+with service type *interloan* to indicate that the supplying library does not
+transfer a digital copy of the item to the requesting library.  Therefore the
+item is sent either as physical original (unless *Stationary* also applies) or
+as printed copy.  This limitation type SHOULD NOT be used with other service
+types.
+
+<div class="note">
+
+The typical kind of transfer from supplying library to requesting library can
+be inferred from existence of limitations *NoDigitalTransfer* and *Stationary*:
+
+-------- ------------------------------------------------------------------ --------------------------
+item     limitations                                                        transfer between libraries
+-------- ------------------------------------------------------------------ --------------------------
+digital  `[]`{.json}                                                        digital copy
+
+         `[{"id":"http://purl.org/ontology/dso#NoDigitalTransfer"}]`{.json} printout copy
+
+physical `[]`{.json}                                                        original or digitized copy
+
+         `[{"id":"http://purl.org/ontology/dso#NoDigitalTransfer"}]`{.json} original
+                                                                            
+         `[{"id":"http://purl.org/ontology/dso#NoDigitalTransfer"},         printed photocopy
+         {"id":"http://purl.org/ontology/dso#Stationary"}]`{.json}
+               
+         `[{"id":"http://purl.org/ontology/dso#Stationary"}]`{.json}        digitized copy
+-------- ------------------------------------------------------------------ --------------------------
+
+These limitation do not tell how the copy or original is provided to the patron
+after reception. See also limitation type *PhysicalDelivery*.
+
+</div>
+
+<div class="example">
+
+An Item available for interlibrary loan only as paper copy within the same
+country as the giving institution.
+
+```json
+{
+  "available": [ {
+    "service": "interloan",
+    "limitation": [ {
+      "id": "http://purl.org/ontology/dso#PhysicalDelivery",
+      "content": "Only paper copy to patron"
+    }, {
+      "id": "http://purl.org/ontology/dso#NoForeignCountry",
+      "content": "Only domestic loans"
+    } ]
+  } ]
+}
+```
+
+An item not available for interlibrary loan:
+
+```json
+{ "unavailable": [ { "service": "interloan" } ] }
+```
+
+</div>
+
+
+### PartialDelivery {.unnumbered}
+
+The limitation id <http://purl.org/ontology/dso#PartialDelivery> can be used
+with service type *interloan* to indicate that an item is not handed out to the
+patron as full original but as partial copy. The limitation does not specify
+whether a partial copy is being transfered to the requesting library or whether
+the library receives a full copy or original before creating an extract.  This
+limitation type SHOULD NOT be used with other service types. 
+
+<div class="note">
+
+See also field `part` of [item]. To illustrate the difference to
+*PartialDelivery* compare the following examples.  In the first case item
+`example:section:1` only contains a part of `example:document`. This part is
+provided for interlibrary loan: 
+
+~~~json
+{ 
+  "id": "example:document",
+  "items": [ 
+    {
+      "id": "example:section:1",
+      "part": "narrower",
+      "available": {
+        "service": "interloan" 
+      }
+    }
+  ]
+}
+~~~
+
+In the second case item `example:all-sections` containing all of
+`example:document` could be sent fully or partial to the receiving
+library. The patron will only get a (unspecified) part, anyway:
+
+~~~json
+{ 
+  "id": "example:document",
+  "items": [ 
+    {
+      "id": "example:all-sections",
+      "available": {
+        "service": "interloan",
+        "limitation": [
+          { "id": "http://purl.org/ontology/dso#PartialDelivery" }
+        ]
+      }
+    }
+  ]
+}
+~~~
 
 ### openaccess limitations {.unnumbered}
 
 A limitation with `id` starting with `http://creativecommons.org/license/`
-SHOULD be used with service type `openaccess` to refer to a specific **Creative
+can be used with service type *openaccess* to refer to a specific **Creative
 Commons License**. Note that limitations of this service type, in contrast to
 other service types, do not refer to access but to usage rights.
 
@@ -978,94 +1198,6 @@ A public domain audio book:
 ```
 </div>
 
-### interloan limitations {.unnumbered}
-
-The following limitations SHOULD be used to limit services of type Interloan,
-if applicable. The limitations origin from preservation and license
-restrictions, among other reasons. Depending on its type the limitations refer
-to an action between two of supplying library, requesting library, and patron:
-
-#### NoDigitalTransfer {.unnumbered}
-
-The limitation id <http://purl.org/ontology/dso#NoDigitalTransfer> SHOULD be
-used with service type `interloan` to indicate that the supplying library is
-not allowed to transfer a digital copy of the item to the requesting library.
-Therefore the item is sent either as physical original (unless NoOriginalTransfer also applies) or as printed copy.
-
-#### NoOriginalTransfer {.unnumbered}
-
-The limitation id <http://purl.org/ontology/dso#NoOriginalTransfer> SHOULD be
-used with service type `interloan` to indicate that an item is not allowed to
-be transfered to another library as physical original. Therefore the item is
-sent either as digital copy (unless limitation NoDigitalTransfer also applies)
-or as printed copy.
-
-#### NoForeignCountry {.unnumbered}
-
-The limitation id <http://purl.org/ontology/dso#NoForeignCountry> SHOULD be
-used with service type `interloan` to indicate that the supplying library and
-requesting library must be in the same country.
-
-#### NoDigitalDelivery {.unnumbered}
-
-The limitation id <http://purl.org/ontology/dso#NoDigitalDelivery> SHOULD be
-used with service type `interloan` to indicate that patrons are only allowed to
-receive physical copies.
-
-#### NoFullCopy {.unnumbered}
-
-The limitation id <http://purl.org/ontology/dso#NoOriginalTransfer> SHOULD be
-used with service type `interloan` to indicate that an item is only copied
-in extract. This limitation often implies NoOriginalTransfer but it
-MAY also be used for an item being transfered as original or full copy to
-the requesting library before an extract is delivered to the patron.
-
-<div class="note">
-
-The typical type of transfer from supplying library to requesting library can
-be inferred from existence of limitations NoDigitalTransfer and
-NoOriginalTransfer:
-
-item type      limitations                            transfer between libraries
--------------- -------------------------------------- --------------------------
-digital item   -                                      digital copy
-               NoDigitalTransfer                      printout copy
-physical item  -                                      original or digitized copy
-               NoDigitalTransfer                      original
-               NoDigitalTransfer & NoOriginalTransfer printed photocopy
-               NoOriginalTransfer                     digitized copy
--------------- -------------------------------------- --------------------------
-
-</div>
-
-<div class="example">
-
-An Item available for interlibrary loan only as paper copy within the same
-country as the giving institution.
-
-```json
-{
-  "available": [ {
-    "service": "interloan",
-    "limitation": [ {
-      "id": "http://purl.org/ontology/dso#NoDigitalDelivery",
-      "content": "Only paper copy to patron"
-    }, {
-      "id": "http://purl.org/ontology/dso#NoForeignCountry",
-      "content": "Only domestic loans"
-    } ]
-  } ]
-}
-```
-
-An item not available for interlibrary loan:
-
-```json
-{ "unavailable": [ { "service": "interloan" } ] }
-```
-
-
-</div>
 
 ## JSON Schema
 
@@ -1081,7 +1213,7 @@ to validate [DAIA Response] format without [integrity rules].
 
 Thanks for contributions to DAIA specification from Uwe Reh, David Maus, Oliver
 Goldschmidt, Jan Frederik Maas, Jürgen Hofmann, Anne Christensen, André
-Lahmann, and Ross Singer among others.
+Lahmann, Ross Singer, Jonathan Rochkind, and Christian Hauschke among others.
 
 ----
 
