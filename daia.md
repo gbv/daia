@@ -655,11 +655,14 @@ A DAIA server SHOULD sent the following HTTP response headers with every [DAIA R
 Content-Language
   : to indicate the language of human-readable response fields
     (`content`, `about`, `error_description`).
+
 Content-Type
   : the value `application/json` or `application/json; charset=utf-8` for JSON response;
     the value `application/javascript` or `application/javascript; charset=utf-8` for JSONP response.
+
 X-DAIA-Version
   : the version of DAIA specification which the server was checked against.
+
 Link
   : to refer to another [request URL](#request-and-response) with unprocessed request
     identifiers and [RFC 5988] relation type `next`.
