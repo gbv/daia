@@ -446,7 +446,7 @@ Response]:
    [DAIA response]: The value of field `institution.id` SHOULD NOT occur as
    `id` of another entity (`storage`, `department`, and `limitation`).
 
-4. [Limitations] SHOULD globally be disjoint with other entities
+4. [Limitations] (field `id`) MUST be disjoint with other entities
    (`institution`, `storage`, and `department`).
 
 5. Storages are subordinated to departments: The value of field `id` in [Item]
@@ -656,16 +656,18 @@ Content-Language
   : to indicate the language of human-readable response fields
     (`content`, `about`, `error_description`).
 
+Link
+  : a [request URL](#request-and-response) with unprocessed request
+    identifiers (if given) and [RFC 5988] relation type `next`.
+
+A DAIA server MUST sent the following HTTP response headers:
+
 Content-Type
   : the value `application/json` or `application/json; charset=utf-8` for JSON response;
     the value `application/javascript` or `application/javascript; charset=utf-8` for JSONP response.
 
 X-DAIA-Version
   : the version of DAIA specification which the server was checked against.
-
-Link
-  : to refer to another [request URL](#request-and-response) with unprocessed request
-    identifiers and [RFC 5988] relation type `next`.
 
 ## Error responses
 
