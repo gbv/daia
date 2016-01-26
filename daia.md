@@ -541,7 +541,7 @@ patron-type
   : a patron identifier for [patron-specific availability].
 
 access_token
-  : an [access token] for authentification.
+  : an [access token] for authentication.
     A DAIA client MUST use HTTPS when sending access tokens.
 
 suppress_response_codes
@@ -621,6 +621,7 @@ A DAIA client SHOULD sent the following HTTP request headers:
 
 User-Agent
   : with an appropriate client name and version number.
+
 Accept
   : with the value `application/json`.
 
@@ -629,16 +630,19 @@ A DAIA client MAY sent the following HTTP request headers:
 Accept-Language
   : to indicate preferred languages of human-readable response fields
     (`content`, `about`, `error_description`).
+
 Authorization
-  : to provide an OAuth 2 Bearer token for [authentification].
+  : to provide an OAuth 2 Bearer token for [authentication].
 
 For OPTIONS preflight requests of Cross-Origin Resource Sharing (CORS) a DAIA
 client MUST include the following HTTP request headers:
 
 Origin
   : where the cross-origin request originates from.
+
 Access-Control-Request-Method
   : the HTTP verb `GET`.
+
 Access-Control-Request-Headers
   : the value `Authorization` if access tokens are sent as HTTP headers.
 
@@ -655,6 +659,9 @@ A DAIA server SHOULD sent the following HTTP response headers with every [DAIA R
 Content-Language
   : to indicate the language of human-readable response fields
     (`content`, `about`, `error_description`).
+
+Access-Control-Allow-Origin
+  : to allow Cross-Origin Resource Sharing, this header should be set to `*`.
 
 Link
   : a [request URL](#request-and-response) with unprocessed request
@@ -679,10 +686,13 @@ following fields:
 
 error
   : alphanumeric error code.
+
 code
   : HTTP status code.
+
 error_description
   : human-readable error description (OPTIONAL).
+
 error_uri
   : human-readable web page about the error (OPTIONAL).
 
@@ -730,7 +740,7 @@ are given or if given values are unknown or invalid. A DAIA server SHOULD
 return an [error response] status 501 (not supported) if it does not support
 patron-specific availability for `patron` or `patron-type` respectively.
 
-Patron-specific availability SHOULD be combined with [authentification].
+Patron-specific availability SHOULD be combined with [authentication].
 
 <div class="example">
 A document with id `doc:rare` is not allowed to be lend by normal students
@@ -757,16 +767,16 @@ http://example.org/?format=json&id=doc:rare
 `examples/response-6.json`{.include .codeblock .json}
 </div>
 
-## Authentification
+## Authentication
 
-[access token]: #authentification
-[authentification]: #authentification
+[access token]: #authentication
+[authentication]: #authentication
 
 A DAIA server MAY support authentfication via OAuth 2.0 bearer tokens ([RFC
 6750]). Access tokens can be provided either as URL query parameter
 `access_token` or in the HTTP [request header] `Authorization`.
 
-A DAIA server that supports authentification, MUST also support HTTP OPTIONS
+A DAIA server that supports authentication, MUST also support HTTP OPTIONS
 requests for CORS.
 
 DAIA server and client MUST use HTTPS when sending and receiving access tokens.
@@ -778,7 +788,7 @@ add a scope named `read_availability` for authentificated access to a DAIA
 server.
 
 <div class="example">
-The following requests both include the same access token for authentification.
+The following requests both include the same access token for authentication.
 
 ```
 GET /?format=json&id=some:doc HTTP/1.1
@@ -901,7 +911,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 * Removed DAIA/XML and DAIA/RDF
 * Specified processing of multiple request identifiers
 * Added field requested to map request identifiers to documents
-* Added authentification
+* Added authentication
 * Added patron-specific availability
 * Added CORS and HTTP OPTIONS
 * Added field about to document and item
