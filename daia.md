@@ -128,7 +128,6 @@ it makes sense to use a JSON path or JSPath expression, such as `institution.hre
 </div>
 
 <div class="note">
-
 DAIA was primarily designed to query availability of documents with known URIs,
 so the mapping from [request identifier] to document or item identifier is
 straightforward in most cases. DAIA server may support more complicated
@@ -923,11 +922,12 @@ Content-Language
     (`content`, `about`, `error_description`).
 
 Access-Control-Allow-Origin
-  : to allow Cross-Origin Resource Sharing, this header should be set to `*`.
+  : to allow Cross-Origin Resource Sharing, this header SHOULD be set to `*`.
 
 Link
-  : a [request URL](#request-and-response) with unprocessed request
-    identifiers (if given) and [RFC 5988] relation type `next`.
+  : URL of a [DAIA profile] document with [RFC 5988] relation type `profile`.
+    Also a [request URL](#request-and-response) with unprocessed request
+    identifiers (if given) and relation type `next`.
 
 A DAIA server MUST sent the following HTTP response headers:
 
@@ -939,8 +939,8 @@ X-DAIA-Version
   : the version of DAIA specification which the server was checked against.
 
 Access-Control-Allow-Headers
-  : if [authentication] is supported, this header in response to an OPTIONS
-    request MUST include the value `Authorization`.
+  : In response to an OPTIONS request this header MUST include the value `Content-Type`
+    and, if [authentication] is supported, the value `Authorization`.
 
 ## Error responses
 
@@ -1072,6 +1072,35 @@ Accept: application/json
 ```
 </div>
 
+## Profiles
+
+[DAIA profile]: #profiles
+
+A DAIA Server SHOULD supply a **profile** in form of a JSON document. The
+DAIA profile MUST be referred to in a HTTP Link header as part of [Response
+headers].
+
+<div class="example">
+HTTP response headers including a link to a DAIA profile:
+
+~~~
+HTTP/1.1 200 OK
+Content-Language: en
+Access-Control-Allow-Origin: *
+Link: <https://example.org/profile.json>; rel="profile"
+Content-Type: application/json; charset=utf-8
+X-DAIA-Version: 1.0.0
+Access-Control-Allow-Headers: Authorization, Content-Type
+Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+~~~
+
+</div>
+
+<div class="note">
+The format a DAIA profile has not been specified yet. See
+<https://github.com/gbv/daia/issues/22> for discussion. 
+</div>
+
 # References
 
 ## Normative References
@@ -1145,7 +1174,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 
 #### 0.9.9 (2016-02-26) {.unnumbered}
 
-* Make support of Link response header mandatory
+* Make support of Link response header mandatory and add profile
 * Moved and extended recommended limitation types to main part
 * Renamed limitation type NoDigitalTransfer to PhysicalInterloan
 * Clarify service type remote is primarily digital
