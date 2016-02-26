@@ -247,11 +247,16 @@ has a **service type** to define what can be done with a given item. A service
 type MUST be identified by an URI. Abbreviated names SHOULD be used for the
 following predefined DAIA service types.
 
+A DAIA server SHOULD NOT omit services because of assumed implications between
+service types (for instance most times an item is available for loan it is also
+available for presentation) but include all service types it knows about.
+
 ### presentation {.unnumbered}
 
 The service type <http://purl.org/ontology/dso#Presentation>, abbreviated as
 `presentation`, indicates that an item is made accessible within the
 institution or department.
+
 
 ### loan {.unnumbered}
 
