@@ -228,8 +228,8 @@ identifier `10.1007/978-3-531-19144-7_13`. The first document is a printed
 collection that contains the requested article as one part (`part` is
 `broader`). A copy of the collection is available for loan. The second document
 is a digital edition of the article. A copy of this article can be used within
-the the institution and for loan under special conditions but it is not
-available as Open Access.
+the the institution and for short time loan but it is not available as Open
+Access.
 
 `examples/response-2.json`{.include .codeblock .json}
 </div>

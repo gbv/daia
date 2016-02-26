@@ -16,10 +16,14 @@
       "item": [
         {
           "id": "http://dx.doi.org/10.1007/978-3-531-19144-7_13", 
-          "available": [ 
-            { "service": "presentation" },
-            { "service": "loan",
-              "limitation": [ { "content": "via VPN" } ] }
+          "available": [ {
+              "service": "presentation"
+            },{
+              "service": "loan",
+              "limitation": [ {
+                "id": "http://purl.org/ontology/dso#ShortLoan"
+              } ]
+            }
           ],
           "unavailable": [ { "service": "openaccess" } ]
         }
