@@ -71,16 +71,14 @@ service
     `interloan`, and `openaccess`. DAIA clients SHOULD ignore other non-URI values.
 
 entity
-  : A JSON object with the following OPTIONAL fields:
+  : A non-empty JSON object with the following fields:
 
-    name    type    description
-    ------- ------- --------------------------------------------------------
-    id      URI     globally unique identifier of the entity
-    href    URL     web page about the entity
-    content string  human-readable label, title or description of the entity
-    ------- ------- --------------------------------------------------------
-
-    At least one of this fields MUST be given.
+    name    type                description
+    ------- ------- ----------- --------------------------------------------------------
+    id      URI     RECOMMENDED globally unique identifier of the entity
+    href    URL     OPTIONAL    web page about the entity
+    content string  OPTIONAL    human-readable label, title or description of the entity
+    ------- ------- ----------- --------------------------------------------------------
 
     The language of field `content` SHOULD be given with HTTP [response header]
     `Content-Language`. A DAIA client MAY use the `id` field to retrieve
@@ -196,20 +194,20 @@ X-DAIA-Version: 1.0.0
 [items]: #items
 [item]: #items
 
-An **item** is a JSON object with nine OPTIONAL fields:
+An **item** is a JSON object with the following fields:
 
-name        type                            description
------------ ---------------------- -------- ---------------------------------------------------------------
-id          URI                    OPTIONAL globally unique identifier of the item
-href        URL                    OPTIONAL web page about the item
-part        string                 OPTIONAL whether and how the item is partial
-label       string                 OPTIONAL call number or similar item label for finding or identification
-about       string                 OPTIONAL human-readable description of the item
-department  [entity]               OPTIONAL an administrative sub-entitity of the institution
-storage     [entity]               OPTIONAL a physical location of the item (stacks, floor etc.)
-available   array of [available]   OPTIONAL set of available [services]
-unavailable array of [unavailable] OPTIONAL set of unavailable [services]
------------ ---------------------- -------- ------------------------------------------------------
+name        type                               description
+----------- ---------------------- ----------- ---------------------------------------------------------------
+id          URI                    RECOMMENDED globally unique identifier of the item
+href        URL                    OPTIONAL    web page about the item
+part        string                 OPTIONAL    whether and how the item is partial
+label       string                 OPTIONAL    call number or similar item label for finding or identification
+about       string                 OPTIONAL    human-readable description of the item
+department  [entity]               OPTIONAL    an administrative sub-entitity of the institution
+storage     [entity]               OPTIONAL    a physical location of the item (stacks, floor etc.)
+available   array of [available]   OPTIONAL    set of available [services]
+unavailable array of [unavailable] OPTIONAL    set of unavailable [services]
+----------- ---------------------- ----------- ------------------------------------------------------
 
 Items refer to particular copies or holdings of documents. The value of field
 `part` MUST be one of `narrower` and `broader`, if given.  Partial items refer
@@ -1171,6 +1169,11 @@ Before version 1.0.0 the patch version was used as minor version.
 
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
+
+#### 0.9.10 (2017-02-??) {.unnumbered}
+
+* Make item id and entity id RECOMMENDED (#33)
+* Update JSON Schema
 
 #### 0.9.9 (2016-02-26) {.unnumbered}
 
