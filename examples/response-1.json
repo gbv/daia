@@ -1,4 +1,5 @@
 {
+  "$schema": "http://gbv.github.io/daia/daia.schema.json",
   "institution": {
     "content": "Staats- und Universitätsbibliothek Hamburg",
     "href": "http://www.sub.uni-hamburg.de/"

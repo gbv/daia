@@ -98,13 +98,15 @@ via <http://viaf.org/viaf/151962300>.
 
 [DAIA Response]: #daia-response
 
-A **DAIA Response** is a JSON object with three OPTIONAL fields:
+A **DAIA Response** is a JSON object with one REQUIRED and four OPTIONAL fields:
 
 name        type                          description
 ----------- -------------------- -------- ----------------------------------------------------------------------
 document    array of [documents] REQUIRED documents matching the processed [request identifiers]
 institution [entity]             OPTIONAL institution that grants or knows about services and their availability
 timestamp   datetime             OPTIONAL time the DAIA Response was generated
+$schema     URL                  OPTIONAL link to a JSON Schema document
+@context    URL                  OPTIONAL link to a JSON-LD context document
 ----------- -------------------- -------- ----------------------------------------------------------------------
 
 A DAIA Response sent by a DAIA server in response to a request MUST only
@@ -1133,8 +1135,11 @@ The format a DAIA profile has not been specified yet. See
 * Davis, M. and Whistler, K.: “Unicode Normalization Forms”.
   Unicode Standard Annex #15. <http://www.unicode.org/reports/tr15/>.
 
-* Galiegue, F. and Zyp, K. 2013: "JSON Schema v4".
+* Galiegue, F. and Zyp, K. 2013: “JSON Schema v4”.
   <http://json-schema.org/latest/json-schema-core.html>.
+
+* Sporny, M. et al., 2014: “JSON-LD 1.0”.
+  <https://www.w3.org/TR/json-ld/>
 
 * Voß, J. 2015. “Patrons Account Information API (PAIA)”
   <http://gbv.github.io/paia/>.
@@ -1173,6 +1178,7 @@ included at <https://github.com/gbv/daia/releases> with release notes.
 #### 0.9.10 (2017-02-??) {.unnumbered}
 
 * Make item id and entity id RECOMMENDED (#33)
+* Add OPTIONAL response fields `$schema` and `@context`
 * Update JSON Schema
 
 #### 0.9.9 (2016-02-26) {.unnumbered}
@@ -1290,7 +1296,6 @@ The following JSON Schema [`daia.schema.json`](daia.schema.json) can be used
 to validate [DAIA Response] format without [integrity rules].
 
 `daia-schema/daia.schema.json`{.include .codeblock .json}
-`daia.schema.json`{.include .codeblock .json}
 
 # Acknowledgements
 

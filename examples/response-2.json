@@ -1,4 +1,5 @@
 {
+  "$schema": "http://gbv.github.io/daia/daia.schema.json",
   "document": [
     {
       "id": "urn:isbn:978-3-531-18621-4",
