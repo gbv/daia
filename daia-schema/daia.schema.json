@@ -79,6 +79,15 @@
       ],
       "type": "object"
     },
+    "chronology": {
+      "additionalProperties": true,
+      "properties": {
+        "about": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "count": {
       "minimum": 1,
       "type": "integer"
@@ -153,6 +162,9 @@
             "$ref": "#/types/available"
           },
           "type": "array"
+        },
+        "chronology": {
+          "$ref": "#/types/chronology"
         },
         "department": {
           "$ref": "#/types/entity"

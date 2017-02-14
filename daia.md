@@ -205,6 +205,7 @@ href        URL                    OPTIONAL    web page about the item
 part        string                 OPTIONAL    whether and how the item is partial
 label       string                 OPTIONAL    call number or similar item label for finding or identification
 about       string                 OPTIONAL    human-readable description of the item
+chronology  [chronology]           OPTIONAL    chronology or enumeration of the item
 department  [entity]               OPTIONAL    an administrative sub-entitity of the institution
 storage     [entity]               OPTIONAL    a physical location of the item (stacks, floor etc.)
 available   array of [available]   OPTIONAL    set of available [services]
@@ -688,6 +689,39 @@ A public domain audio book:
 ```
 </div>
 
+## Chronology
+
+A **chronology** is a JSON object with one OPTIONAL field:
+
+name    type                description
+------- ------- ----------- ------------------------------------------------------
+about   string  OPTIONAL    human-readble summary of the chronology or enumeration
+------- ------- ----------- ------------------------------------------------------
+
+A chronology specifies the extend of a partitioned [item] such as a serial in
+terms of time spans, volumes, and issues. A later version of DAIA specification
+will define addition fields to express this information in structured form.
+DAIA clients SHOULD therefore ignore unknown fields in a chronology object
+until they can refer to a later version of DAIA.
+
+Item field `part` SHOULD be set to `narrower` if a chronology is given and the
+chronology does not cover the full extent of the document (for instance not all
+issues of a journal).
+
+<div class="example">
+
+An itemChronology of an item with cronology volume 1 (1920) until volume 19 (1939),
+volume 21 (1941), and volume 36 (1956) since the most current volume:
+
+`examples/chronology-1.json`{.include .codeblock .json}
+
+First issue of *Philosophical Transactions* the first English scientific
+journal, in response to availability of the full journal until its first rename
+(1665–1678):
+
+`examples/response-7.json`{.include .codeblock .json}
+
+</div>
 
 ## Integrity rules
 
@@ -1163,7 +1197,7 @@ consists of three numbers, optionally followed by `+` and a suffix:
 * The major version (first number) is increased if changes require
   a modification of DAIA clients
 * The minor version (second number) is increased if changes require
-  a modification a DAIA servers
+  a modification of DAIA servers
 * The patch version (third number) is increased for backwards compatible
   fixes or extensions, such as the introduction of new optional fields
 * The optional suffix indicates informal changes in documentation
@@ -1175,10 +1209,11 @@ Before version 1.0.0 the patch version was used as minor version.
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
 
-#### 0.9.10 (2017-02-??) {.unnumbered}
+#### 0.9.10 (2017-02-14) {.unnumbered}
 
 * Make item id and entity id RECOMMENDED (#33)
 * Add OPTIONAL response fields `$schema` and `@context`
+* Add OPTIONAL item field `chronology`
 * Update JSON Schema
 
 #### 0.9.9 (2016-02-26) {.unnumbered}
