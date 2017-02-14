@@ -2,6 +2,12 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "additionalProperties": false,
   "properties": {
+    "$schema": {
+      "$ref": "#/types/URL"
+    },
+    "@context": {
+      "$ref": "#/types/URL"
+    },
     "document": {
       "items": {
         "$ref": "#/types/document"
@@ -71,6 +77,15 @@
       "required": [
         "service"
       ],
+      "type": "object"
+    },
+    "chronology": {
+      "additionalProperties": true,
+      "properties": {
+        "about": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "count": {
@@ -147,6 +162,9 @@
             "$ref": "#/types/available"
           },
           "type": "array"
+        },
+        "chronology": {
+          "$ref": "#/types/chronology"
         },
         "department": {
           "$ref": "#/types/entity"
