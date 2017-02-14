@@ -1,124 +1,225 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "types": {
-        "URI": {
-            "type": "string",
-            "format": "uri"
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "document": {
+      "items": {
+        "$ref": "#/types/document"
+      },
+      "type": "array"
+    },
+    "institution": {
+      "$ref": "#/types/entity"
+    },
+    "timestamp": {
+      "$ref": "#/types/datetime"
+    }
+  },
+  "required": [
+    "document"
+  ],
+  "type": "object",
+  "types": {
+    "URI": {
+      "format": "uri",
+      "type": "string"
+    },
+    "URL": {
+      "allOf": [
+        {
+          "format": "uri",
+          "type": "string"
         },
-        "URL": {
-            "allOf": [
-                { "type": "string", "format": "uri" },
-                { "type": "string", "pattern": "^https?:" }
-            ]
+        {
+          "pattern": "^https?:",
+          "type": "string"
+        }
+      ]
+    },
+    "anydate": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](Z|[+-][0-9][0-9]:[0-9][0-9])?$",
+          "type": "string"
         },
-        "count": {
-            "type": "integer",
-            "minimum": 1
+        {
+          "enum": [
+            "unknown"
+          ]
+        }
+      ]
+    },
+    "available": {
+      "additionalProperties": false,
+      "properties": {
+        "delay": {
+          "$ref": "#/types/duration"
         },
-        "datetime": {
-            "type": "string",
-            "format": "date-time"
+        "href": {
+          "$ref": "#/types/URL"
         },
-        "anydate": {
-            "anyOf": [
-                { "type": "string", "pattern": "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](Z|[+-][0-9][0-9]:[0-9][0-9])?$" },
-                { "enum": ["unknown"] }
-            ]
-        },
-        "duration": {
-            "anyOf": [
-                { "type": "string", "pattern": "^-?P([0-9]+Y)?([0-9]+M)([0-9]+D)T?([0-9]+H)([0-9]+M)([0-9]+(\\.[0-9]+)?S)?$" },
-                { "enum": ["unknown"] }
-            ]
+        "limitation": {
+          "items": {
+            "$ref": "#/types/entity"
+          },
+          "type": "array"
         },
         "service": {
-            "anyOf": [
-                { "$ref": "#/types/URI" },
-                { "enum": ["presentation","loan","interloan","openaccess"] }
-            ]
+          "$ref": "#/types/service"
+        }
+      },
+      "required": [
+        "service"
+      ],
+      "type": "object"
+    },
+    "count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "datetime": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "document": {
+      "additionalProperties": false,
+      "properties": {
+        "about": {
+          "type": "string"
         },
-        "entity": {
-            "type": "object",
-            "properties": {
-                "id": { "$ref": "#/types/URI" },
-                "href": { "$ref": "#/types/URL" },
-                "content": { "type": "string" }
-            },
-            "additionalProperties": false
+        "href": {
+          "$ref": "#/types/URL"
         },
-        "document": {
-            "type": "object",
-            "properties": {
-                "id": { "$ref": "#/types/URI" },
-                "requested": { "type": "string" },
-                "href": { "$ref": "#/types/URL" },
-                "about": { "type": "string" },
-                "item": {
-                    "type": "array",
-                    "items": { "$ref": "#/types/item" }
-                }
-            },
-            "required": ["id"],
-            "additionalProperties": false
+        "id": {
+          "$ref": "#/types/URI"
         },
         "item": {
-            "type": "object",
-            "properties": {
-                "id": { "$ref": "#/types/URI" },
-                "href": { "$ref": "#/types/URL" },
-                "part": { "enum": [ "broader", "narrower" ] },
-                "label": { "type": "string" },
-                "about": { "type": "string" },
-                "department": { "$ref": "#/types/entity" },
-                "storage": { "$ref": "#/types/entity" },
-                "available": {
-                    "type": "array",
-                    "items": { "$ref": "#/types/available" }
-                },
-                "unavailable": {
-                    "type": "array",
-                    "items": { "$ref": "#/types/unavailable" }
-                }
-            },
-            "additionalProperties": false
+          "items": {
+            "$ref": "#/types/item"
+          },
+          "type": "array"
+        },
+        "requested": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "duration": {
+      "anyOf": [
+        {
+          "pattern": "^-?P([0-9]+Y)?([0-9]+M)?([0-9]+D)?T?([0-9]+H)?([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?$",
+          "type": "string"
+        },
+        {
+          "enum": [
+            "unknown"
+          ]
+        }
+      ]
+    },
+    "entity": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "href": {
+          "$ref": "#/types/URL"
+        },
+        "id": {
+          "$ref": "#/types/URI"
+        }
+      },
+      "type": "object"
+    },
+    "item": {
+      "additionalProperties": false,
+      "properties": {
+        "about": {
+          "type": "string"
         },
         "available": {
-            "type": "object",
-            "properties": {
-                "service": { "$ref": "#/types/service" },
-                "href": { "$ref": "#/types/URL" },
-                "delay": { "$ref": "#/types/duration" },
-                "limitation": {
-                    "type": "array",
-                    "items": { "$ref": "#/types/entity" }
-                }
-            },
-            "required": ["service"],
-            "additionalProperties": false
+          "items": {
+            "$ref": "#/types/available"
+          },
+          "type": "array"
+        },
+        "department": {
+          "$ref": "#/types/entity"
+        },
+        "href": {
+          "$ref": "#/types/URL"
+        },
+        "id": {
+          "$ref": "#/types/URI"
+        },
+        "label": {
+          "type": "string"
+        },
+        "part": {
+          "enum": [
+            "broader",
+            "narrower"
+          ]
+        },
+        "storage": {
+          "$ref": "#/types/entity"
         },
         "unavailable": {
-            "type": "object",
-            "properties": {
-                "service": { "$ref": "#/types/service" },
-                "href": { "$ref": "#/types/URL" },
-                "expected": { "$ref": "#/types/anydate" },
-                "queue": { "$ref": "#/types/count" },
-                "limitation": {
-                    "type": "array",
-                    "items": { "$ref": "#/types/entity" }
-                }
-            },
-            "additionalProperties": false
+          "items": {
+            "$ref": "#/types/unavailable"
+          },
+          "type": "array"
         }
+      },
+      "type": "object"
     },
-    "properties": {
-        "institution": { "$ref": "#/types/entity" },
-        "document": {
-            "type": "array",
-            "items": { "$ref": "#/types/document" }
+    "service": {
+      "anyOf": [
+        {
+          "$ref": "#/types/URI"
         },
-        "timestamp": { "$ref": "#/types/datetime" }
+        {
+          "enum": [
+            "presentation",
+            "loan",
+            "remote",
+            "interloan",
+            "openaccess"
+          ]
+        }
+      ]
     },
-    "additionalProperties": false
+    "unavailable": {
+      "additionalProperties": false,
+      "properties": {
+        "expected": {
+          "$ref": "#/types/anydate"
+        },
+        "href": {
+          "$ref": "#/types/URL"
+        },
+        "limitation": {
+          "items": {
+            "$ref": "#/types/entity"
+          },
+          "type": "array"
+        },
+        "queue": {
+          "$ref": "#/types/count"
+        },
+        "service": {
+          "$ref": "#/types/service"
+        }
+      },
+      "required": [
+        "service"
+      ],
+      "type": "object"
+    }
+  }
 }
