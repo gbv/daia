@@ -6,7 +6,9 @@
         "is-my-json-valid": "~2.12.0",
         "jsonfile": "~2.2.0",
         "glob": "~5.0.0",        
-        "mocha": "~1.21.4"
+        "mocha": "~1.21.4",
+        "jsonld": "~0.4.11",
+        "n3": "~0.9.1"
     },
     "scripts": {
         "test": "./node_modules/.bin/mocha --reporter tap ."

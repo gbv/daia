@@ -1,0 +1,49 @@
+{
+  "document": {
+      "@id": "http://www.w3.org/2000/01/rdf-schema#seeAlso"
+  },
+  "about": {
+    "@id": "http://purl.org/dc/elements/1.1/description"
+  },
+  "available": {
+    "@id": "http://purl.org/ontology/daia/availableFor",
+    "@type": "@id"
+  },
+  "content": {
+    "@id": "http://purl.org/dc/elements/1.1/title"
+  },
+  "delay": {
+    "@id": "http://purl.org/ontology/service#delay",
+    "@type": "http://www.w3.org/2001/XMLSchema#duration"
+  },
+  "href": {
+    "@id": "http://xmlns.com/foaf/0.1/page",
+    "@type": "@id"
+  },
+  "id": "@id",
+  "interloan": "http://purl.org/ontology/dso#Interloan",
+  "item": {
+    "@id": "http://purl.org/ontology/holding#exemplar",
+    "@type": "@id"
+  },
+  "label": {
+    "@id": "http://purl.org/ontology/holding#label"
+  },
+  "limitation": {
+    "@id": "http://purl.org/ontology/service#limitedBy",
+    "@type": "@id"
+  },
+  "loan": "http://purl.org/ontology/dso#Loan",
+  "openaccess": "http://purl.org/ontology/dso#Openaccess",
+  "presentation": "http://purl.org/ontology/dso#Presentation",
+  "queue": {
+    "@id": "http://purl.org/ontology/service#queue",
+    "@type": "http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+  },
+  "remote": "http://purl.org/ontology/dso#Remote",
+  "service": "@type",
+  "unavailable": {
+    "@id": "http://purl.org/ontology/daia/unavailableFor",
+    "@type": "@id"
+  }
+}
