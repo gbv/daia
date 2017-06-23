@@ -1186,17 +1186,14 @@ The format a DAIA profile has not been specified yet. See
 * Davis, M. and Whistler, K.: “Unicode Normalization Forms”.
   Unicode Standard Annex #15. <http://www.unicode.org/reports/tr15/>.
 
-* Galiegue, F. and Zyp, K. 2013: “JSON Schema v4”.
-  <http://json-schema.org/latest/json-schema-core.html>.
+* Wright, A. and Andrews, H. 2017: “JSON Schema”.
+  <https://tools.ietf.org/html/draft-wright-json-schema-01>
 
 * Sporny, M. et al., 2014: “JSON-LD 1.0”.
   <https://www.w3.org/TR/json-ld/>
 
-* Voß, J. 2015. “Patrons Account Information API (PAIA)”
+* Voß, J. 2017. “Patrons Account Information API (PAIA)”
   <http://gbv.github.io/paia/>.
-
-* Voß, J. 2015. “ng-daia”.
-  <http://gbv.github.io/ng-daia/>.
 
 [RFC 2119]: http://tools.ietf.org/html/rfc2119
 [RFC 3986]: http://tools.ietf.org/html/rfc3986
@@ -1333,15 +1330,6 @@ limitation string   OPTIONAL string describing an additional limitation
 { "service": "openaccess", "available": true, "href": "http://dx.doi.org/10.1901%2Fjaba.1974.7-497a" }
 ```
 </div>
-
-<div class="note">
-The DAIA client [ng-daia] implements a possible mapping of DAIA Response to
-DAIA Simple and a possible HTML display of DAIA Response and DAIA Simple. Try
-the [demo page](https://gbv.github.io/ng-daia/demo/) to get DAIA Simple from
-DAIA Response format.
-</div>
-
-[ng-daia]: http://gbv.github.io/ng-daia/
 
 
 ## JSON Schema
