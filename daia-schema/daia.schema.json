@@ -72,6 +72,9 @@
         },
         "service": {
           "$ref": "#/types/service"
+        },
+        "title": {
+          "type": "string"
         }
       },
       "required": [
@@ -232,6 +235,9 @@
         },
         "service": {
           "$ref": "#/types/service"
+        },
+        "title": {
+          "type": "string"
         }
       },
       "required": [

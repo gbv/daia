@@ -313,8 +313,9 @@ fields:
 
 name        type                       description
 ----------- ----------------- -------- --------------------------------------------------
-service     service           REQUIRED the type of [service] being available
-href        URL               OPTIONAL a link required to perform, register or reserve the service
+service     service           REQUIRED type of [service] being available
+href        URL               OPTIONAL link required to perform, register or reserve the service
+title       string            OPTIONAL suggested link title or anchor text of the link in field href
 delay       duration          OPTIONAL estimated delay (if given).
 limitation  array of [entity] OPTIONAL more specific [limitations] of the service
 ----------- ----------------- -------- --------------------------------------------------
@@ -325,7 +326,9 @@ unknown.
 
 If field `href` is given, a DAIA client MUST assume that this link is required
 to perform the service. If field `href` is not given, a DAIA client SHOULD
-assume that the service can be used without further information.
+assume that the service can be used without further information. If field
+`href` is not given, field `title` MUST NOT be given neither. DAIA clients MAY
+choose to not display field `title` or override it with a default value.
 
 <div class="example">
 Directly available, e.g. documents in open stacks or pickup area:
@@ -369,8 +372,9 @@ fields:
 
 name        type                       description
 ----------- ----------------- -------- --------------------------------------------------
-service     service           REQUIRED the type of [service] being unavailable
-href        URL               OPTIONAL a link required to perform, register or reserve the service
+service     service           REQUIRED type of [service] being unavailable
+href        URL               OPTIONAL link required to perform, register or reserve the service
+title       string            OPTIONAL suggested link title or anchor text of the link in field href
 expected    anydate           OPTIONAL expected date when the service will be available again
 queue       count             OPTIONAL number of waiting requests for this service
 limitation  array of [entity] OPTIONAL more specific [limitations] of the service
@@ -383,7 +387,9 @@ when or whether the service will be available again.
 If field `href` is given, a DAIA client MUST assume that this link is required
 to perform the service as soon at is is available again. If field `href` is not
 given, a DAIA client SHOULD NOT assume whether additional information is needed
-once the service is available again.
+once the service is available again. If field `href` is not given, field
+`title` MUST NOT be given neither. DAIA clients MAY choose to not display field
+`title` or override it with a default value.
 
 <div class="example">
 
@@ -1208,6 +1214,10 @@ Before version 1.0.0 the patch version was used as minor version.
 
 Releases with functional changes are tagged with a version number and
 included at <https://github.com/gbv/daia/releases> with release notes.
+
+#### 1.0.0 (2017-06-23) {.unnumbered}
+
+* Add OPTIONAL (un)available field `title`
 
 #### 0.9.10 (2017-02-14) {.unnumbered}
 
