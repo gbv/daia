@@ -28,6 +28,17 @@ mapped to other data formats such as RDF.
 
 A non-normative [JSON Schema] is included in the appendix.
 
+------------------------------------------------------ ------------------------------------------------------
+[response](#daia-response)                                            
+↳ [documents]                                          documents matching the processed [request identifiers]
+&#160;&#160; ↳ [items]                                 set of instances or copies of the document
+&#160;&#160;&#160;&#160; ↳ [available] / [unavailable] list of [services] the items can/cannot be used for
+&#160;&#160;&#160;&#160;&#160;&#160; ↳ [limitations]   optional limitations of the service
+------------------------------------------------------ ------------------------------------------------------
+
+: Outline of DAIA data model
+
+
 ## Simple data types
 
 [entity]: #simple-data-types
